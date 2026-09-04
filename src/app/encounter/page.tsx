@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { nanoid } from "nanoid";
 import { AppNav } from "@/components/AppNav";
+import { VoiceButton } from "@/components/VoiceButton";
 import { db, ensureSeeded } from "@/lib/db";
 import { detectCountryFromPosition } from "@/lib/country";
 import { compressImage } from "@/lib/image";
@@ -42,6 +43,7 @@ function errorMessage(code: string): string {
   if (code === "MODEL_TIMEOUT") return "模型这次响应有点慢，请重试。";
   if (code === "INVALID_MODEL_OUTPUT") return "模型没有给出可用的显影结果，请重试。";
   if (code === "INVALID_RELATED_ITEM") return "历史关联没有确认成功，请再试一次。";
+  if (code === "LOCAL_STORAGE_ERROR") return "这台设备暂时无法保存记录，请检查浏览器存储空间后重试。";
   return "网络或模型服务暂时不可用，请重试。";
 }
 
@@ -223,7 +225,11 @@ export default function EncounterPage() {
         isSeed: false,
         createdAt: now,
       };
-      await db.items.put(item);
+      try {
+        await db.items.put(item);
+      } catch {
+        throw new Error("LOCAL_STORAGE_ERROR");
+      }
       router.push(`/item/${item.id}`);
     } catch (caught) {
       setError(errorMessage(caught instanceof Error ? caught.message : "MODEL_ERROR"));
@@ -260,6 +266,8 @@ export default function EncounterPage() {
     try {
       await db.items.put(item);
       router.push(`/item/${item.id}`);
+    } catch {
+      setError("这台设备暂时无法保存记录，请检查浏览器存储空间后重试。");
     } finally {
       setSavingManual(false);
     }
@@ -322,13 +330,16 @@ export default function EncounterPage() {
             <p className="eyebrow">02 / 留下一句话</p>
             <div className="field">
               <label htmlFor="note">你当时说了什么？</label>
-              <textarea
-                id="note"
-                value={userNote}
-                onChange={(event) => setUserNote(event.target.value)}
-                placeholder="比如：它怎么会长在这里？"
-                maxLength={300}
-              />
+              <div className="voice-field">
+                <textarea
+                  id="note"
+                  value={userNote}
+                  onChange={(event) => setUserNote(event.target.value)}
+                  placeholder="比如：它怎么会长在这里？"
+                  maxLength={300}
+                />
+                <VoiceButton value={userNote} onChange={setUserNote} />
+              </div>
             </div>
             <div className="field-row" style={{ marginTop: 12 }}>
               <div className="field">
@@ -421,7 +432,7 @@ export default function EncounterPage() {
             </button>
           ) : null}
           <p className="privacy-note">
-            照片只保存在本机；显影期间会临时发送给百炼模型，应用服务端不保存照片。
+            照片、文字和语音只在识别期间临时发送给相应 AI 服务；应用服务端不保存这些内容。
           </p>
         </div>
       </div>

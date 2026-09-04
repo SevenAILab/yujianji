@@ -11,7 +11,8 @@
     "seed:check": "tsx scripts/check-seed.ts",
     "seed:check:final": "SEED_MIN_COUNT=20 npm run seed:check",
     "seed:ai": "tsx scripts/seed-ai.ts",
-    "ping": "tsx scripts/ping.ts"
+    "ping": "tsx scripts/ping.ts",
+    "qr": "bash scripts/qr.sh"
   },
   "dependencies": {
     "country-code-lookup": "^0.1.5",
@@ -40,9 +41,10 @@
     "@types/react-dom": "^19",
     "@types/topojson-client": "^3.1.5",
     "dotenv": "^17.4.2",
+    "qrcode-terminal": "^0.12.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.13",
     "typescript": "^5",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.7"
   }
 }

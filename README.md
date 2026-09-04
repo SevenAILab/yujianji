@@ -67,9 +67,15 @@ npm run seed:ai
 ## 页面
 
 - `/` 世界地图、国家高亮、统计和最近遇见
-- `/encounter` 拍照/相册、原话、地点、定位降级、显影和手动保存
-- `/item/[id]` 初见/重逢、AI 博物志、依据、追问和删除
-- `/firsts` 只统计 `ai.verdict === "first"` 的记录
+- `/encounter` 拍照/相册、原话、语音输入、地点、定位降级、显影和手动保存
+- `/item/[id]` 初见/重逢、AI 博物志、依据、追问、分享图和删除
+- `/firsts` 只统计 `ai.verdict === "first"` 的记录，并支持按日期调用旅程总结
+
+### P1 / P2
+
+- 语音输入使用浏览器 Web Speech API。iPhone Safari 或 Android Chrome 不支持时，按钮会置灰并提示直接打字。
+- 分享图由浏览器 Canvas 本地生成，尺寸固定为 `1080 × 1920`，不经过应用服务端。
+- 旅程总结在 `/firsts` 中选择日期范围后调用 `/api/summary`，只发送结构化的记录摘要，不发送照片。
 
 照片和记录只存用户浏览器的 IndexedDB。识别期间照片会临时发送给百炼模型，应用服务端不保存照片。
 
@@ -92,3 +98,21 @@ npm run seed:check
 4. 比赛结束后禁用或轮换公开 Demo 使用的 API key。
 
 API 使用 Node.js runtime，单次函数最长 60 秒；客户端压缩后的 data URL 必须不超过 2MB。限流是单实例内每分钟 120 次的成本保护，多实例部署时不是强全局限流。
+
+## 二维码与局域网
+
+生产二维码：
+
+```bash
+npm run qr
+# 或指定地址
+bash scripts/qr.sh https://yujianji.vercel.app
+```
+
+局域网备用：
+
+```bash
+PORT=3001 ./scripts/lan.sh
+```
+
+脚本会打印本机局域网地址。手机和电脑连接同一 Wi-Fi 后，用二维码或该地址打开。

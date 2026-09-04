@@ -5,13 +5,13 @@ import { buildRecognitionUserText, RECOGNIZE_SYSTEM_PROMPT } from "@/lib/prompt"
 import { callVision } from "@/lib/llm";
 import { dataUrlByteLength } from "@/lib/image";
 import { parseRecognizeResult, RecognizeParseError } from "@/lib/recognize";
+import { allowRequest } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const MAX_BODY_BYTES = 4.5 * 1024 * 1024;
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
-const requestTimes: number[] = [];
 
 function errorResponse(
   status: number,
@@ -23,18 +23,6 @@ function errorResponse(
 
 function isAllowedImageDataUrl(value: string): boolean {
   return /^data:image\/(?:jpeg|jpg|png);base64,[A-Za-z0-9+/=\s]+$/i.test(value);
-}
-
-function allowRequest(): boolean {
-  const now = Date.now();
-  while (requestTimes[0] && now - requestTimes[0] > 60_000) {
-    requestTimes.shift();
-  }
-  if (requestTimes.length >= 120) {
-    return false;
-  }
-  requestTimes.push(now);
-  return true;
 }
 
 export async function POST(request: Request) {

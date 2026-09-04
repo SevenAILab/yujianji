@@ -12,10 +12,13 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { AppNav } from "@/components/AppNav";
+import { ShareCard } from "@/components/ShareCard";
 import { db, ensureSeeded } from "@/lib/db";
+import { toHistoryEntry } from "@/lib/history";
 import { CATEGORY_LABELS } from "@/lib/types";
 import type { Item } from "@/lib/types";
 import { formatDate, formatMonth } from "@/lib/format";
+import { recognizeResultSchema } from "@/lib/schema";
 
 export default function ItemPage() {
   const params = useParams<{ id: string }>();
@@ -32,6 +35,8 @@ export default function ItemPage() {
   );
   const [answer, setAnswer] = useState("");
   const [savedAnswer, setSavedAnswer] = useState(false);
+  const [actionError, setActionError] = useState("");
+  const [redeveloping, setRedeveloping] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -44,6 +49,10 @@ export default function ItemPage() {
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (item?.answer) setAnswer(item.answer);
+  }, [item?.answer]);
 
   if (item === undefined) {
     return (
@@ -72,14 +81,70 @@ export default function ItemPage() {
 
   async function saveAnswer() {
     if (!answer.trim()) return;
-    await db.items.update(currentItem.id, { answer: answer.trim() });
-    setSavedAnswer(true);
+    try {
+      await db.items.update(currentItem.id, { answer: answer.trim() });
+      setSavedAnswer(true);
+      setActionError("");
+    } catch {
+      setActionError("回答暂时没有保存成功，请检查浏览器存储空间后重试。");
+    }
   }
 
   async function deleteItem() {
     if (!window.confirm("确定要删除这件遇见吗？")) return;
-    await db.items.delete(currentItem.id);
-    router.push("/");
+    try {
+      await db.items.delete(currentItem.id);
+      router.push("/");
+    } catch {
+      setActionError("删除暂时没有完成，请重试。");
+    }
+  }
+
+  async function redevelop() {
+    if (redeveloping) return;
+    setRedeveloping(true);
+    setActionError("");
+    try {
+      const history = (await db.items.orderBy("date").toArray())
+        .filter((entry) => entry.id !== currentItem.id)
+        .map(toHistoryEntry);
+      const response = await fetch("/api/recognize", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          image: currentItem.photo,
+          userNote: currentItem.userNote,
+          history,
+        }),
+      });
+      const payload = (await response.json()) as unknown;
+      if (!response.ok) {
+        const failed = payload as { error?: string };
+        throw new Error(failed.error ?? "重新显影失败，请重试");
+      }
+      const result = recognizeResultSchema.parse(payload);
+      if (result.unrecognized) {
+        throw new Error("这张照片仍然没有足够依据，先保留为未显影。");
+      }
+      await db.items.update(currentItem.id, {
+        name: result.name,
+        nameEn: result.nameEn ?? undefined,
+        category: result.category,
+        ai: {
+          cognition: result.cognition,
+          fun: result.fun,
+          luck: result.luck,
+          question: result.question,
+          verdict: result.verdict,
+          relatedItemId: result.relatedItemId,
+          memorySentence: result.memorySentence,
+        },
+      });
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "重新显影失败，请重试");
+    } finally {
+      setRedeveloping(false);
+    }
   }
 
   return (
@@ -135,8 +200,8 @@ export default function ItemPage() {
               <p className="eyebrow">还没有显影</p>
               <h2>先把它留在这里</h2>
               <p>这件遇见没有经过 AI 解读，但照片、地点和你说的话已经保存下来了。</p>
-              <button className="secondary-action" style={{ marginTop: 14 }} onClick={() => router.push("/encounter")}>
-                重新显影
+              <button className="secondary-action" style={{ marginTop: 14 }} onClick={() => void redevelop()} disabled={redeveloping}>
+                {redeveloping ? "正在重新显影…" : "重新显影"}
               </button>
             </section>
           )}
@@ -207,6 +272,9 @@ export default function ItemPage() {
               </div>
             </section>
           ) : null}
+
+          <ShareCard item={item} />
+          {actionError ? <div className="error-box">{actionError}</div> : null}
 
           <div className="action-row">
             <button className="secondary-action" onClick={() => router.push("/")}>
