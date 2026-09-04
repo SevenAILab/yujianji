@@ -9,21 +9,36 @@ import { ItemCard } from "@/components/ItemCard";
 import { MapErrorBoundary } from "@/components/MapErrorBoundary";
 import { WorldMap } from "@/components/WorldMap";
 import { db, ensureSeeded } from "@/lib/db";
+import type { Item } from "@/lib/types";
 
 export default function Home() {
   const router = useRouter();
-  const items = useLiveQuery(() => db.items.orderBy("date").toArray(), [], []);
+  const [seedReady, setSeedReady] = useState(false);
+  const items = useLiveQuery(
+    () => (seedReady ? db.items.orderBy("date").toArray() : Promise.resolve([] as Item[])),
+    [seedReady],
+    [],
+  );
   const [toast, setToast] = useState("");
 
   useEffect(() => {
+    let active = true;
     ensureSeeded()
       .then((inserted) => {
-        if (inserted) {
+        if (active && inserted) {
           setToast("已载入示例历史。照片来自队员的真实旅行记录。");
           window.setTimeout(() => setToast(""), 3600);
         }
       })
-      .catch(() => setToast("示例历史加载失败，请刷新重试。"));
+      .catch(() => {
+        if (active) setToast("示例历史加载失败，请刷新重试。");
+      })
+      .finally(() => {
+        if (active) setSeedReady(true);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   const stats = useMemo(() => {

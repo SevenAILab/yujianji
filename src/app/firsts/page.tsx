@@ -2,22 +2,32 @@
 
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { AppNav } from "@/components/AppNav";
 import { ItemCard } from "@/components/ItemCard";
 import { db, ensureSeeded } from "@/lib/db";
+import type { Item } from "@/lib/types";
 
 export default function FirstsPage() {
   const router = useRouter();
+  const [seedReady, setSeedReady] = useState(false);
   const items = useLiveQuery(
-    () => db.items.orderBy("date").reverse().toArray(),
-    [],
+    () => (seedReady ? db.items.orderBy("date").reverse().toArray() : Promise.resolve([] as Item[])),
+    [seedReady],
     [],
   );
 
   useEffect(() => {
-    void ensureSeeded();
+    let active = true;
+    void ensureSeeded()
+      .catch(() => undefined)
+      .finally(() => {
+        if (active) setSeedReady(true);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   const firsts = items.filter((item) => item.ai?.verdict === "first");

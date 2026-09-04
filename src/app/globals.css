@@ -543,7 +543,7 @@ img {
 
 .toast {
   position: fixed;
-  top: 18px;
+  top: 72px;
   left: 50%;
   z-index: 50;
   width: min(calc(100% - 36px), 390px);

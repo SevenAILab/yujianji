@@ -4,7 +4,7 @@
     "name": "粉色叶子",
     "nameEn": "Pink leaf",
     "category": "plant",
-    "photo": "/seed/pink-leaf-placeholder.jpg",
+    "photo": "/seed/pink-leaf-real.jpg",
     "place": "浙江 · 莫干山",
     "country": "CHN",
     "lat": 30.61,
@@ -13,17 +13,17 @@
     "date": "2025-10-12T16:32:00+08:00",
     "userNote": "第一次见到粉色的叶子。",
     "ai": {
-      "cognition": "这是一株具有粉红色叶片的植物幼苗，叶片对生，叶脉以浅色线条示意。",
-      "fun": "部分植物在新叶阶段会呈现粉红或红色，这是花青素暂时积累形成的保护色，随成熟逐渐转绿。",
+      "cognition": "一片呈现鲜艳粉红色的植物叶片，叶脉清晰，边缘可见细小绒毛；仅凭这张照片无法确定具体物种。",
+      "fun": "微距下，叶缘的细小绒毛像一圈柔软的绒边，也让叶片的纹理变得更立体。",
       "luck": {
-        "text": "在莫干山这样的亚热带湿润山区，春季新叶泛粉的现象相对常见，是自然节律的温柔提醒。",
-        "basis": "用户标注地点为浙江莫干山，属亚热带季风气候，春季新叶显色现象有生态依据",
+        "text": "在莫干山这样的山地环境里，偶遇一片粉红叶色，是自然节律递来的一点细腻信号。",
+        "basis": "照片显示典型落叶阔叶植物叶片结构，结合用户标注地点与‘第一次见到’语境，推断为季节性色素变化现象；无物种鉴定依据，故未断言具体植物。",
         "confidence": "medium"
       },
-      "question": "你当时是在哪个月份见到它的？",
+      "question": "这片叶子来自哪类植物？你当时是否注意到枝条或花的特征？",
       "verdict": "first",
       "relatedItemId": null,
-      "memorySentence": "第一次遇见粉色叶子，真像春天寄来的一封信。"
+      "memorySentence": "第一次遇见粉叶，真像秋日悄悄染上的温柔信笺。"
     },
     "isSeed": true,
     "createdAt": "2025-10-12T16:32:00+08:00"
@@ -33,7 +33,7 @@
     "name": "黑色玄武岩",
     "nameEn": "Basalt",
     "category": "mineral",
-    "photo": "/seed/basalt-placeholder.jpg",
+    "photo": "/seed/basalt-real.jpg",
     "place": "青海 · 茶卡",
     "country": "CHN",
     "lat": 36.79,
@@ -42,17 +42,17 @@
     "date": "2024-08-20T10:18:00+08:00",
     "userNote": "捡了一块有孔洞的黑色石头。",
     "ai": {
-      "cognition": "一种喷出型火成岩，由岩浆快速冷却形成，常见气孔构造。",
-      "fun": "这些孔洞是岩浆喷发时气体逸出后留下的空腔，被称为‘气孔构造’。",
+      "cognition": "这是一块带有明显孔隙的深色岩石，看起来像玄武岩；仅凭照片无法完成岩石鉴定。",
+      "fun": "岩石里的孔隙可能是气体逸出后留下的空间，也可能来自风化或断裂，近看会比远看更有细节。",
       "luck": {
-        "text": "在茶卡盐湖周边拾得带气孔的玄武岩，说明曾有火山活动影响此地地貌。",
-        "basis": "青海柴达木盆地边缘存在新生代火山活动遗迹，茶卡地区偶见玄武岩碎块。",
+        "text": "在茶卡盐湖周边遇见一块带孔隙的深色石头，让脚下的地质时间突然有了触感。",
+        "basis": "依据是照片中的深色块状纹理、可见孔隙，以及用户提供的地点和原话；未进行现场取样或岩石鉴定。",
         "confidence": "medium"
       },
-      "question": "这块石头的气孔大小是否均匀？",
+      "question": "你还记得这些孔隙是均匀分布，还是只集中在石头的一侧吗？",
       "verdict": "first",
       "relatedItemId": null,
-      "memorySentence": "第一次遇见带气孔的玄武岩，真幸运！"
+      "memorySentence": "第一次遇见带孔洞的玄武岩，像大地留下的呼吸印记。"
     },
     "isSeed": true,
     "createdAt": "2024-08-20T10:18:00+08:00"
@@ -71,19 +71,512 @@
     "date": "2023-07-16T15:06:00+01:00",
     "userNote": "海风把白色的崖壁吹得很亮。",
     "ai": {
-      "cognition": "由白垩纪海相沉积形成的白色 chalk 崖壁，沿英吉利海峡东南海岸延伸。",
-      "fun": "这些白崖的白色来自远古海洋微生物遗骸压实形成的碳酸钙沉积，本质是亿万年前的‘海藻墓碑’。",
+      "cognition": "一段面向海面的白色白垩质崖壁，崖面有明显的层理和侵蚀痕迹。",
+      "fun": "白色崖壁、灰蓝海面和阴天光线放在一起，会让海岸显得像一张被轻轻褪色的旧照片。",
       "luck": {
-        "text": "在阴天薄雾中，白崖反光柔和，反而更显轮廓清晰，是难得的静谧观景时刻。",
-        "basis": "照片显示多云天空与低对比度光照，符合英国南部春季常见天气条件，利于减少眩光、突出崖体层次",
+        "text": "此刻云层低垂而海面平静，崖壁在漫射光下显出柔和轮廓，是难得的静谧观景时刻。",
+        "basis": "照片中天空阴沉、海面无大浪、崖面反光均匀，符合低照度下白垩岩显色清晰的条件",
         "confidence": "medium"
       },
-      "question": "你走的这条小径，是否通往七姐妹中的‘贝林顿崖’（Birling Gap）？",
+      "question": "你当时是沿着崖顶步道走，还是在海边回望这段白崖？",
       "verdict": "first",
       "relatedItemId": null,
-      "memorySentence": "第一次遇见七姐妹白崖，风里有盐和时间的味道。"
+      "memorySentence": "第一次遇见七姐妹，风拂过白崖，光落在肩头。"
     },
     "isSeed": true,
     "createdAt": "2023-07-16T15:06:00+01:00"
+  },
+  {
+    "id": "sunset-ridge-2022-11",
+    "name": "日落山脊",
+    "nameEn": "Sunset ridge",
+    "category": "landscape",
+    "photo": "/seed/public-01.jpg",
+    "place": "加拿大 · 山脊",
+    "country": "CAN",
+    "lat": 49.28,
+    "lng": -123.12,
+    "locationSource": "manual",
+    "date": "2022-11-03T17:12:00-08:00",
+    "userNote": "太阳落下去以后，山一层一层变成了剪影。",
+    "ai": {
+      "cognition": "层叠山峦在日落时分呈现剪影轮廓，大气散射形成暖色调渐变天幕。",
+      "fun": "山脊剪影的层次感常源于不同距离山体对光线的遮挡差异，而非实际高差巨大。",
+      "luck": {
+        "text": "此刻的光与影恰好构成清晰的层叠结构，是气象与视角共同成全的短暂构图。",
+        "basis": "照片中可见多层山影与清晰太阳星芒，说明空气洁净、无云遮挡，属典型晴朗傍晚条件",
+        "confidence": "medium"
+      },
+      "question": "你当时站在哪一座山脊上？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见这层层叠叠的暮色山影，真好。"
+    },
+    "isSeed": true,
+    "createdAt": "2022-11-03T17:12:00-08:00"
+  },
+  {
+    "id": "alpine-lake-2021-06",
+    "name": "蓝色山湖",
+    "nameEn": "Alpine lake",
+    "category": "landscape",
+    "photo": "/seed/public-05.jpg",
+    "place": "意大利 · 多洛米蒂",
+    "country": "ITA",
+    "lat": 46.7,
+    "lng": 12.08,
+    "locationSource": "manual",
+    "date": "2021-06-21T11:40:00+02:00",
+    "userNote": "湖水蓝得像把天空借了过来。",
+    "ai": {
+      "cognition": "一片被山林和岩壁包围的蓝绿色高山湖泊，湖边有一座伸入水面的木屋。",
+      "fun": "木屋、倒影和远处的山峰形成了天然的三层构图，难怪人会在这里多看一会儿。",
+      "luck": {
+        "text": "晨雾轻笼山腰时，湖面如镜映出整座山形，这种光影平衡稍纵即逝。",
+        "basis": "照片中可见低云缠绕山体中段、水面平静无风，符合清晨高湿度稳定气流条件",
+        "confidence": "medium"
+      },
+      "question": "你到湖边时，最先注意到的是木屋、倒影，还是远处被云遮住的山峰？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见，湖水真像把天空借了过来。"
+    },
+    "isSeed": true,
+    "createdAt": "2021-06-21T11:40:00+02:00"
+  },
+  {
+    "id": "forest-path-2020-10",
+    "name": "森林小径",
+    "nameEn": "Forest path",
+    "category": "landscape",
+    "photo": "/seed/public-04.jpg",
+    "place": "德国 · 黑森林",
+    "country": "DEU",
+    "lat": 48.35,
+    "lng": 8.2,
+    "locationSource": "manual",
+    "date": "2020-10-08T09:26:00+02:00",
+    "userNote": "林子里只有脚步声和一点阳光。",
+    "ai": {
+      "cognition": "一条穿行于高大针叶林间的土质小径，两侧林木密集，阳光斜射形成光斑。",
+      "fun": "黑森林的名称源于其树木浓密、阴影深重，德语‘Schwarzwald’即‘黑色森林’之意。",
+      "luck": {
+        "text": "此刻林中光影交错，恰是晨间或傍晚林冠透光最柔和的时段。",
+        "basis": "照片中低角度斜射光与长影表明太阳高度较低，符合日出后或日落前的光照特征",
+        "confidence": "medium"
+      },
+      "question": "小径左侧树干上隐约可见的白色标记，是徒步路径标识吗？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见这条静谧小径，真好。"
+    },
+    "isSeed": true,
+    "createdAt": "2020-10-08T09:26:00+02:00"
+  },
+  {
+    "id": "misty-mountains-2022-04",
+    "name": "远山薄雾",
+    "nameEn": "Misty mountains",
+    "category": "landscape",
+    "photo": "/seed/public-03.jpg",
+    "place": "浙江 · 天目山",
+    "country": "CHN",
+    "lat": 30.31,
+    "lng": 119.43,
+    "locationSource": "manual",
+    "date": "2022-04-18T07:55:00+08:00",
+    "userNote": "雾把远处的山收进了一张很轻的纸里。",
+    "ai": {
+      "cognition": "层叠山峦在晨昏光线下被薄雾笼罩，形成由近及远渐隐的视觉层次。",
+      "fun": "这种现象称为‘大气透视’，因空气中微粒散射光线，使远处景物对比度降低、色调偏蓝灰。",
+      "luck": {
+        "text": "此刻的雾与光恰好平衡，让山形轮廓清晰又不失柔意。",
+        "basis": "照片中雾浓度适中，未完全遮蔽山脊线，且天空呈暖色过渡，符合日出或日落短暂时段的典型特征。",
+        "confidence": "medium"
+      },
+      "question": "你当时站在天目山哪一处观景点看到这层叠的山影？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见，雾把山收进轻纸里，真美。"
+    },
+    "isSeed": true,
+    "createdAt": "2022-04-18T07:55:00+08:00"
+  },
+  {
+    "id": "mountain-rocks-2021-09",
+    "name": "山间巨石",
+    "nameEn": "Mountain rocks",
+    "category": "mineral",
+    "photo": "/seed/public-06.jpg",
+    "place": "美国 · 喀斯喀特山脉",
+    "country": "USA",
+    "lat": 46.85,
+    "lng": -121.76,
+    "locationSource": "manual",
+    "date": "2021-09-14T14:20:00-07:00",
+    "userNote": "阳光把石头的轮廓照得像一座小山。",
+    "ai": {
+      "cognition": "一组被夕阳照亮的山间岩石，岩体轮廓清晰，前后山林叠出很有层次的剪影。",
+      "fun": "逆光会把岩石的纹理藏起来，却把轮廓放大成像小山一样的形状。",
+      "luck": {
+        "text": "你站在晨光穿透云隙的瞬间，恰好捕捉到山体明暗交界最富层次的时刻。",
+        "basis": "照片中可见低角度光线、山间雾气和前景岩石轮廓；人物细节无法从照片中可靠判断。",
+        "confidence": "high"
+      },
+      "question": "当时你脚下这块岩石表面是否光滑，还是布满风化裂隙？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见这组巨石，阳光为它镀上金边。"
+    },
+    "isSeed": true,
+    "createdAt": "2021-09-14T14:20:00-07:00"
+  },
+  {
+    "id": "green-valley-2020-05",
+    "name": "绿色山谷",
+    "nameEn": "Green valley",
+    "category": "landscape",
+    "photo": "/seed/public-08.jpg",
+    "place": "伊朗 · 山谷",
+    "country": "IRN",
+    "lat": 37.27,
+    "lng": 49.59,
+    "locationSource": "manual",
+    "date": "2020-05-26T13:10:00+03:30",
+    "userNote": "风吹过山谷，绿色像水一样流动。",
+    "ai": {
+      "cognition": "一片被绿草覆盖的山谷，中央可见环形石堆和小路，背景是岩峰与落日天空。",
+      "fun": "环形石堆让这片山谷多了一点人为留下的秩序感，但照片本身无法判断它的来历或用途。",
+      "luck": {
+        "text": "此刻的光线与草色恰如其分地交汇，让山谷显露出一种短暂而完整的和谐。",
+        "basis": "照片中夕阳低照、云层稀薄、草被饱和度高，属典型黄金时刻与雨后植被丰茂期的叠加现象",
+        "confidence": "medium"
+      },
+      "question": "你当时走近那个石圈时，有没有注意到地面有被踩踏出的细小路径？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见这山谷，真像风把绿意酿成了诗。"
+    },
+    "isSeed": true,
+    "createdAt": "2020-05-26T13:10:00+03:30"
+  },
+  {
+    "id": "forest-waterfall-2019-08",
+    "name": "林间瀑布",
+    "nameEn": "Forest waterfall",
+    "category": "landscape",
+    "photo": "/seed/public-09.jpg",
+    "place": "美国 · 哥伦比亚河峡谷",
+    "country": "USA",
+    "lat": 45.64,
+    "lng": -121.93,
+    "locationSource": "manual",
+    "date": "2019-08-09T10:45:00-07:00",
+    "userNote": "水从树影里一层一层落下来。",
+    "ai": {
+      "cognition": "一座分成数段落下的林间瀑布，中段有一座拱桥横跨水流，岩壁和苔藓都很湿润。",
+      "fun": "长曝光把水流拍成了连续的白色丝带，桥反而成了画面里最稳的一条水平线。",
+      "luck": {
+        "text": "你恰好在绿意最浓的时节抵达，岩壁苔藓与新叶共同托住了水流的轻盈感。",
+        "basis": "照片中植被繁茂、无枯黄或落叶，结合哥伦比亚河峡谷典型湿润气候与春季至初夏植被高峰特征推断",
+        "confidence": "medium"
+      },
+      "question": "你站在桥上时，记得最清楚的是水声，还是两侧岩壁的湿润气味？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见，水从树影里一层层落下来，真好。"
+    },
+    "isSeed": true,
+    "createdAt": "2019-08-09T10:45:00-07:00"
+  },
+  {
+    "id": "fern-leaves-2024-03",
+    "name": "蕨叶",
+    "nameEn": "Fern leaves",
+    "category": "plant",
+    "photo": "/seed/public-10.jpg",
+    "place": "新西兰 · 坎特伯雷",
+    "country": "NZL",
+    "lat": -43.53,
+    "lng": 172.63,
+    "locationSource": "manual",
+    "date": "2024-03-11T15:30:00+12:00",
+    "userNote": "叶片一层叠一层，像一片绿色的羽毛。",
+    "ai": {
+      "cognition": "这是蕨类植物的复叶，由多级羽片构成，呈深绿色密集生长。",
+      "fun": "蕨类通过孢子繁殖，不产生花或种子，是地球上最古老的维管植物之一。",
+      "luck": {
+        "text": "在坎特伯雷湿润林下，这类蕨叶常形成浓密绿毯，为小型生物提供隐蔽所。",
+        "basis": "照片显示典型林下蕨类群落结构，结合用户标注地点为新西兰坎特伯雷，该区常见温带雨林蕨类群落。",
+        "confidence": "medium"
+      },
+      "question": "这片蕨叶的羽轴是否可见分叉？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见这层叠如羽的绿意，真好。"
+    },
+    "isSeed": true,
+    "createdAt": "2024-03-11T15:30:00+12:00"
+  },
+  {
+    "id": "rainforest-light-2023-09",
+    "name": "雨林光线",
+    "nameEn": "Rainforest light",
+    "category": "landscape",
+    "photo": "/seed/public-11.jpg",
+    "place": "奥地利 · 湖区",
+    "country": "AUT",
+    "lat": 47.8,
+    "lng": 13.04,
+    "locationSource": "manual",
+    "date": "2023-09-02T08:40:00+02:00",
+    "userNote": "森林里的光不是照进来的，是慢慢浮起来的。",
+    "ai": {
+      "cognition": "这是晨雾中森林的透光现象，阳光穿过树冠与水汽形成可见光柱，属于丁达尔效应的自然呈现。",
+      "fun": "这种光柱并非光源本身发光，而是悬浮微粒对光的散射让路径‘显形’，如同空气中的隐形笔迹被照亮。",
+      "luck": {
+        "text": "你恰好在湿度与光照角度协同作用的短暂窗口里按下快门。",
+        "basis": "照片中雾气浓度适中、光源方向低且侧逆，符合林中丁达尔效应的典型触发条件；奥地利湖区夏季晨间常见此类微气候。",
+        "confidence": "medium"
+      },
+      "question": "当时地面植被是否以蕨类和苔藓为主？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见这浮起的光，真好。"
+    },
+    "isSeed": true,
+    "createdAt": "2023-09-02T08:40:00+02:00"
+  },
+  {
+    "id": "misty-conifers-2022-12",
+    "name": "雾中针叶林",
+    "nameEn": "Misty conifers",
+    "category": "landscape",
+    "photo": "/seed/public-12.jpg",
+    "place": "瑞士 · 山林",
+    "country": "CHE",
+    "lat": 46.82,
+    "lng": 8.23,
+    "locationSource": "manual",
+    "date": "2022-12-17T16:05:00+01:00",
+    "userNote": "山林像在雾里呼吸。",
+    "ai": {
+      "cognition": "一片被低云或山雾笼罩的针叶林，林冠在雾气里逐渐隐去，呈现安静的纵深感。",
+      "fun": "雾会把远处的树干和山坡慢慢擦淡，只留下近处的枝叶和一层湿润的空气感。",
+      "luck": {
+        "text": "你恰好在雾气未散、光线尚柔的时刻抵达，让林相显出呼吸般的律动。",
+        "basis": "照片中雾层较厚且均匀，林冠无强光直射，符合晨间或雨后初晴的典型雾林光照条件",
+        "confidence": "medium"
+      },
+      "question": "你当时觉得雾是从山谷升上来，还是从林间慢慢散开的？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见，山林在雾里轻轻呼吸。"
+    },
+    "isSeed": true,
+    "createdAt": "2022-12-17T16:05:00+01:00"
+  },
+  {
+    "id": "snowy-pines-2021-01",
+    "name": "雪山与松林",
+    "nameEn": "Snowy pines",
+    "category": "landscape",
+    "photo": "/seed/public-13.jpg",
+    "place": "加拿大 · 山地公园",
+    "country": "CAN",
+    "lat": 51.18,
+    "lng": -115.57,
+    "locationSource": "manual",
+    "date": "2021-01-22T12:18:00-07:00",
+    "userNote": "雪线下面的松树还在保持绿色。",
+    "ai": {
+      "cognition": "落日余晖下的山地景观，前景是裸露岩面和针叶林，远处山峰被薄雾柔化。",
+      "fun": "针叶林的深绿色和暖色天空形成反差，山地的冷空气仿佛也被拍出了颜色。",
+      "luck": {
+        "text": "此刻光线柔和、雾气轻笼，是山地晨昏间短暂而稳定的视觉窗口。",
+        "basis": "照片呈现典型日出/日落逆光场景，薄雾与山形层次清晰，符合高海拔山区稳定天气条件下的光学现象。",
+        "confidence": "medium"
+      },
+      "question": "你当时是为了等日落，还是路过时刚好看见这片山林的光线？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见这静谧山色，真好。"
+    },
+    "isSeed": true,
+    "createdAt": "2021-01-22T12:18:00-07:00"
+  },
+  {
+    "id": "red-rock-road-2020-07",
+    "name": "红色峡谷公路",
+    "nameEn": "Red rock road",
+    "category": "landscape",
+    "photo": "/seed/public-14.jpg",
+    "place": "美国 · 犹他州",
+    "country": "USA",
+    "lat": 37.1,
+    "lng": -113,
+    "locationSource": "manual",
+    "date": "2020-07-19T18:22:00-06:00",
+    "userNote": "公路把两片红色的岩壁分开了。",
+    "ai": {
+      "cognition": "一条沥青公路穿行于红褐色砂岩峡谷之间，两侧岩壁层理清晰，远处可见深色山峰。",
+      "fun": "这类红色岩层多含赤铁矿，是数百万年沉积与氧化作用共同留下的色彩印记。",
+      "luck": {
+        "text": "此刻光线柔和，岩壁阴影层次分明，恰是摄影与静观的良机。",
+        "basis": "照片中天空晴朗无云，光照均匀，岩壁明暗对比适中，符合日出后或日落前的典型光效。",
+        "confidence": "medium"
+      },
+      "question": "你当时是在开车，还是停下来走到路中央附近拍下这张照片的？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见这道穿过红岩的公路，真幸运。"
+    },
+    "isSeed": true,
+    "createdAt": "2020-07-19T18:22:00-06:00"
+  },
+  {
+    "id": "poppy-field-2019-05",
+    "name": "田野里的虞美人",
+    "nameEn": "Poppies in a field",
+    "category": "plant",
+    "photo": "/seed/public-15.jpg",
+    "place": "法国 · 普罗旺斯",
+    "country": "FRA",
+    "lat": 43.9,
+    "lng": 5.4,
+    "locationSource": "manual",
+    "date": "2019-05-27T17:05:00+02:00",
+    "userNote": "风一吹，红色的小花就一起点头。",
+    "ai": {
+      "cognition": "一片生长在田野边缘的红色小花，花瓣轻薄，花茎在风里一起摇晃；仅凭照片无法确定具体品种。",
+      "fun": "花朵成片出现时，风一吹就像红色的波纹，远看比单独一朵更有动势。",
+      "luck": {
+        "text": "在温带夏初的麦田边缘，它常成片出现，是农耕景观中短暂却醒目的生命节奏。",
+        "basis": "依据是照片中的红色花瓣、细长花茎和田野环境，以及用户提供的地点和原话；未进行现场物种鉴定。",
+        "confidence": "high"
+      },
+      "question": "你记得这片红花是在麦田边，还是在一段更开阔的草地里吗？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见虞美人，在普罗旺斯的风里点头。"
+    },
+    "isSeed": true,
+    "createdAt": "2019-05-27T17:05:00+02:00"
+  },
+  {
+    "id": "highland-road-2024-11",
+    "name": "高原长路",
+    "nameEn": "Highland road",
+    "category": "landscape",
+    "photo": "/seed/public-16.jpg",
+    "place": "智利 · 高原",
+    "country": "CHL",
+    "lat": -22.9,
+    "lng": -68.2,
+    "locationSource": "manual",
+    "date": "2024-11-06T09:12:00-04:00",
+    "userNote": "路一直通向山的另一边。",
+    "ai": {
+      "cognition": "一条笔直的柏油公路穿过干旱山地，两侧是低矮灌丛和裸露地表，远处山峰拉出清晰的纵深。",
+      "fun": "道路中线把视线一路带向山口，像给辽阔地形写下了一条很确定的句子。",
+      "luck": {
+        "text": "在晴朗日光下，道路与远山构成的视觉纵深令人感到平静而辽阔。",
+        "basis": "照片中天空澄澈、能见度高，符合高原晴日典型条件；道路居中构图强化了空间延伸感。",
+        "confidence": "high"
+      },
+      "question": "你当时是在开车，还是停下来走到路中央附近拍下这张照片的？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见这条通向群山的长路，真好。"
+    },
+    "isSeed": true,
+    "createdAt": "2024-11-06T09:12:00-04:00"
+  },
+  {
+    "id": "snowline-road-2023-02",
+    "name": "雪线公路",
+    "nameEn": "Snowline road",
+    "category": "landscape",
+    "photo": "/seed/public-17.jpg",
+    "place": "奥地利 · 山口",
+    "country": "AUT",
+    "lat": 47.27,
+    "lng": 11.4,
+    "locationSource": "manual",
+    "date": "2023-02-12T14:48:00+01:00",
+    "userNote": "转过弯就能看见雪山，像一张明信片。",
+    "ai": {
+      "cognition": "一条蜿蜒于山地林线附近的柏油公路，路旁针叶林与远处雪山组成清晰的高山景观。",
+      "fun": "转弯、林线和雪山叠在一起，会让一段普通公路看起来像一张正在展开的明信片。",
+      "luck": {
+        "text": "此刻阳光斜照，雪线清晰可见，是晴朗午后山地光照条件稳定时的馈赠。",
+        "basis": "照片中光影柔和、雪面反光均匀，无强风扬雪迹象，符合稳定天气下的山口视景特征",
+        "confidence": "medium"
+      },
+      "question": "你记得转过这个弯之前，已经看见雪山，还是转弯后才第一次看见？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见雪线公路，像明信片般干净又真实。"
+    },
+    "isSeed": true,
+    "createdAt": "2023-02-12T14:48:00+01:00"
+  },
+  {
+    "id": "whitby-harbor-2022-10",
+    "name": "海港上的海鸥",
+    "nameEn": "Harbor gull",
+    "category": "animal",
+    "photo": "/seed/whitby-harbor.jpg",
+    "place": "英国 · 惠特比",
+    "country": "GBR",
+    "lat": 54.49,
+    "lng": -0.61,
+    "locationSource": "manual",
+    "date": "2022-10-15T12:16:00+01:00",
+    "userNote": "它站在港口边，好像比我更熟悉这里。",
+    "ai": {
+      "cognition": "一只海鸥单脚站在港口木桩上，背景是惠特比沿岸的房屋和海面；仅凭照片无法确认具体鸟种。",
+      "fun": "海鸥站在木桩上的姿态很像一位熟悉港口日常的旁观者，和背景里的船只很合拍。",
+      "luck": {
+        "text": "在惠特比这样的北海沿岸渔港，海鸥常以人类活动为食源线索，形成稳定的栖居节奏。",
+        "basis": "照片中港口环境、船只与海鸥共存状态符合该物种在英伦沿海的常见生态位",
+        "confidence": "medium"
+      },
+      "question": "你当时先注意到的是海鸥，还是它身后的港口房屋和海面？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见，它站在惠特比港口，像位老居民。"
+    },
+    "isSeed": true,
+    "createdAt": "2022-10-15T12:16:00+01:00"
+  },
+  {
+    "id": "lighthouse-cliff-2022-10",
+    "name": "崖边灯塔",
+    "nameEn": "Cliff lighthouse",
+    "category": "landscape",
+    "photo": "/seed/beach-lighthouse.jpg",
+    "place": "英国 · 七姐妹海岸",
+    "country": "GBR",
+    "lat": 50.74,
+    "lng": 0.17,
+    "locationSource": "manual",
+    "date": "2022-10-17T09:50:00+01:00",
+    "userNote": "白崖旁边的灯塔，把海面点亮了一小块。",
+    "ai": {
+      "cognition": "一座红白相间的圆柱形灯塔立在白色海崖旁，海面、崖壁和灯塔构成了强烈的纵向对比。",
+      "fun": "灯塔的红色在灰白海岸上格外醒目，像有人在风景里按下了一个小小的强调键。",
+      "luck": {
+        "text": "在多雾的英吉利海峡边缘，这座灯塔的光束常成为夜间归航者的第一道确认信号。",
+        "basis": "照片显示灯塔位于白崖陡岸外海，结合其实际功能与当地常见海雾气候",
+        "confidence": "medium"
+      },
+      "question": "你当时是从崖顶远望灯塔，还是沿着海岸走近后回头拍下它的？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见，白崖边的灯塔真像海上的守望者。"
+    },
+    "isSeed": true,
+    "createdAt": "2022-10-17T09:50:00+01:00"
   }
 ]

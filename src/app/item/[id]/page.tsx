@@ -14,13 +14,18 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { AppNav } from "@/components/AppNav";
 import { db, ensureSeeded } from "@/lib/db";
 import { CATEGORY_LABELS } from "@/lib/types";
+import type { Item } from "@/lib/types";
 import { formatDate, formatMonth } from "@/lib/format";
 
 export default function ItemPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const id = params.id;
-  const item = useLiveQuery(() => db.items.get(id), [id]);
+  const [seedReady, setSeedReady] = useState(false);
+  const item = useLiveQuery(
+    () => (seedReady ? db.items.get(id) : Promise.resolve(undefined as Item | undefined)),
+    [id, seedReady],
+  );
   const related = useLiveQuery(
     () => (item?.ai?.relatedItemId ? db.items.get(item.ai.relatedItemId) : undefined),
     [item?.ai?.relatedItemId],
@@ -29,7 +34,15 @@ export default function ItemPage() {
   const [savedAnswer, setSavedAnswer] = useState(false);
 
   useEffect(() => {
-    void ensureSeeded();
+    let active = true;
+    void ensureSeeded()
+      .catch(() => undefined)
+      .finally(() => {
+        if (active) setSeedReady(true);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   if (item === undefined) {
