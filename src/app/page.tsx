@@ -14,6 +14,7 @@ import type { Item } from "@/lib/types";
 export default function Home() {
   const router = useRouter();
   const [seedReady, setSeedReady] = useState(false);
+  const [mapResetToken, setMapResetToken] = useState(0);
   const items = useLiveQuery(
     () => (seedReady ? db.items.orderBy("date").toArray() : Promise.resolve([] as Item[])),
     [seedReady],
@@ -62,13 +63,18 @@ export default function Home() {
             <h1>我的世界地图</h1>
             <span>YU JIAN JI</span>
           </div>
-          <button className="icon-action" aria-label="地图指南">
+          <button
+            className="icon-action"
+            aria-label="重置地图视角"
+            title="重置地图视角"
+            onClick={() => setMapResetToken((token) => token + 1)}
+          >
             <Compass size={18} />
           </button>
         </header>
 
         <MapErrorBoundary>
-          <WorldMap items={items} />
+          <WorldMap items={items} resetToken={mapResetToken} />
         </MapErrorBoundary>
 
         <section className="stats-grid" aria-label="遇见统计">

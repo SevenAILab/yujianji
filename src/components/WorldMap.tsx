@@ -24,7 +24,13 @@ interface CountryFeature {
   };
 }
 
-export function WorldMap({ items }: { items: Item[] }) {
+export function WorldMap({
+  items,
+  resetToken = 0,
+}: {
+  items: Item[];
+  resetToken?: number;
+}) {
   const router = useRouter();
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [selectedPin, setSelectedPin] = useState<Item[] | null>(null);
@@ -84,7 +90,7 @@ export function WorldMap({ items }: { items: Item[] }) {
     return () => {
       svg.on(".zoom", null);
     };
-  }, []);
+  }, [resetToken]);
 
   return (
     <div className="map-card surface">
