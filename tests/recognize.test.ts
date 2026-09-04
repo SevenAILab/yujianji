@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { extractJsonObject } from "../src/lib/json";
 import { parseRecognizeResult, RecognizeParseError } from "../src/lib/recognize";
-import { recognizeResultSchema } from "../src/lib/schema";
+import {
+  recognizeRequestSchema,
+  recognizeResultSchema,
+} from "../src/lib/schema";
 import type { HistoryEntry } from "../src/lib/types";
 
 const history: HistoryEntry[] = [
@@ -56,6 +59,20 @@ describe("recognize result validation", () => {
       recognizeResultSchema.safeParse({
         ...success,
         cognition: "x".repeat(321),
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects more than 200 history entries at the request boundary", () => {
+    const entry = history[0];
+    expect(
+      recognizeRequestSchema.safeParse({
+        image: "data:image/jpeg;base64,AA==",
+        userNote: "",
+        history: Array.from({ length: 201 }, (_, index) => ({
+          ...entry,
+          id: `${entry.id}-${index}`,
+        })),
       }).success,
     ).toBe(false);
   });

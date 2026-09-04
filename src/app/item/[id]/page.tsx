@@ -194,6 +194,12 @@ export default function ItemPage() {
                   </figure>
                 </div>
               ) : null}
+              {item.ai.verdict === "reunion" && !related ? (
+                <div className="status-note warning" style={{ marginTop: 12 }}>
+                  <MapPin size={14} />
+                  <span>关联的历史记录已被删除，仍保留这次重逢结论。</span>
+                </div>
+              ) : null}
             </section>
           ) : (
             <section className="verdict-card">

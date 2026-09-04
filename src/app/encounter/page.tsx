@@ -169,6 +169,10 @@ export default function EncounterPage() {
       setError("请补充你在哪里遇见它。");
       return;
     }
+    if (locationLoading || !location) {
+      setError("正在确认位置，请等定位状态完成后再显影。");
+      return;
+    }
 
     const occurrenceId = nanoid();
     isSubmittingRef.current = true;
@@ -197,6 +201,13 @@ export default function EncounterPage() {
         setShowManual(true);
         setError("这次还没认出来。可以手动填一个名字，把这次遇见先保存下来。");
         return;
+      }
+      if (
+        result.verdict === "reunion" &&
+        result.relatedItemId &&
+        !(await db.items.get(result.relatedItemId))
+      ) {
+        throw new Error("INVALID_RELATED_ITEM");
       }
 
       const now = new Date().toISOString();
@@ -241,7 +252,7 @@ export default function EncounterPage() {
 
   async function saveManual() {
     if (savingManual) return;
-    if (!preview || !manualName.trim() || !place.trim() || !country) {
+    if (locationLoading || !location || !preview || !manualName.trim() || !place.trim() || !country) {
       setError("手动保存至少需要照片、名称、地点和国家。");
       return;
     }
@@ -421,12 +432,20 @@ export default function EncounterPage() {
             </div>
           ) : null}
 
-          <button className="primary-action" onClick={() => void submit()} disabled={loading}>
+          <button
+            className="primary-action"
+            onClick={() => void submit()}
+            disabled={loading || locationLoading || !location}
+          >
             <Sparkles size={19} />
-            {loading ? "正在显影…" : "显影"}
+            {loading ? "正在显影…" : locationLoading ? "正在确认位置…" : "显影"}
           </button>
           {error && !showManual ? (
-            <button className="secondary-action" onClick={() => void submit()} disabled={loading}>
+            <button
+              className="secondary-action"
+              onClick={() => void submit()}
+              disabled={loading || locationLoading || !location}
+            >
               <RotateCcw size={17} />
               重试
             </button>

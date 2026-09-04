@@ -4,13 +4,23 @@ import Dexie, { type Table } from "dexie";
 import type { Item } from "./types";
 import { itemSchema } from "./schema";
 
+type SeedMeta = {
+  key: string;
+  value: boolean | string;
+};
+
 class YujianjiDatabase extends Dexie {
   items!: Table<Item, string>;
+  meta!: Table<SeedMeta, string>;
 
   constructor() {
     super("yujianji");
     this.version(1).stores({
       items: "id,date,country",
+    });
+    this.version(2).stores({
+      items: "id,date,country",
+      meta: "key",
     });
   }
 }
@@ -33,13 +43,26 @@ export function ensureSeeded(): Promise<boolean> {
       }
 
       const items = parsed.data as Item[];
+      const seedIds = items.map((item) => item.id);
+      const storedIds = await db.meta.get("seeded-ids");
+      const legacyMarker = await db.meta.get("seeded");
+      const seededIds = new Set<string>(
+        typeof storedIds?.value === "string"
+          ? (JSON.parse(storedIds.value) as string[])
+          : legacyMarker?.value === true
+            ? seedIds
+            : [],
+      );
       const existing = await db.items.bulkGet(items.map((item) => item.id));
-      const writes = items.map((item, index) => {
-        const current = existing[index];
-        return current?.answer ? { ...item, answer: current.answer } : item;
+      const missing = items.filter(
+        (item, index) => !existing[index] && !seededIds.has(item.id),
+      );
+      if (missing.length) await db.items.bulkPut(missing);
+      await db.meta.put({
+        key: "seeded-ids",
+        value: JSON.stringify([...new Set([...seededIds, ...seedIds])]),
       });
-      await db.items.bulkPut(writes);
-      return items.some((item, index) => !existing[index]);
+      return missing.length > 0;
     })();
     seedPromise = pending.catch((error) => {
       seedPromise = null;

@@ -30,14 +30,13 @@ export async function POST(request: Request) {
     return errorResponse(429, "RATE_LIMITED", "请求太频繁，请稍后再试");
   }
 
-  const contentLength = Number(request.headers.get("content-length") ?? 0);
-  if (contentLength > MAX_BODY_BYTES) {
-    return errorResponse(413, "IMAGE_TOO_LARGE", "请求体超过 4.5MB");
-  }
-
   let body: unknown;
   try {
-    body = await request.json();
+    const bodyBytes = await request.arrayBuffer();
+    if (bodyBytes.byteLength > MAX_BODY_BYTES) {
+      return errorResponse(413, "IMAGE_TOO_LARGE", "请求体超过 4.5MB");
+    }
+    body = JSON.parse(new TextDecoder().decode(bodyBytes));
   } catch {
     return errorResponse(400, "INVALID_REQUEST", "请求不是有效 JSON");
   }

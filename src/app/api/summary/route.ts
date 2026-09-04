@@ -41,17 +41,16 @@ export async function POST(request: Request) {
     );
   }
 
-  const contentLength = Number(request.headers.get("content-length") ?? 0);
-  if (contentLength > 1_000_000) {
-    return NextResponse.json(
-      { code: "INVALID_REQUEST", error: "总结记录太长，请缩小日期范围" },
-      { status: 413 },
-    );
-  }
-
   let body: unknown;
   try {
-    body = await request.json();
+    const bodyBytes = await request.arrayBuffer();
+    if (bodyBytes.byteLength > 1_000_000) {
+      return NextResponse.json(
+        { code: "INVALID_REQUEST", error: "总结记录太长，请缩小日期范围" },
+        { status: 413 },
+      );
+    }
+    body = JSON.parse(new TextDecoder().decode(bodyBytes));
   } catch {
     return NextResponse.json(
       { code: "INVALID_REQUEST", error: "总结请求格式不正确" },

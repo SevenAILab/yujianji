@@ -123,6 +123,7 @@ export function WorldMap({
                 <g
                   className="pin-group"
                   key={`${group[0].lat}-${group[0].lng}`}
+                  aria-label={`打开${group[0].place}的${group.length}件藏品`}
                   onClick={() => {
                     if (group.length === 1) {
                       router.push(`/item/${group[0].id}`);
@@ -139,6 +140,7 @@ export function WorldMap({
                     }
                   }}
                 >
+                  <circle cx={x} cy={y} r="26" fill="transparent" />
                   <circle className="pin" cx={x} cy={y} r="9" />
                   <circle className="pin-core" cx={x} cy={y} r="4" />
                   {group.length > 1 ? (

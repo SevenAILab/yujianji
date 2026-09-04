@@ -883,6 +883,16 @@ img {
   font-size: 12px;
 }
 
+@media (max-width: 360px) {
+  .share-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .share-actions .secondary-action:first-child {
+    grid-column: span 2;
+  }
+}
+
 .share-status {
   margin: 10px 0 0;
   color: var(--teal);
