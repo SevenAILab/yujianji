@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f9d9df"/>
+      <stop offset="1" stop-color="#f1a9bc"/>
+    </linearGradient>
+    <linearGradient id="leaf" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f9f2e7"/>
+      <stop offset="0.55" stop-color="#ef8ea9"/>
+      <stop offset="1" stop-color="#c9577b"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" fill="url(#bg)"/>
+  <circle cx="160" cy="190" r="210" fill="#fff" opacity=".24"/>
+  <circle cx="760" cy="1010" r="280" fill="#d5789a" opacity=".2"/>
+  <path d="M449 1040C432 792 421 605 466 390" fill="none" stroke="#527e62" stroke-width="22" stroke-linecap="round"/>
+  <path d="M463 716C292 680 174 560 194 390C360 360 491 452 463 716Z" fill="url(#leaf)" stroke="#b85b7c" stroke-width="10"/>
+  <path d="M458 614C606 574 719 456 699 292C542 301 426 415 458 614Z" fill="url(#leaf)" stroke="#b85b7c" stroke-width="10"/>
+  <path d="M450 520L270 408M461 470L615 346M448 651L290 568M477 580L633 465" stroke="#fff" stroke-width="8" opacity=".55"/>
+</svg>

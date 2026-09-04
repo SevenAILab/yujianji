@@ -1,0 +1,89 @@
+[
+  {
+    "id": "moganshan-pink-leaf-2025-10",
+    "name": "粉色叶子",
+    "nameEn": "Pink leaf",
+    "category": "plant",
+    "photo": "/seed/pink-leaf-placeholder.jpg",
+    "place": "浙江 · 莫干山",
+    "country": "CHN",
+    "lat": 30.61,
+    "lng": 119.87,
+    "locationSource": "manual",
+    "date": "2025-10-12T16:32:00+08:00",
+    "userNote": "第一次见到粉色的叶子。",
+    "ai": {
+      "cognition": "这是一株具有粉红色叶片的植物幼苗，叶片对生，叶脉以浅色线条示意。",
+      "fun": "部分植物在新叶阶段会呈现粉红或红色，这是花青素暂时积累形成的保护色，随成熟逐渐转绿。",
+      "luck": {
+        "text": "在莫干山这样的亚热带湿润山区，春季新叶泛粉的现象相对常见，是自然节律的温柔提醒。",
+        "basis": "用户标注地点为浙江莫干山，属亚热带季风气候，春季新叶显色现象有生态依据",
+        "confidence": "medium"
+      },
+      "question": "你当时是在哪个月份见到它的？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见粉色叶子，真像春天寄来的一封信。"
+    },
+    "isSeed": true,
+    "createdAt": "2025-10-12T16:32:00+08:00"
+  },
+  {
+    "id": "qinghai-basalt-2024-08",
+    "name": "黑色玄武岩",
+    "nameEn": "Basalt",
+    "category": "mineral",
+    "photo": "/seed/basalt-placeholder.jpg",
+    "place": "青海 · 茶卡",
+    "country": "CHN",
+    "lat": 36.79,
+    "lng": 99.08,
+    "locationSource": "manual",
+    "date": "2024-08-20T10:18:00+08:00",
+    "userNote": "捡了一块有孔洞的黑色石头。",
+    "ai": {
+      "cognition": "一种喷出型火成岩，由岩浆快速冷却形成，常见气孔构造。",
+      "fun": "这些孔洞是岩浆喷发时气体逸出后留下的空腔，被称为‘气孔构造’。",
+      "luck": {
+        "text": "在茶卡盐湖周边拾得带气孔的玄武岩，说明曾有火山活动影响此地地貌。",
+        "basis": "青海柴达木盆地边缘存在新生代火山活动遗迹，茶卡地区偶见玄武岩碎块。",
+        "confidence": "medium"
+      },
+      "question": "这块石头的气孔大小是否均匀？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见带气孔的玄武岩，真幸运！"
+    },
+    "isSeed": true,
+    "createdAt": "2024-08-20T10:18:00+08:00"
+  },
+  {
+    "id": "seven-sisters-cliff-2023-07",
+    "name": "白色海崖",
+    "nameEn": "White cliff",
+    "category": "landscape",
+    "photo": "/seed/white-cliff.jpg",
+    "place": "英国 · 七姐妹白崖",
+    "country": "GBR",
+    "lat": 50.74,
+    "lng": 0.17,
+    "locationSource": "manual",
+    "date": "2023-07-16T15:06:00+01:00",
+    "userNote": "海风把白色的崖壁吹得很亮。",
+    "ai": {
+      "cognition": "由白垩纪海相沉积形成的白色 chalk 崖壁，沿英吉利海峡东南海岸延伸。",
+      "fun": "这些白崖的白色来自远古海洋微生物遗骸压实形成的碳酸钙沉积，本质是亿万年前的‘海藻墓碑’。",
+      "luck": {
+        "text": "在阴天薄雾中，白崖反光柔和，反而更显轮廓清晰，是难得的静谧观景时刻。",
+        "basis": "照片显示多云天空与低对比度光照，符合英国南部春季常见天气条件，利于减少眩光、突出崖体层次",
+        "confidence": "medium"
+      },
+      "question": "你走的这条小径，是否通往七姐妹中的‘贝林顿崖’（Birling Gap）？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见七姐妹白崖，风里有盐和时间的味道。"
+    },
+    "isSeed": true,
+    "createdAt": "2023-07-16T15:06:00+01:00"
+  }
+]

@@ -5,19 +5,44 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "seed:check": "tsx scripts/check-seed.ts",
+    "seed:check:final": "SEED_MIN_COUNT=20 npm run seed:check",
+    "seed:ai": "tsx scripts/seed-ai.ts",
+    "ping": "tsx scripts/ping.ts"
   },
   "dependencies": {
+    "country-code-lookup": "^0.1.5",
+    "d3-geo": "^3.1.1",
+    "d3-selection": "^3.0.0",
+    "d3-zoom": "^3.0.0",
+    "dexie": "^4.4.5",
+    "dexie-react-hooks": "^4.4.0",
+    "lucide-react": "^1.41.0",
+    "nanoid": "^6.0.1",
     "next": "16.3.4",
+    "openai": "^7.10.0",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/d3-geo": "^3.1.1",
+    "@types/d3-selection": "^3.0.11",
+    "@types/d3-zoom": "^3.0.8",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/topojson-client": "^3.1.5",
+    "dotenv": "^17.4.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4.23.13",
+    "typescript": "^5",
+    "vitest": "^3.2.4"
   }
 }
