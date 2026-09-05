@@ -96,6 +96,9 @@ export default function EncounterPage() {
         if (!active) return;
         setItems(history);
         const previous = [...history].sort((a, b) => b.date.localeCompare(a.date))[0];
+        if (previous) {
+          setPlace(previous.place);
+        }
         applyFallbackLocation(history);
         setLocationLoading(true);
 

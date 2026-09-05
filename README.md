@@ -28,7 +28,7 @@ DASHSCOPE_API_KEY=你的百炼APIKey
 DASHSCOPE_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
 VISION_MODEL=qwen3-vl-plus
 LLM_THINKING=false
-LLM_JSON_MODE=false
+LLM_JSON_MODE=true
 ```
 
 密钥只放在 `.env.local` 或 Vercel Environment Variables，不提交到 Git。服务端只记录模型名、耗时和返回长度，不记录照片、API key 或模型原文。
@@ -39,18 +39,18 @@ LLM_JSON_MODE=false
 npm run ping
 ```
 
-该命令会测试 `qwen3-vl-plus`、`qwen-vl-max`，并对比 thinking 与 JSON mode；只输出耗时和长度。现场切换备用模型时，只修改 `VISION_MODEL` 后重新部署，不需要改代码。
+该命令会测试 `qwen3-vl-plus`、`qwen-vl-max`，并对 `qwen3-vl-plus` 对比 thinking 与 JSON mode；日志只输出耗时、返回长度和 reasoning 是否存在。实测 `qwen-vl-max` 不接受开启 thinking 的参数，因此备用模型只验证关闭 thinking 与 JSON mode。现场切换备用模型时，只修改 `VISION_MODEL` 后重新部署，不需要改代码。
 
 ## Seed 内容
 
-当前仓库包含 20 条用于演示的 seed 记录，覆盖莫干山粉色叶子、青海玄武岩、七姐妹白崖等真实照片。seed 只使用无人脸、无私人可识别信息的风景、植物、动物或物件照片；正式路演前仍应逐张复核公开素材与地点文案。
+当前仓库包含 25 条用于演示的 seed 记录，覆盖莫干山粉色叶子、青海玄武岩、七姐妹白崖，以及物件、食物和动物照片。seed 只使用无人脸、无私人可识别信息的风景、植物、动物、食物或物件照片；正式路演前仍应逐张复核公开素材与地点文案。
 
 ```bash
 npm run seed:check
 npm run seed:check:final
 ```
 
-`seed:check` 是当前开发门，默认至少 3 条；`seed:check:final` 是路演门，要求至少 20 条。两份 seed JSON 必须一致，所有 seed 必须是 `first`，且 `luck.basis` 非空。
+`seed:check` 是当前开发门，默认至少 3 条；`seed:check:final` 是路演门，要求至少 20 条。两份 seed JSON 必须一致，所有 seed 必须是 `first`，且 `luck.basis` 非空；类别门要求至少 2 条 `artifact`、1 条 `food`、2 条 `animal`。
 
 批量生成 AI 字段：
 

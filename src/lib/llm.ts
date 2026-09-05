@@ -57,7 +57,7 @@ export async function callVision({
     ],
     temperature: 0.2,
     max_tokens: 900,
-    extra_body: { enable_thinking: enableThinking },
+    enable_thinking: enableThinking,
   };
 
   if (jsonMode) {
@@ -73,12 +73,19 @@ export async function callVision({
     throw new Error("模型返回为空");
   }
 
+  const message = response.choices[0]?.message as
+    | { reasoning_content?: unknown }
+    | undefined;
   console.info(
     JSON.stringify({
       event: "vision_complete",
       model,
       durationMs: Date.now() - startedAt,
       responseLength: content.length,
+      reasoningPresent: Boolean(
+        typeof message?.reasoning_content === "string" &&
+          message.reasoning_content.trim(),
+      ),
     }),
   );
 

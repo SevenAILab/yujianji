@@ -578,5 +578,150 @@
     },
     "isSeed": true,
     "createdAt": "2022-10-17T09:50:00+01:00"
+  },
+  {
+    "id": "ceramic-mug-2021-04",
+    "name": "白瓷咖啡杯",
+    "nameEn": "Ceramic coffee mug",
+    "category": "artifact",
+    "photo": "/seed/ceramic-mug.jpg",
+    "place": "日本 · 京都",
+    "country": "JPN",
+    "lat": 35.01,
+    "lng": 135.77,
+    "locationSource": "manual",
+    "date": "2021-04-08T09:20:00+09:00",
+    "userNote": "一只很安静的白杯子，光落在它的边缘。",
+    "ai": {
+      "cognition": "这是一只白色陶瓷咖啡杯，杯身圆润，侧面有一只弧形把手，表面施有平整的浅色釉面。",
+      "fun": "杯子的把手让热饮和手掌之间留出了一点距离，也是陶瓷器物最容易被记住的轮廓之一。",
+      "luck": {
+        "text": "柔和的侧光让杯身的弧面和釉色都显得很安静，像一件被日常使用磨出气质的小器物。",
+        "basis": "依据是照片中清晰可见的陶瓷材质、圆形杯身、把手和釉面反光；未确认品牌或窑口。",
+        "confidence": "high"
+      },
+      "question": "你记得这只杯子里装的是咖啡、茶，还是一杯热水吗？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见这只白瓷杯，光也变得很轻。"
+    },
+    "isSeed": true,
+    "createdAt": "2021-04-08T09:20:00+09:00"
+  },
+  {
+    "id": "coffee-table-2020-11",
+    "name": "一组咖啡杯",
+    "nameEn": "Coffee cups",
+    "category": "artifact",
+    "photo": "/seed/coffee-cup.jpg",
+    "place": "澳大利亚 · 墨尔本",
+    "country": "AUS",
+    "lat": -37.81,
+    "lng": 144.96,
+    "locationSource": "manual",
+    "date": "2020-11-14T14:10:00+11:00",
+    "userNote": "三杯咖啡碰在一起，像一个小小的下午仪式。",
+    "ai": {
+      "cognition": "照片里有三只盛着咖啡的杯子，杯口可见奶泡拉花，桌面和手部动作共同构成了聚会中的瞬间。",
+      "fun": "奶泡上的纹样会随着端杯和饮用慢慢改变，每一杯都只在那一刻拥有自己的图案。",
+      "luck": {
+        "text": "三只杯子在同一张桌面上靠近，说明这次咖啡更像一次共享的停留，而不只是一个人的饮料。",
+        "basis": "依据是照片中三只杯子的数量、杯壁轮廓、奶泡纹样和共同端杯的动作；未判断具体咖啡馆。",
+        "confidence": "high"
+      },
+      "question": "你们当时是第一次一起喝咖啡，还是一场已经重复过很多次的见面？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见这组咖啡杯，刚好有人把下午端了过来。"
+    },
+    "isSeed": true,
+    "createdAt": "2020-11-14T14:10:00+11:00"
+  },
+  {
+    "id": "pizza-table-2019-06",
+    "name": "玛格丽特披萨",
+    "nameEn": "Margherita pizza",
+    "category": "food",
+    "photo": "/seed/pizza.jpg",
+    "place": "意大利 · 那不勒斯",
+    "country": "ITA",
+    "lat": 40.85,
+    "lng": 14.27,
+    "locationSource": "manual",
+    "date": "2019-06-22T19:30:00+02:00",
+    "userNote": "刚出炉的披萨，边缘焦得很香。",
+    "ai": {
+      "cognition": "这是一张切成三角片的圆形披萨，表面有融化的奶酪、番茄和香草，饼边呈现烘烤后的焦褐色。",
+      "fun": "披萨边缘的气孔和焦痕会记录烤箱里的热量如何经过面团，脆和软往往就在几厘米之间。",
+      "luck": {
+        "text": "刚出炉的热气、焦褐色饼边和鲜亮的番茄放在一起，是一顿饭最接近现场的时刻。",
+        "basis": "依据是照片中可见的披萨切片、番茄、奶酪、香草和烘烤痕迹；未确认配方或餐厅。",
+        "confidence": "high"
+      },
+      "question": "你第一口先吃的是中间的奶酪，还是边缘那圈焦香的饼边？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见这张热披萨，香气先于名字被记住。"
+    },
+    "isSeed": true,
+    "createdAt": "2019-06-22T19:30:00+02:00"
+  },
+  {
+    "id": "golden-retriever-2018-10",
+    "name": "叼着郁金香的金毛",
+    "nameEn": "Golden retriever with a tulip",
+    "category": "animal",
+    "photo": "/seed/dog.jpg",
+    "place": "荷兰 · 阿姆斯特丹",
+    "country": "NLD",
+    "lat": 52.37,
+    "lng": 4.90,
+    "locationSource": "manual",
+    "date": "2018-10-05T11:05:00+02:00",
+    "userNote": "它叼着一朵花，表情却像什么都没发生。",
+    "ai": {
+      "cognition": "照片里是一只金毛寻回犬，嘴里叼着一支黄色郁金香，背景是户外庭院和树木。",
+      "fun": "寻回犬叼东西时常会保持一种认真又无辜的表情，仿佛每件捡来的物品都有明确的任务。",
+      "luck": {
+        "text": "花和狗同时出现在画面中央，让一个普通的户外片刻多了一点轻松的戏剧性。",
+        "basis": "依据是照片中清晰可见的犬只外形、黄色花朵和庭院环境；未判断犬只的具体血统。",
+        "confidence": "high"
+      },
+      "question": "那朵花是它自己捡来的，还是有人特意把它交给它的？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见这位叼花的朋友，它比花更会抢镜。"
+    },
+    "isSeed": true,
+    "createdAt": "2018-10-05T11:05:00+02:00"
+  },
+  {
+    "id": "tabby-cat-2017-03",
+    "name": "窗边虎斑猫",
+    "nameEn": "Tabby cat",
+    "category": "animal",
+    "photo": "/seed/cat.jpg",
+    "place": "英国 · 伦敦",
+    "country": "GBR",
+    "lat": 51.51,
+    "lng": -0.13,
+    "locationSource": "manual",
+    "date": "2017-03-18T16:45:00+00:00",
+    "userNote": "它坐在那里，像是在等一个不急着发生的下午。",
+    "ai": {
+      "cognition": "这是一只短毛虎斑猫，额头和身体上有深浅相间的条纹，正安静地趴在室内的软垫上。",
+      "fun": "猫咪把前爪收在身体下方时，轮廓会变得像一块有表情的小毯子，这是它放松时常见的姿态。",
+      "luck": {
+        "text": "窗边的自然光把虎斑纹理和眼睛的颜色照得很清楚，安静本身就成了这次相遇的主题。",
+        "basis": "依据是照片中的虎斑纹理、耳形、眼睛和室内光线；未判断具体品种或年龄。",
+        "confidence": "high"
+      },
+      "question": "它平时更喜欢待在窗边，还是只在这一个下午来这里休息？",
+      "verdict": "first",
+      "relatedItemId": null,
+      "memorySentence": "第一次遇见这只虎斑猫，时间好像也放轻了脚步。"
+    },
+    "isSeed": true,
+    "createdAt": "2017-03-18T16:45:00+00:00"
   }
 ]

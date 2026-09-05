@@ -18,11 +18,18 @@ const prompt = `请用 JSON 返回照片里最明显的主体：
 async function main() {
   let failures = 0;
   for (const model of ["qwen3-vl-plus", "qwen-vl-max"]) {
-    for (const variant of [
-      { name: "thinking_off_json_off", enableThinking: false, jsonMode: false },
-      { name: "thinking_on_json_off", enableThinking: true, jsonMode: false },
-      { name: "thinking_off_json_on", enableThinking: false, jsonMode: true },
-    ]) {
+    const variants =
+      model === "qwen3-vl-plus"
+        ? [
+            { name: "thinking_off_json_off", enableThinking: false, jsonMode: false },
+            { name: "thinking_on_json_off", enableThinking: true, jsonMode: false },
+            { name: "thinking_off_json_on", enableThinking: false, jsonMode: true },
+          ]
+        : [
+            { name: "thinking_off_json_off", enableThinking: false, jsonMode: false },
+            { name: "thinking_off_json_on", enableThinking: false, jsonMode: true },
+          ];
+    for (const variant of variants) {
       const startedAt = Date.now();
       try {
         const result = await callVision({

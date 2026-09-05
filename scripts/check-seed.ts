@@ -36,6 +36,7 @@ if (
 
 const items = parsed as Array<{
   id: string;
+  category: string;
   photo: string;
   place: string;
   date: string;
@@ -58,6 +59,18 @@ const missingBasis = items.filter((item) => !item.ai?.luck.basis);
 const nonFirst = items.filter(
   (item) => item.ai?.verdict !== "first" || item.ai.relatedItemId !== null,
 );
+const categoryCounts = items.reduce<Record<string, number>>((counts, item) => ({
+  ...counts,
+  [item.category]: (counts[item.category] ?? 0) + 1,
+}), {});
+const categoryMinimums: Record<string, number> = {
+  artifact: 2,
+  food: 1,
+  animal: 2,
+};
+const missingCategoryMinimums = Object.entries(categoryMinimums)
+  .filter(([category, minimumCount]) => (categoryCounts[category] ?? 0) < minimumCount)
+  .map(([category, minimumCount]) => `${category} ${categoryCounts[category] ?? 0}/${minimumCount}`);
 const publicItems = publicParsed as typeof items;
 const filesMatch = JSON.stringify(parsed) === JSON.stringify(publicParsed);
 const minimum = Number(process.env.SEED_MIN_COUNT ?? "3");
@@ -68,6 +81,7 @@ if (
   missingPhotos.length ||
   missingBasis.length ||
   nonFirst.length ||
+  missingCategoryMinimums.length ||
   !filesMatch ||
   items.length !== publicItems.length
 ) {
@@ -80,6 +94,9 @@ if (
   if (nonFirst.length) {
     console.error(`seed 必须全部为 first: ${nonFirst.map((item) => item.id).join(", ")}`);
   }
+  if (missingCategoryMinimums.length) {
+    console.error(`seed 类别数量不足: ${missingCategoryMinimums.join(", ")}`);
+  }
   if (!filesMatch || items.length !== publicItems.length) {
     console.error("data/seed.json 与 public/seed-data.json 不一致");
   }
@@ -87,7 +104,7 @@ if (
 }
 
 console.log(
-  `items=${items.length} places=${new Set(items.map((item) => item.place)).size} years=[${[
+  `items=${items.length} categories=${JSON.stringify(categoryCounts)} places=${new Set(items.map((item) => item.place)).size} years=[${[
     ...new Set(items.map((item) => item.date.slice(0, 4))),
   ].sort().join(",")}] required_ids=OK photos=OK`,
 );
