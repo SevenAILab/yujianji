@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "native:build": "node scripts/build-native.mjs",
+    "native:sync": "npm run native:build && cap sync",
+    "native:preview": "node scripts/preview-native.mjs",
     "start": "next start",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -15,6 +18,9 @@
     "qr": "bash scripts/qr.sh"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.1",
+    "@capacitor/core": "^8.5.1",
+    "@capacitor/ios": "^8.5.1",
     "country-code-lookup": "^0.1.5",
     "d3-geo": "^3.1.1",
     "d3-selection": "^3.0.0",
@@ -33,6 +39,7 @@
     "zod": "^4.5.4"
   },
   "devDependencies": {
+    "@capacitor/cli": "8.4.3",
     "@tailwindcss/postcss": "^4",
     "@types/d3-geo": "^3.1.1",
     "@types/d3-selection": "^3.0.11",
@@ -42,6 +49,7 @@
     "@types/react-dom": "^19",
     "@types/topojson-client": "^3.1.5",
     "dotenv": "^17.4.2",
+    "fake-indexeddb": "^6.2.5",
     "qrcode-terminal": "^0.12.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.13",

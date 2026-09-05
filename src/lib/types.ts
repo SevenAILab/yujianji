@@ -68,6 +68,57 @@ export interface Item {
   createdAt: string;
 }
 
+export type DeviceSource = "manual" | "bluetooth-heart-rate" | "health-provider";
+
+export interface HealthSnapshot {
+  timestamp: string;
+  heartRate?: number;
+  bloodOxygen?: number;
+  altitude?: number;
+  steps?: number;
+  source: DeviceSource;
+  sampleId?: string;
+  originId?: string;
+  originName?: string;
+  provider?: "health-connect" | "healthkit";
+  endTimestamp?: string;
+}
+
+export interface NutritionEntry {
+  id: string;
+  timestamp: string;
+  meal: string;
+  calories?: number;
+  waterMl?: number;
+}
+
+export interface TrackPoint {
+  timestamp: string;
+  lat: number;
+  lng: number;
+  altitude?: number;
+  heading?: number;
+  speed?: number;
+}
+
+export type TripStatus = "active" | "paused" | "completed";
+
+export interface Trip {
+  id: string;
+  title: string;
+  status: TripStatus;
+  startedAt: string;
+  endedAt?: string;
+  trackPoints: TrackPoint[];
+  healthSnapshots: HealthSnapshot[];
+  nutrition: NutritionEntry[];
+  panorama?: string;
+  distanceMeters: number;
+  elevationGainMeters: number;
+  riskLevel: "low" | "medium" | "high";
+  createdAt: string;
+}
+
 export interface HistoryEntry {
   id: string;
   name: string;

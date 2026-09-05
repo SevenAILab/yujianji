@@ -134,8 +134,8 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
         path({ type: "Feature", properties: {}, geometry: pin.region.geometry } as never);
         context!.shadowColor = color;
         // 示例数据画得更淡，让用户自己的记录一眼跳出来
-        context!.shadowBlur = pin.allSeed ? 3 : 9;
-        context!.fillStyle = `${color}${pin.allSeed ? "4d" : "d4"}`;
+        context!.shadowBlur = pin.allSeed ? 8 : 12;
+        context!.fillStyle = `${color}${pin.allSeed ? "66" : "d4"}`;
         context!.fill();
         context!.shadowBlur = 0;
         context!.strokeStyle = pin.allSeed ? `${color}80` : color;
@@ -174,13 +174,11 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
           context!.moveTo(base[0], base[1]);
           context!.lineTo(centerX, centerY);
           context!.stroke();
+          const pulse = Math.sin(timestamp / 520 + pinIndex + locationIndex);
           context!.shadowColor = color;
-          // 示例钉子不做呼吸光晕，视觉上退到背景里
-          context!.shadowBlur = isSeedPin
-            ? 0
-            : 10 + Math.sin(timestamp / 520 + pinIndex + locationIndex) * 1.5;
-          context!.fillStyle = isSeedPin ? `${color}66` : color;
-          context!.beginPath(); context!.arc(centerX, centerY, isSeedPin ? 2.9 : 3.4, 0, Math.PI * 2); context!.fill();
+          context!.shadowBlur = (isSeedPin ? 9 : 13) + pulse * 2;
+          context!.fillStyle = isSeedPin ? `${color}d9` : color;
+          context!.beginPath(); context!.arc(centerX, centerY, isSeedPin ? 3.3 : 3.8, 0, Math.PI * 2); context!.fill();
           context!.shadowBlur = 0;
           context!.fillStyle = isSeedPin
             ? "rgba(255,253,247,.7)"

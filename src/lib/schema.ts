@@ -96,6 +96,53 @@ export const itemSchema = z.object({
   createdAt: z.string().min(1),
 });
 
+const healthSnapshotSchema = z.object({
+  timestamp: z.string().min(1),
+  heartRate: z.number().finite().optional(),
+  bloodOxygen: z.number().finite().optional(),
+  altitude: z.number().finite().optional(),
+  steps: z.number().finite().optional(),
+  source: z.enum(["manual", "bluetooth-heart-rate", "health-provider"]),
+  sampleId: z.string().optional(),
+  originId: z.string().optional(),
+  originName: z.string().optional(),
+  provider: z.enum(["health-connect", "healthkit"]).optional(),
+  endTimestamp: z.string().optional(),
+});
+
+const trackPointSchema = z.object({
+  timestamp: z.string().min(1),
+  lat: z.number().finite(),
+  lng: z.number().finite(),
+  altitude: z.number().finite().optional(),
+  heading: z.number().finite().optional(),
+  speed: z.number().finite().optional(),
+});
+
+const nutritionEntrySchema = z.object({
+  id: z.string().min(1),
+  timestamp: z.string().min(1),
+  meal: z.string().min(1).max(80),
+  calories: z.number().finite().nonnegative().optional(),
+  waterMl: z.number().finite().nonnegative().optional(),
+});
+
+export const tripSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1).max(120),
+  status: z.enum(["active", "paused", "completed"]),
+  startedAt: z.string().min(1),
+  endedAt: z.string().optional(),
+  trackPoints: trackPointSchema.array(),
+  healthSnapshots: healthSnapshotSchema.array(),
+  nutrition: nutritionEntrySchema.array(),
+  panorama: z.string().optional(),
+  distanceMeters: z.number().finite().nonnegative(),
+  elevationGainMeters: z.number().finite().nonnegative(),
+  riskLevel: z.enum(["low", "medium", "high"]),
+  createdAt: z.string().min(1),
+});
+
 export const recognizeRequestSchema = z.object({
   image: z.string().min(1),
   userNote: z.string().max(300),

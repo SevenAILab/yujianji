@@ -1,5 +1,7 @@
 "use client";
 
+import { LOCAL_ONLY } from "./app-mode";
+
 export interface SpeechResult {
   finalText: string;
   interimText: string;
@@ -40,14 +42,14 @@ declare global {
 }
 
 export function getSpeechRecognition(): SpeechRecognitionInstance | null {
-  if (typeof window === "undefined") return null;
+  if (LOCAL_ONLY || typeof window === "undefined") return null;
   const Recognition =
     window.SpeechRecognition ?? window.webkitSpeechRecognition;
   return Recognition ? new Recognition() : null;
 }
 
 export function isSpeechRecognitionSupported(): boolean {
-  if (typeof window === "undefined") return false;
+  if (LOCAL_ONLY || typeof window === "undefined") return false;
   return Boolean(window.SpeechRecognition ?? window.webkitSpeechRecognition);
 }
 

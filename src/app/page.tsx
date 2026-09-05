@@ -2,7 +2,14 @@
 
 import { Camera, Globe2, ImagePlus, PenLine, Plus, Video } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type TouchEvent as ReactTouchEvent,
+} from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { AppNav } from "@/components/AppNav";
 import { InsightLine } from "@/components/InsightLine";
@@ -25,6 +32,7 @@ export default function Home() {
   const captureStartXRef = useRef(0);
   const captureDragRef = useRef(0);
   const captureDraggingRef = useRef(false);
+  const captureTouchActiveRef = useRef(false);
   const capturePressTimerRef = useRef<number | null>(null);
   const captureLongPressRef = useRef(false);
   const recordingReleaseRequestedRef = useRef(false);
@@ -181,6 +189,7 @@ export default function Home() {
   }
 
   function startCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
+    if (event.pointerType === "touch") return;
     captureStartXRef.current = event.clientX;
     captureDragRef.current = 0;
     captureDraggingRef.current = true;
@@ -189,6 +198,7 @@ export default function Home() {
   }
 
   function moveCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
+    if (event.pointerType === "touch") return;
     if (!captureDraggingRef.current) return;
     const limit = captureSliderLimit();
     const next = Math.max(-limit, Math.min(limit, event.clientX - captureStartXRef.current));
@@ -196,19 +206,24 @@ export default function Home() {
     setCaptureDrag(next);
   }
 
-  function finishCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
+  function completeCaptureDrag(completedDrag: number) {
     const limit = captureSliderLimit();
     const threshold = limit * .58;
-    const completedDrag = captureDragRef.current;
     captureDraggingRef.current = false;
     setCaptureDragging(false);
     setCaptureDrag(0);
     captureDragRef.current = 0;
+    if (completedDrag >= threshold) albumInputRef.current?.click();
+    if (completedDrag <= -threshold) photoInputRef.current?.click();
+  }
+
+  function finishCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
+    if (event.pointerType === "touch") return;
+    const completedDrag = captureDragRef.current;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
-    if (completedDrag >= threshold) albumInputRef.current?.click();
-    if (completedDrag <= -threshold) photoInputRef.current?.click();
+    completeCaptureDrag(completedDrag);
   }
 
   function cancelCaptureDrag() {
@@ -216,6 +231,41 @@ export default function Home() {
     captureDragRef.current = 0;
     setCaptureDragging(false);
     setCaptureDrag(0);
+  }
+
+  function startCaptureTouch(event: ReactTouchEvent<HTMLButtonElement>) {
+    const touch = event.touches[0];
+    if (!touch) return;
+    captureTouchActiveRef.current = true;
+    captureStartXRef.current = touch.clientX;
+    captureDragRef.current = 0;
+    captureDraggingRef.current = true;
+    setCaptureDragging(true);
+  }
+
+  function moveCaptureTouch(event: ReactTouchEvent<HTMLButtonElement>) {
+    if (!captureTouchActiveRef.current) return;
+    const touch = event.touches[0];
+    if (!touch) return;
+    event.preventDefault();
+    const limit = captureSliderLimit();
+    const next = Math.max(
+      -limit,
+      Math.min(limit, touch.clientX - captureStartXRef.current),
+    );
+    captureDragRef.current = next;
+    setCaptureDrag(next);
+  }
+
+  function finishCaptureTouch() {
+    if (!captureTouchActiveRef.current) return;
+    captureTouchActiveRef.current = false;
+    completeCaptureDrag(captureDragRef.current);
+  }
+
+  function cancelCaptureTouch() {
+    captureTouchActiveRef.current = false;
+    cancelCaptureDrag();
   }
 
   useEffect(() => {
@@ -347,7 +397,13 @@ export default function Home() {
                 onPointerDown={startCaptureDrag}
                 onPointerMove={moveCaptureDrag}
                 onPointerUp={finishCaptureDrag}
-                onPointerCancel={cancelCaptureDrag}
+                onPointerCancel={(event) => {
+                  if (event.pointerType !== "touch") cancelCaptureDrag();
+                }}
+                onTouchStart={startCaptureTouch}
+                onTouchMove={moveCaptureTouch}
+                onTouchEnd={finishCaptureTouch}
+                onTouchCancel={cancelCaptureTouch}
                 onKeyDown={(event) => {
                   if (event.key === "ArrowLeft") photoInputRef.current?.click();
                   if (event.key === "ArrowRight") albumInputRef.current?.click();
