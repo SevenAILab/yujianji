@@ -57,6 +57,10 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cardActiveRef = useRef(false);
   const [hover, setHover] = useState<Hover>(null);
+  const wrapWidth = wrapRef.current?.clientWidth ?? 360;
+  const wrapHeight = wrapRef.current?.clientHeight ?? 420;
+  const hoverCardWidth = 218;
+  const hoverCardHeight = 238;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -251,7 +255,7 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
   }, [pins]);
 
   return (
-    <div ref={wrapRef} style={{ position: "relative", height: 610, overflow: "hidden", borderRadius: 24, border: "1px solid rgba(44,130,120,.18)", background: "#f7f5ed" }}>
+    <div ref={wrapRef} style={{ position: "relative", width: "100%", height: "clamp(360px, 74vw, 610px)", overflow: "hidden", borderRadius: 24, border: "1px solid rgba(44,130,120,.18)", background: "#f7f5ed" }}>
       <canvas ref={canvasRef} style={{ display: "block", cursor: "grab", touchAction: "none" }} />
       <div style={{ position: "absolute", left: 18, top: 16, color: "#568078", fontSize: 12, letterSpacing: ".14em" }}>拖动旋转 · 悬停大头针</div>
       {hover ? (
@@ -260,7 +264,7 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
           onMouseEnter={() => { cardActiveRef.current = true; }}
           onMouseLeave={() => { cardActiveRef.current = false; setHover(null); }}
           onClick={() => router.push(`/item/${hover.location.preview[0]?.id ?? hover.location.itemIds[0]}`)}
-          style={{ position: "absolute", left: Math.min(hover.x + 6, 660), top: Math.max(18, hover.y - 92), width: 218, padding: 8, textAlign: "left", font: "inherit", cursor: "pointer", background: "rgba(255,253,247,.97)", border: "1px solid rgba(57,139,128,.3)", boxShadow: "7px 9px 0 rgba(98,160,139,.11), 0 16px 34px rgba(42,91,84,.13)", transform: "rotate(-1deg)" }}
+          style={{ position: "absolute", left: Math.min(Math.max(8, hover.x + 6), Math.max(8, wrapWidth - hoverCardWidth - 8)), top: Math.min(Math.max(18, hover.y - 92), Math.max(18, wrapHeight - hoverCardHeight - 10)), width: hoverCardWidth, padding: 8, textAlign: "left", font: "inherit", cursor: "pointer", background: "rgba(255,253,247,.97)", border: "1px solid rgba(57,139,128,.3)", boxShadow: "7px 9px 0 rgba(98,160,139,.11), 0 16px 34px rgba(42,91,84,.13)", transform: "rotate(-1deg)" }}
           aria-label={`打开${hover.location.name}的记录`}
         >
           <img src={hover.location.coverPhoto} alt="" style={{ width: "100%", height: 112, objectFit: "cover", display: "block" }} />

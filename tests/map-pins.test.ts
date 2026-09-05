@@ -70,4 +70,17 @@ describe("map pins", () => {
 
     expect(buildMapPins(input)).toHaveLength(2);
   });
+
+  it("accepts records without coordinates and excludes them from pins", () => {
+    const input = mapPinsRequestSchema.parse({
+      items: [
+        { ...shanghai, lat: null, lng: null },
+        { ...shanghai, id: "with-coordinates" },
+      ],
+    });
+
+    const pins = buildMapPins(input);
+    expect(pins).toHaveLength(1);
+    expect(pins[0].itemIds).toEqual(["with-coordinates"]);
+  });
 });

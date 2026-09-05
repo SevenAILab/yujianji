@@ -1301,3 +1301,25 @@ img {
     padding-top: 28px;
   }
 }
+
+/* 首页那一句话：像随口说的，不是通知条 */
+.insight-line {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  margin: 10px 0 2px;
+  color: var(--teal);
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.insight-dot {
+  flex: none;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--teal);
+  opacity: 0.55;
+  transform: translateY(-2px);
+}

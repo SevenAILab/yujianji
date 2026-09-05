@@ -58,7 +58,7 @@ LLM_JSON_MODE=true
 npm run ping
 ```
 
-该命令会测试 `qwen3-vl-plus`、`qwen-vl-max`，并对 `qwen3-vl-plus` 对比 thinking 与 JSON mode；日志只输出耗时、返回长度和 reasoning 是否存在。实测 `qwen-vl-max` 不接受开启 thinking 的参数，因此备用模型只验证关闭 thinking 与 JSON mode。现场切换备用模型时，只修改 `VISION_MODEL` 后重新部署，不需要改代码。
+该命令会测试 `qwen3-vl-plus`、`qwen-vl-max`，并对 `qwen3-vl-plus` 对比 thinking 与 JSON mode；日志只输出耗时、返回长度和 reasoning 是否存在。`qwen-vl-max` 的 thinking 参数如果被服务商拒绝，备用模型仍可验证关闭 thinking 与 JSON mode。现场切换备用模型时，只修改 `VISION_MODEL` 后重新部署，不需要改代码。
 
 ## Seed 内容
 
@@ -95,16 +95,19 @@ npm run seed:ai
 
 ## 页面
 
-- `/` 世界地图、国家高亮、统计和最近遇见
-- `/encounter` 拍照/相册、原话、语音输入、地点、定位降级、显影和手动保存
+- `/` 世界地图、国家/Admin-1 高亮、统计和最近遇见
+- `/encounter` 拍照/视频/相册、原话、语音输入、地点、定位降级、显影和手动保存
 - `/item/[id]` 初见/重逢、AI 博物志、依据、追问、分享图和删除
 - `/firsts` 只统计 `ai.verdict === "first"` 的记录，并支持按日期调用旅程总结
+
+地图使用本地 `world-atlas` 国家几何和 `src/data/admin1-regions.json` 的 Admin-1 几何，不使用地图瓦片或在线地图服务。首页的地图由 `MemoryGlobe` 绘制，地图异常由错误边界隔离，列表与藏品详情仍可访问。`/api/map-pins` 是独立的地图聚合能力。
 
 ### P1 / P2
 
 - 语音输入使用浏览器 Web Speech API。iPhone Safari 或 Android Chrome 不支持时，按钮会置灰并提示直接打字。
 - 分享图由浏览器 Canvas 本地生成，尺寸固定为 `1080 × 1920`，不经过应用服务端。
 - 旅程总结在 `/firsts` 中选择日期范围后调用 `/api/summary`，只发送结构化的记录摘要，不发送照片。
+- `/api/geocode` 保留为独立的地点查询能力，不是主保存流程依赖；主流程的地点文案由用户填写，GPS 国家判断使用本地多边形。
 
 照片和记录只存用户浏览器的 IndexedDB。识别期间照片会临时发送给百炼模型，应用服务端不保存照片。
 
@@ -114,7 +117,7 @@ npm run seed:ai
 
 - 源文件最大 100MB；超过 60 秒时只在本机处理前 60 秒，并在确认页明确提示，原视频不会保存。
 - 按时长均匀抽取 1–6 帧，优先 960px JPEG，并按完整请求体预算自适应降低质量。
-- 完整 JSON 请求在客户端限制为 4.2MB；服务端再次校验，帧原始字节合计不超过 1.2MB，WAV 不超过约 1.95MB。
+- 完整 JSON 请求在客户端限制为 4.2MB；服务端再次校验，帧原始字节合计不超过约 1.1MB，WAV 不超过约 1.95MB。
 - Omni 模型返回后先进入确认步骤，用户可以取消卡片、改名称和地点、查看重逢关联，并把不确定的重逢改为初见。
 - 语音地点只作为待确认文字。只有它能匹配已有同地点的可信坐标时才沿用坐标；否则记录仍可保存，但不会生成虚假地图 pin。
 - `OMNI_MODEL` 默认是 `qwen3.5-omni-plus`，调用采用流式文本输出，服务端不会转发模型流或记录音频、转写与模型原文。
@@ -126,17 +129,20 @@ npm run seed:ai
 ```bash
 # 运行测试
 npm test
+ npm run seed:check:final
 
 # TypeScript 类型检查
 npx tsc --noEmit
 
 # 创建生产构建
 npm run build
-npm run seed:check:final
-npm audit --omit=dev --audit-level=high
+ git diff --check
+ npm audit --omit=dev --audit-level=high
 ```
 
-自动化测试覆盖 Zod schema、模型 JSON 提取、`relatedItemId` 合法性，以及地图/地点和视频链路的关键纯函数。相机、GPS、断网、压缩和双设备流程需要用 iPhone Safari 与 Android Chrome 真机验收。
+ 自动化测试覆盖三类契约：Zod schema、模型 JSON 提取、`relatedItemId` 合法性；另外覆盖地图 pin、Admin-1 几何和 Insight 的纯函数边界。相机、GPS、断网、压缩和双设备流程需要用 iPhone Safari 与 Android Chrome 真机验收。
+
+2026-09-05 本轮已完成的本地/生产证据以仓库中的截图和日志为准；真实蜂窝网络截图仍需用手机蜂窝网络补拍，不能由桌面网络验收代替。
 
 ## Vercel
 

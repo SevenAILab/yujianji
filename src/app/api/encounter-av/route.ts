@@ -17,7 +17,7 @@ export const maxDuration = 60;
 
 const MAX_BODY_BYTES = 4_200_000;
 const MAX_AUDIO_BYTES = 1_950_000;
-const MAX_FRAME_BYTES = 1_200_000;
+const MAX_FRAME_BYTES = 1_100_000;
 
 function errorResponse(status: number, code: string, message: string) {
   return NextResponse.json({ error: message, code }, { status });

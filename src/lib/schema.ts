@@ -99,7 +99,7 @@ export const recognizeRequestSchema = z.object({
   image: z.string().min(1),
   userNote: z.string().max(300),
   history: z.union([
-    z.array(historyEntrySchema).max(200),
+    z.array(historyEntrySchema).max(1_000),
     z.string().max(120_000),
   ]),
 });

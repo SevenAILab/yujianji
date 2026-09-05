@@ -13,8 +13,8 @@ export const mapPinSourceSchema = z.object({
   regionId: z.string().min(1).max(160).optional(),
   place: z.string().min(1).max(120),
   country: z.string().min(2).max(5),
-  lat: z.number().finite().min(-90).max(90),
-  lng: z.number().finite().min(-180).max(180),
+  lat: z.number().finite().min(-90).max(90).nullable(),
+  lng: z.number().finite().min(-180).max(180).nullable(),
   date: z.string().min(1).max(40),
   name: z.string().min(1).max(80),
   userNote: z.string().max(300).default(""),
@@ -38,6 +38,7 @@ export const mapPinsRequestSchema = z.object({
 
 export type MapPinSource = z.infer<typeof mapPinSourceSchema>;
 export type MapPinsRequest = z.infer<typeof mapPinsRequestSchema>;
+type CoordinateMapPinSource = MapPinSource & { lat: number; lng: number };
 
 export interface MapPinLocation {
   id: string;
@@ -87,7 +88,7 @@ function normalizePart(value: string): string {
 }
 
 export function deriveLocationId(
-  item: Pick<MapPinSource, "locationId" | "country" | "place" | "lat" | "lng">,
+  item: Pick<CoordinateMapPinSource, "locationId" | "country" | "place" | "lat" | "lng">,
   coordinatePrecision = 3,
 ): string {
   if (item.locationId) return item.locationId;
@@ -101,7 +102,7 @@ export function deriveLocationId(
 }
 
 function isInsideBounds(
-  item: MapPinSource,
+  item: CoordinateMapPinSource,
   bounds: NonNullable<MapPinsRequest["bounds"]>,
 ): boolean {
   const insideLatitude = item.lat >= bounds.south && item.lat <= bounds.north;
@@ -112,11 +113,22 @@ function isInsideBounds(
   return insideLatitude && insideLongitude;
 }
 
+function hasCoordinates(item: MapPinSource): item is CoordinateMapPinSource {
+  return item.lat !== null && item.lng !== null;
+}
+
 export function buildMapPins(input: MapPinsRequest): MapPin[] {
+  const coordinateItems = input.items.filter(hasCoordinates);
   const candidates = input.bounds
-    ? input.items.filter((item) => isInsideBounds(item, input.bounds!))
-    : input.items;
-  const groups = new Map<string, { region: ReturnType<typeof resolveAdmin1Region>; items: MapPinSource[] }>();
+    ? coordinateItems.filter((item) => isInsideBounds(item, input.bounds!))
+    : coordinateItems;
+  const groups = new Map<
+    string,
+    {
+      region: ReturnType<typeof resolveAdmin1Region>;
+      items: CoordinateMapPinSource[];
+    }
+  >();
 
   for (const item of candidates) {
     const region = resolveAdmin1Region(item);
@@ -135,7 +147,7 @@ export function buildMapPins(input: MapPinsRequest): MapPin[] {
       const lat = items.reduce((sum, item) => sum + item.lat, 0) / items.length;
       const lng = items.reduce((sum, item) => sum + item.lng, 0) / items.length;
 
-      const locationGroups = new Map<string, MapPinSource[]>();
+      const locationGroups = new Map<string, CoordinateMapPinSource[]>();
       items.forEach((item) => {
         const id = deriveLocationId(item, input.coordinatePrecision);
         locationGroups.set(id, [...(locationGroups.get(id) ?? []), item]);

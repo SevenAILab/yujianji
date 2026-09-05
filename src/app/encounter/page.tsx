@@ -59,6 +59,12 @@ type SaveLocation = {
   location: LocationStatus;
   country: string;
 };
+type LocatedItem = Item & { lat: number; lng: number };
+
+/** 只有带坐标的历史条目才能用作位置兜底；其余走深圳默认值。 */
+function hasCoordinates(item: Item): item is LocatedItem {
+  return item.lat !== null && item.lng !== null;
+}
 
 function positionFailureText(failure: PositionFailure | null): string {
   if (failure === "unsupported") return "这台设备不支持定位。";
@@ -119,10 +125,10 @@ export default function EncounterPage() {
     let active = true;
 
     function applyFallbackLocation(history: Item[]) {
-      const previous = [...history].sort((a, b) =>
-        b.date.localeCompare(a.date),
-      )[0];
-      if (previous && previous.lat !== null && previous.lng !== null) {
+      const previous = [...history]
+        .sort((a, b) => b.date.localeCompare(a.date))
+        .find(hasCoordinates);
+      if (previous) {
         setCountry(previous.country === "UNK" ? "" : previous.country);
         setLocation({
           source: "previous",
@@ -146,7 +152,13 @@ export default function EncounterPage() {
         const history = await db.items.orderBy("date").toArray();
         if (!active) return;
         setItems(history);
-        const previous = [...history].sort((a, b) => b.date.localeCompare(a.date))[0];
+        const previousItem = [...history].sort((a, b) =>
+          b.date.localeCompare(a.date),
+        )[0];
+        if (previousItem) setPlace(previousItem.place);
+        const previous = [...history]
+          .sort((a, b) => b.date.localeCompare(a.date))
+          .find(hasCoordinates);
         applyFallbackLocation(history);
         setLocationLoading(true);
 
@@ -166,7 +178,7 @@ export default function EncounterPage() {
             position: positionResult.position,
             countryDetected: Boolean(detectedCountry),
           });
-        } else if (previous && previous.lat !== null && previous.lng !== null) {
+        } else if (previous) {
           setLocation({
             source: "previous",
             text: `${positionFailureText(positionResult.failure)}已按你上一条藏品的位置记录。`,
@@ -311,9 +323,7 @@ export default function EncounterPage() {
       const result = recognizeResultSchema.parse(payload);
       if (result.unrecognized) {
         setShowManual(true);
-        setError(
-          `这次还没认出来。${result.observation} 可以手动填一个名字，把这次遇见先保存下来。`,
-        );
+        setError("这次还没认出来。可以手动填一个名字，把这次遇见先保存下来。");
         return;
       }
       if (
@@ -485,7 +495,9 @@ export default function EncounterPage() {
   }
 
   const showCountrySelector =
-    !locationLoading && Boolean(location) && (!location?.countryDetected || location.source !== "gps");
+    !locationLoading &&
+    Boolean(location) &&
+    (!location?.countryDetected || location.source !== "gps");
   const locationSource = location?.source ?? "manual";
 
   if (avDraft) {
@@ -652,7 +664,9 @@ export default function EncounterPage() {
                     <option value="">请选择</option>
                     <option value="UNK">位置未定</option>
                     {COUNTRY_OPTIONS.map(([value, label]) => (
-                      <option value={value} key={value}>{label}</option>
+                      <option value={value} key={value}>
+                        {label}
+                      </option>
                     ))}
                   </select>
                 ) : (

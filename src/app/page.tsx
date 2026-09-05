@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRef } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { AppNav } from "@/components/AppNav";
+import { InsightLine } from "@/components/InsightLine";
 import { ItemCard } from "@/components/ItemCard";
 import { MapErrorBoundary } from "@/components/MapErrorBoundary";
 import { MemoryGlobe, type MemoryGlobeApiPin, type MemoryGlobePin } from "@/components/MemoryGlobe";
@@ -135,6 +136,8 @@ export default function Home() {
           </button>
         </header>
 
+        <InsightLine items={items} />
+
         <MapErrorBoundary>
           <MemoryGlobe key={mapResetToken} pins={mapPins} />
         </MapErrorBoundary>
@@ -218,7 +221,7 @@ export default function Home() {
                 <input
                   className="file-input"
                   type="file"
-                  accept="image/*"
+                  accept="image/*,video/*"
                   capture="environment"
                   onChange={(event) => beginFileEncounter(event.target.files?.[0])}
                 />
@@ -230,7 +233,7 @@ export default function Home() {
                 <input
                   className="file-input"
                   type="file"
-                  accept="image/*"
+                  accept="image/*,video/*"
                   onChange={(event) => beginFileEncounter(event.target.files?.[0])}
                 />
               </label>

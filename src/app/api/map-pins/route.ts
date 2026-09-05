@@ -38,4 +38,3 @@ export async function POST(request: Request) {
     memoryCount: pins.reduce((sum, pin) => sum + pin.memoryCount, 0),
   });
 }
-

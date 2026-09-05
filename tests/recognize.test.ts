@@ -5,6 +5,7 @@ import {
   recognizeRequestSchema,
   recognizeResultSchema,
 } from "../src/lib/schema";
+import { normalizeHistory } from "../src/lib/history";
 import type { HistoryEntry } from "../src/lib/types";
 
 const history: HistoryEntry[] = [
@@ -78,18 +79,27 @@ describe("recognize result validation", () => {
     ).toBe(false);
   });
 
-  it("rejects more than 200 history entries at the request boundary", () => {
+  it("accepts oversized history and trims it to the newest 200 entries", () => {
     const entry = history[0];
-    expect(
-      recognizeRequestSchema.safeParse({
-        image: "data:image/jpeg;base64,AA==",
-        userNote: "",
-        history: Array.from({ length: 201 }, (_, index) => ({
-          ...entry,
-          id: `${entry.id}-${index}`,
-        })),
-      }).success,
-    ).toBe(false);
+    const historyInput = Array.from({ length: 201 }, (_, index) => ({
+      ...entry,
+      id: `${entry.id}-${index}`,
+      date: `2025-${String((index % 12) + 1).padStart(2, "0")}-01T00:00:00+08:00`,
+    }));
+    const parsed = recognizeRequestSchema.safeParse({
+      image: "data:image/jpeg;base64,AA==",
+      userNote: "",
+      history: historyInput,
+    });
+
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    const normalized = normalizeHistory(parsed.data.history);
+    expect(normalized.truncated).toBe(true);
+    expect(normalized.entries).toHaveLength(200);
+    expect(normalized.entries.map(({ id }) => id)).not.toContain(
+      "moganshan-pink-leaf-2025-10-0",
+    );
   });
 
   it("accepts a valid reunion id", () => {
