@@ -183,16 +183,9 @@
   color: #5f7e7d;
 }
 
-.itemShell :global(.question-box),
 .itemShell :global(.status-note) {
   border-radius: 14px;
   background: #e9f1ec;
-}
-
-.itemShell :global(.field textarea) {
-  border-color: #d9e5df;
-  border-radius: 13px;
-  background: #f7faf6;
 }
 
 .itemShell :global(.secondary-action) {

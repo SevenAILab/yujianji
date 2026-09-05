@@ -4,6 +4,7 @@ interface CallVisionOptions {
   imageDataUrl?: string;
   systemPrompt: string;
   userText: string;
+  imageDetail?: "high" | "low";
   model?: string;
   enableThinking?: boolean;
   jsonMode?: boolean;
@@ -42,6 +43,7 @@ export async function callVision({
   imageDataUrl,
   systemPrompt,
   userText,
+  imageDetail = "high",
   model = process.env.VISION_MODEL ?? "qwen3-vl-plus",
   enableThinking = process.env.LLM_THINKING === "true",
   jsonMode = process.env.LLM_JSON_MODE === "true",
@@ -54,7 +56,7 @@ export async function callVision({
         { type: "text" as const, text: userText },
         {
           type: "image_url" as const,
-          image_url: { url: imageDataUrl, detail: "high" as const },
+          image_url: { url: imageDataUrl, detail: imageDetail },
         },
       ]
     : [{ type: "text" as const, text: userText }];

@@ -6,6 +6,7 @@ import { callVision } from "@/lib/llm";
 import { dataUrlByteLength } from "@/lib/image";
 import { parseRecognizeResult, RecognizeParseError } from "@/lib/recognize";
 import { allowRequest } from "@/lib/rate-limit";
+import { isTimeoutLike } from "@/lib/timeout-error";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -62,7 +63,10 @@ export async function POST(request: Request) {
   const userText = buildRecognitionUserText(userNote, historyEntries);
   const deadline = Date.now() + 55_000;
 
-  async function callWithBudget(extraUserText = userText) {
+  async function callWithBudget(
+    extraUserText = userText,
+    imageDetail: "high" | "low" = "high",
+  ) {
     const remainingMs = deadline - Date.now();
     if (remainingMs <= 1_000) {
       throw new Error("模型总响应时间已用尽");
@@ -71,12 +75,20 @@ export async function POST(request: Request) {
       imageDataUrl: image,
       systemPrompt: RECOGNIZE_SYSTEM_PROMPT,
       userText: extraUserText,
-      timeoutMs: Math.min(26_000, remainingMs),
+      imageDetail,
+      timeoutMs: Math.min(45_000, remainingMs),
     });
   }
 
   try {
-    const raw = await callWithBudget();
+    let raw: string;
+    try {
+      raw = await callWithBudget();
+    } catch (error) {
+      if (!isTimeoutLike(error)) throw error;
+      console.info(JSON.stringify({ event: "vision_timeout_retry" }));
+      raw = await callWithBudget(userText, "low");
+    }
 
     try {
       return NextResponse.json(parseRecognizeResult(raw, historyEntries));
@@ -109,8 +121,7 @@ export async function POST(request: Request) {
     }
 
     const message = error instanceof Error ? error.message : "";
-    const lowerMessage = message.toLowerCase();
-    if (lowerMessage.includes("timeout") || lowerMessage.includes("abort")) {
+    if (isTimeoutLike(error)) {
       return errorResponse(504, "MODEL_TIMEOUT", "模型响应超时，请重试");
     }
     if (message.includes("缺少 DASHSCOPE_API_KEY")) {

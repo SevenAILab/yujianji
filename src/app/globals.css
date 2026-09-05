@@ -1059,26 +1059,6 @@ img {
   color: var(--warning);
 }
 
-.question-box {
-  margin-top: 16px;
-  padding: 14px;
-  border-radius: 15px;
-  background: #edf7f5;
-}
-
-.question-box strong {
-  display: block;
-  color: var(--teal-dark);
-  font-size: 12px;
-}
-
-.question-box p {
-  margin: 7px 0 11px;
-  color: #49686d;
-  font-size: 13px;
-  line-height: 1.6;
-}
-
 .action-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1322,4 +1302,134 @@ img {
   background: var(--teal);
   opacity: 0.55;
   transform: translateY(-2px);
+}
+
+.comment-thread {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.comment-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.comment-avatar {
+  display: grid;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 12px;
+}
+
+.comment-avatar-ai {
+  background: var(--mint);
+  color: var(--teal-dark);
+}
+
+.comment-avatar-user {
+  width: 28px;
+  height: 28px;
+  background: var(--sky);
+  color: var(--teal);
+}
+
+.comment-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.comment-name {
+  margin-bottom: 3px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.comment-text {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.comment-time {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.comment-reply {
+  padding-left: 38px;
+}
+
+.comment-pending {
+  color: var(--muted);
+}
+
+.comment-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.comment-input-row textarea {
+  min-width: 0;
+  flex: 1;
+  min-height: 38px;
+  max-height: 100px;
+  resize: vertical;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.comment-send {
+  display: grid;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--teal);
+  color: white;
+  cursor: pointer;
+}
+
+.comment-send:disabled {
+  cursor: not-allowed;
+  opacity: .45;
+}
+
+.comment-retry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0 0 38px;
+  border-top: 1px solid var(--line);
+  color: var(--warning);
+  font-size: 12px;
+}
+
+.comment-retry button {
+  flex: none;
+  padding: 5px 9px;
+  border: 1px solid var(--warning);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--warning);
+  font: inherit;
+  cursor: pointer;
 }

@@ -2,10 +2,10 @@
 
 import {
   ArrowLeft,
-  Check,
   CircleAlert,
   MapPin,
   MessageCircle,
+  Send,
   X,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -42,7 +42,8 @@ export default function ItemPage() {
     [loadedItem?.ai?.relatedItemId],
   );
   const [answer, setAnswer] = useState("");
-  const [savedAnswer, setSavedAnswer] = useState(false);
+  const [replying, setReplying] = useState(false);
+  const [replyError, setReplyError] = useState("");
   const [actionError, setActionError] = useState("");
   const [redeveloping, setRedeveloping] = useState(false);
   const [editingLocation, setEditingLocation] = useState(false);
@@ -91,14 +92,34 @@ export default function ItemPage() {
 
   const currentItem = loadedItem;
 
-  async function saveAnswer() {
-    if (!answer.trim()) return;
+  async function submitAnswer() {
+    const submittedAnswer = answer.trim();
+    if (!submittedAnswer || replying || currentItem.reply) return;
     try {
-      await db.items.update(currentItem.id, { answer: answer.trim() });
-      setSavedAnswer(true);
-      setActionError("");
+      await db.items.update(currentItem.id, { answer: submittedAnswer });
+      setReplying(true);
+      setReplyError("");
+      const question = currentItem.ai?.question;
+      if (!question) return;
+      const response = await fetch("/api/reply", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          itemName: currentItem.name,
+          userNote: currentItem.userNote,
+          question,
+          answer: submittedAnswer,
+        }),
+      });
+      const payload = (await response.json()) as { reply?: string; error?: string };
+      if (!response.ok || !payload.reply) {
+        throw new Error(payload.error ?? "回应暂时生成不出来，请重试。");
+      }
+      await db.items.update(currentItem.id, { reply: payload.reply });
     } catch {
-      setActionError("回答暂时没有保存成功，请检查浏览器存储空间后重试。");
+      setReplyError("回应暂时没有生成，请再试一次。");
+    } finally {
+      setReplying(false);
     }
   }
 
@@ -366,24 +387,69 @@ export default function ItemPage() {
 
           {currentItem.ai?.question ? (
             <section className="content-card surface">
-              <p className="eyebrow"><MessageCircle size={13} /> 它问你</p>
-              <div className="question-box">
-                <strong>{currentItem.ai.question}</strong>
-                <p>{currentItem.answer || "这个回答可以以后再补。"}</p>
-                <div className="field">
-                  <label htmlFor="answer">回答一句</label>
-                  <textarea
-                    id="answer"
-                    value={answer}
-                    onChange={(event) => setAnswer(event.target.value)}
-                    placeholder="把当时没说完的话留在这里"
-                    maxLength={300}
-                  />
+              <p className="eyebrow"><MessageCircle size={13} /> 评论</p>
+              <div className="comment-thread">
+                <div className="comment-row">
+                  <div className="comment-avatar comment-avatar-ai">集</div>
+                  <div className="comment-body">
+                    <div className="comment-name">遇见集</div>
+                    <div className="comment-text">{currentItem.ai.question}</div>
+                    <div className="comment-time">刚刚</div>
+                  </div>
                 </div>
-                <button className="secondary-action" style={{ marginTop: 10 }} onClick={() => void saveAnswer()}>
-                  <Check size={16} />
-                  {savedAnswer ? "已保存" : "保存回答"}
-                </button>
+                {currentItem.answer ? (
+                  <div className="comment-row comment-reply">
+                    <div className="comment-avatar comment-avatar-user">我</div>
+                    <div className="comment-body">
+                      <div className="comment-name">我</div>
+                      <div className="comment-text">{currentItem.answer}</div>
+                      <div className="comment-time">刚刚</div>
+                    </div>
+                  </div>
+                ) : null}
+                {replying ? (
+                  <div className="comment-row comment-reply">
+                    <div className="comment-avatar comment-avatar-ai"><MessageCircle size={15} /></div>
+                    <div className="comment-body">
+                      <div className="comment-name">遇见集</div>
+                      <div className="comment-text comment-pending">正在回应…</div>
+                    </div>
+                  </div>
+                ) : currentItem.reply ? (
+                  <div className="comment-row comment-reply">
+                    <div className="comment-avatar comment-avatar-ai">集</div>
+                    <div className="comment-body">
+                      <div className="comment-name">遇见集</div>
+                      <div className="comment-text">{currentItem.reply}</div>
+                      <div className="comment-time">刚刚</div>
+                    </div>
+                  </div>
+                ) : currentItem.answer ? (
+                  <div className="comment-retry">
+                    <span>{replyError || "这条回答还没有收到回应。"}</span>
+                    <button type="button" onClick={() => void submitAnswer()}>让它再说一次</button>
+                  </div>
+                ) : !currentItem.answer ? (
+                  <div className="comment-input-row">
+                    <textarea
+                      id="answer"
+                      value={answer}
+                      onChange={(event) => setAnswer(event.target.value)}
+                      placeholder="说点什么…"
+                      maxLength={300}
+                      rows={1}
+                    />
+                    <button
+                      className="comment-send"
+                      type="button"
+                      aria-label="发送回答"
+                      onClick={() => void submitAnswer()}
+                      disabled={!answer.trim() || replying}
+                    >
+                      <Send size={16} />
+                    </button>
+                  </div>
+                ) : null}
               </div>
             </section>
           ) : null}

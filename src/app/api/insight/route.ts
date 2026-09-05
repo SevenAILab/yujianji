@@ -4,6 +4,7 @@ import { callVision } from "@/lib/llm";
 import { extractJsonObject } from "@/lib/json";
 import { INSIGHT_SYSTEM_PROMPT } from "@/lib/prompt";
 import { allowRequest } from "@/lib/rate-limit";
+import { isTimeoutLike } from "@/lib/timeout-error";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -58,14 +59,13 @@ export async function POST(request: Request) {
     if (line.length > 40) throw new Error("模型返回超长句子");
     return NextResponse.json({ line });
   } catch (error) {
-    const message = error instanceof Error ? error.message.toLowerCase() : "";
     console.error(
       JSON.stringify({
         event: "insight_error",
         errorType: error instanceof Error ? error.constructor.name : "unknown",
       }),
     );
-    if (message.includes("timeout") || message.includes("abort")) {
+    if (isTimeoutLike(error)) {
       return NextResponse.json(
         { code: "MODEL_TIMEOUT", error: "这句话生成超时" },
         { status: 504 },

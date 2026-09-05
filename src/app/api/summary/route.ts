@@ -4,6 +4,7 @@ import { callVision } from "@/lib/llm";
 import { normalizeHistory } from "@/lib/history";
 import { buildSummaryUserText, cleanSummary, SUMMARY_SYSTEM_PROMPT } from "@/lib/summary";
 import { allowRequest } from "@/lib/rate-limit";
+import { isTimeoutLike } from "@/lib/timeout-error";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -88,8 +89,7 @@ export async function POST(request: Request) {
     if (!summary) throw new Error("模型返回空总结");
     return NextResponse.json({ summary });
   } catch (error) {
-    const message = error instanceof Error ? error.message.toLowerCase() : "";
-    if (message.includes("timeout") || message.includes("abort")) {
+    if (isTimeoutLike(error)) {
       return NextResponse.json(
         { code: "MODEL_TIMEOUT", error: "总结响应超时，请重试" },
         { status: 504 },

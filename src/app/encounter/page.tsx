@@ -111,6 +111,19 @@ export default function EncounterPage() {
   const fileLocationAppliedRef = useRef(false);
 
   useEffect(() => {
+    if (!loading || !preview || videoFile) return;
+    const stages = [
+      [4_000, "在翻你之前的记录…"],
+      [9_000, "在想该问你点什么…"],
+      [15_000, "快好了，它有点话多…"],
+    ] as const;
+    const timers = stages.map(([delay, stage]) =>
+      window.setTimeout(() => setLoadingStage(stage), delay),
+    );
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [loading, preview, videoFile]);
+
+  useEffect(() => {
     let active = true;
 
     async function loadContext() {
@@ -250,7 +263,7 @@ export default function EncounterPage() {
     const occurrenceId = nanoid();
     isSubmittingRef.current = true;
     setLoading(true);
-    setLoadingStage("AI记录中");
+    setLoadingStage("正在看这张照片…");
     setError("");
     setShowManual(false);
 
@@ -618,7 +631,7 @@ export default function EncounterPage() {
         <div className="loading-overlay" role="status" aria-live="polite">
           <div className="loading-inner">
             <div className="loading-orb" />
-            <strong>正在显影…</strong>
+            <strong>{loadingStage || "正在看这张照片…"}</strong>
             <span>让一件遇见慢慢显出名字，也看看我们是否早就见过。</span>
           </div>
         </div>

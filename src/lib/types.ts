@@ -63,6 +63,7 @@ export interface Item {
   heard?: string;
   ai: RecognizedAi | null;
   answer?: string;
+  reply?: string;
   isSeed: boolean;
   createdAt: string;
 }

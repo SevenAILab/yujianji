@@ -91,6 +91,7 @@ export const itemSchema = z.object({
   heard: z.string().max(500).optional(),
   ai: z.union([recognizedAiSchema, z.null()]),
   answer: z.string().optional(),
+  reply: z.string().optional(),
   isSeed: z.boolean(),
   createdAt: z.string().min(1),
 });

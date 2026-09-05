@@ -5,6 +5,7 @@ import { normalizeHistory } from "@/lib/history";
 import { allowRequest } from "@/lib/rate-limit";
 import { buildEncounterAvUserText, ENCOUNTER_AV_SYSTEM_PROMPT } from "@/lib/prompt";
 import { callOmni } from "@/lib/llm";
+import { isTimeoutLike } from "@/lib/timeout-error";
 import {
   assertReunionPreserved,
   AvParseError,
@@ -117,7 +118,7 @@ export async function POST(request: Request) {
       return errorResponse(502, error.code, error.message);
     }
     const message = error instanceof Error ? error.message.toLowerCase() : "";
-    if (message.includes("timeout") || message.includes("abort") || message.includes("时间已用尽")) {
+    if (isTimeoutLike(error)) {
       return errorResponse(504, "MODEL_TIMEOUT", "视频显影超时，请重试");
     }
     if (message.includes("缺少 dashscope_api_key")) {
