@@ -6,7 +6,7 @@ import {
   CircleAlert,
   MapPin,
   MessageCircle,
-  Trash2,
+  X,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -19,6 +19,7 @@ import { CATEGORY_LABELS } from "@/lib/types";
 import type { Item } from "@/lib/types";
 import { formatDate, formatMonth } from "@/lib/format";
 import { recognizeResultSchema } from "@/lib/schema";
+import styles from "./item-detail.module.css";
 
 const ITEM_LOADING = Symbol("item-loading");
 
@@ -155,15 +156,15 @@ export default function ItemPage() {
   }
 
   return (
-    <main className="app-shell">
-      <div className="phone-page">
-        <header className="page-header">
+    <main className={`app-shell ${styles.itemShell}`}>
+      <div className={`phone-page ${styles.itemPage}`}>
+        <header className={`page-header ${styles.itemHeader}`}>
           <button className="icon-action" onClick={() => router.back()} aria-label="返回">
             <ArrowLeft size={18} />
           </button>
           <span className="muted">{formatMonth(currentItem.date)}</span>
-          <button className="icon-action" onClick={() => void deleteItem()} aria-label="删除藏品">
-            <Trash2 size={17} />
+          <button className={`icon-action ${styles.itemDeleteButton}`} onClick={() => void deleteItem()} aria-label="删除藏品">
+            <X size={19} strokeWidth={1.7} />
           </button>
         </header>
 
@@ -257,7 +258,7 @@ export default function ItemPage() {
                 <span>地点文字来自你在视频里说的话，并由你保存前确认。</span>
               </div>
             ) : null}
-            {currentItem.locationSource !== "gps" ? (
+            {currentItem.locationSource !== "gps" && currentItem.locationSource !== "exif" ? (
               <div className="status-note warning" style={{ marginTop: 12 }}>
                 <MapPin size={14} />
                 <span>
@@ -301,11 +302,8 @@ export default function ItemPage() {
           {actionError ? <div className="error-box">{actionError}</div> : null}
 
           <div className="action-row">
-            <button className="secondary-action" onClick={() => router.push("/")}>
-              返回地图
-            </button>
-            <button className="secondary-action danger-action" onClick={() => void deleteItem()}>
-              删除这件
+            <button className={`primary-action ${styles.returnJourneyButton}`} onClick={() => router.push("/journeys")}>
+              返回旅途
             </button>
           </div>
         </div>

@@ -144,3 +144,4 @@ export function generateJourney(input: z.infer<typeof journeyGenerationRequestSc
     }),
   };
 }
+

@@ -1,52 +1,84 @@
 "use client";
 
-import { Camera, Compass, ImagePlus, PenLine, Plus, X } from "lucide-react";
+import { Camera, Globe2, ImagePlus, PenLine, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { useRef } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { AppNav } from "@/components/AppNav";
 import { InsightLine } from "@/components/InsightLine";
-import { ItemCard } from "@/components/ItemCard";
 import { MapErrorBoundary } from "@/components/MapErrorBoundary";
 import { MemoryGlobe, type MemoryGlobeApiPin, type MemoryGlobePin } from "@/components/MemoryGlobe";
 import { db, ensureSeeded } from "@/lib/db";
 import { setPendingEncounterFile } from "@/lib/encounter-transfer";
 import type { Item } from "@/lib/types";
+import styles from "./home.module.css";
 
 export default function Home() {
   const router = useRouter();
   const [seedReady, setSeedReady] = useState(false);
   const [mapResetToken, setMapResetToken] = useState(0);
   const [mapPins, setMapPins] = useState<MemoryGlobePin[]>([]);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const albumInputRef = useRef<HTMLInputElement>(null);
+  const captureSliderRef = useRef<HTMLDivElement>(null);
+  const captureStartXRef = useRef(0);
+  const captureDragRef = useRef(0);
+  const captureDraggingRef = useRef(false);
+  const [captureDrag, setCaptureDrag] = useState(0);
+  const [captureDragging, setCaptureDragging] = useState(false);
   const items = useLiveQuery(
     () => (seedReady ? db.items.orderBy("date").toArray() : Promise.resolve([] as Item[])),
     [seedReady],
     [],
   );
   const [toast, setToast] = useState("");
-  const [showEncounterMenu, setShowEncounterMenu] = useState(false);
-  const encounterTriggerRef = useRef<HTMLButtonElement | null>(null);
-  const encounterCloseRef = useRef<HTMLButtonElement | null>(null);
 
-  useEffect(() => {
-    if (!showEncounterMenu) {
-      encounterTriggerRef.current?.focus();
-      return;
-    }
-    encounterCloseRef.current?.focus();
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setShowEncounterMenu(false);
-    }
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [showEncounterMenu]);
-
-  function beginFileEncounter(file: File | undefined) {
+  function beginFileEncounter(file: File | undefined, source: "camera" | "album") {
     if (!file) return;
-    setPendingEncounterFile(file);
-    setShowEncounterMenu(false);
+    setPendingEncounterFile(file, source);
     router.push("/encounter");
+  }
+
+  function captureSliderLimit() {
+    return 54;
+  }
+
+  function startCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
+    captureStartXRef.current = event.clientX;
+    captureDragRef.current = 0;
+    captureDraggingRef.current = true;
+    setCaptureDragging(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
+
+  function moveCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
+    if (!captureDraggingRef.current) return;
+    const limit = captureSliderLimit();
+    const next = Math.max(-limit, Math.min(limit, event.clientX - captureStartXRef.current));
+    captureDragRef.current = next;
+    setCaptureDrag(next);
+  }
+
+  function finishCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
+    const limit = captureSliderLimit();
+    const threshold = limit * .58;
+    const completedDrag = captureDragRef.current;
+    captureDraggingRef.current = false;
+    setCaptureDragging(false);
+    setCaptureDrag(0);
+    captureDragRef.current = 0;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (completedDrag >= threshold) albumInputRef.current?.click();
+    if (completedDrag <= -threshold) cameraInputRef.current?.click();
+  }
+
+  function cancelCaptureDrag() {
+    captureDraggingRef.current = false;
+    captureDragRef.current = 0;
+    setCaptureDragging(false);
+    setCaptureDrag(0);
   }
 
   useEffect(() => {
@@ -107,151 +139,109 @@ export default function Home() {
 
   const stats = useMemo(() => {
     const firsts = items.filter((item) => item.ai?.verdict === "first");
+    const locations = new Set(
+      items.map((item) => `${item.country}:${item.place.trim()}:${item.lat ?? ""}:${item.lng ?? ""}`),
+    );
     return {
       discovered: items.length,
       countries: new Set(
-        items.filter((item) => item.country !== "UNK").map((item) => item.country),
+        items
+          .filter((item) => item.country !== "UNK" && item.country !== "OTHER")
+          .map((item) => item.country),
       ).size,
       firsts: firsts.length,
+      locations: locations.size,
     };
   }, [items]);
 
-  const recent = [...items].reverse().slice(0, 4);
-
   return (
-    <main className="app-shell">
-      <div className="phone-page">
-        <header className="page-header">
-          <div className="brand-lockup">
-            <h1>我的世界地图</h1>
-            <span>YU JIAN JI</span>
+    <main className={`app-shell ${styles.homeShell}`}>
+      <div className={`phone-page ${styles.homePage}`}>
+        <header className={styles.heroHeader}>
+          <div>
+            <p className={styles.wordmark}>遇见集<sup>®</sup></p>
+            <p className={styles.subtitle}>THE PLACES THAT MADE ME</p>
+            <p className={styles.tagline}>世界很大，而你，正好出发。</p>
           </div>
           <button
-            className="icon-action"
+            className={styles.globeReset}
             aria-label="重置地图视角"
             title="重置地图视角"
             onClick={() => setMapResetToken((token) => token + 1)}
           >
-            <Compass size={18} />
+            <Globe2 size={26} strokeWidth={1.8} />
           </button>
         </header>
 
-        <InsightLine items={items} />
-
-        <MapErrorBoundary>
-          <MemoryGlobe key={mapResetToken} pins={mapPins} />
-        </MapErrorBoundary>
-
-        <section className="stats-grid" aria-label="遇见统计">
-          <div className="stat-card">
-            <strong>{stats.discovered}</strong>
-            <span>发现总数</span>
-          </div>
-          <div className="stat-card">
-            <strong>{stats.countries}</strong>
-            <span>去过的国家</span>
-          </div>
-          <div className="stat-card">
-            <strong>{stats.firsts}</strong>
-            <span>我的第一次</span>
-          </div>
-        </section>
-
-        <button
-          className="primary-action home-action"
-          ref={encounterTriggerRef}
-          onClick={() => setShowEncounterMenu(true)}
-        >
-          <Plus size={19} />
-          遇见
-        </button>
-
-        <div className="section-heading">
-          <h2>最近遇见</h2>
-          <span>{items.length} 件藏品</span>
+        <div className={styles.globeStage}>
+          <MapErrorBoundary>
+            <MemoryGlobe key={mapResetToken} pins={mapPins} />
+          </MapErrorBoundary>
         </div>
-        {recent.length > 0 ? (
-          <div className="item-grid">
-            {recent.map((item) => <ItemCard item={item} key={item.id} />)}
-          </div>
-        ) : (
-          <div className="surface empty-state">你的第一件遇见，会从这里开始。</div>
-        )}
 
-        <p className="privacy-note">
-          照片存储在本机浏览器；视频只在本机拆成画面帧和音频后临时发送给百炼模型，原视频与应用服务端都不会保存。
-        </p>
-      </div>
-      <div aria-hidden={showEncounterMenu || undefined}>
-        <AppNav />
-      </div>
-      {showEncounterMenu ? (
-        <div
-          className="dialog-backdrop"
-          role="presentation"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setShowEncounterMenu(false);
-          }}
-        >
-          <div
-            className="encounter-menu"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="encounter-menu-title"
-          >
-            <div className="encounter-menu-head">
-              <div>
-                <p className="eyebrow">开始一条记录</p>
-                <h2 id="encounter-menu-title">你想怎么留下它？</h2>
+        <section className={styles.dashboard} aria-label="开始一次遇见">
+          <div className={styles.captureSlider}>
+            <div className={`${styles.captureSliderRail} ${captureDragging ? styles.active : ""}`} ref={captureSliderRef}>
+              <span className={styles.captureSliderLine} />
+              <div className={styles.captureSliderLabels} aria-hidden="true">
+                <span><Camera size={18} strokeWidth={1.7} />拍摄</span>
+                <span>相册<ImagePlus size={17} strokeWidth={1.7} /></span>
               </div>
               <button
-                className="icon-action"
-                ref={encounterCloseRef}
-                aria-label="关闭遇见入口"
-                onClick={() => setShowEncounterMenu(false)}
-              >
-                <X size={17} />
-              </button>
-            </div>
-            <div className="encounter-menu-actions">
-              <label className="encounter-menu-action">
-                <Camera size={22} />
-                <span>拍摄</span>
-                <small>打开相机，拍一张新的照片</small>
-                <input
-                  className="file-input"
-                  type="file"
-                  accept="image/*,video/*"
-                  capture="environment"
-                  onChange={(event) => beginFileEncounter(event.target.files?.[0])}
-                />
-              </label>
-              <label className="encounter-menu-action">
-                <ImagePlus size={22} />
-                <span>从相册选</span>
-                <small>从手机里挑一张已经拍好的照片</small>
-                <input
-                  className="file-input"
-                  type="file"
-                  accept="image/*,video/*"
-                  onChange={(event) => beginFileEncounter(event.target.files?.[0])}
-                />
-              </label>
-              <button
-                className="encounter-menu-action"
-                onClick={() => {
-                  setShowEncounterMenu(false);
-                  router.push("/encounter?mode=text");
+                className={`${styles.captureSliderThumb} ${captureDragging ? styles.dragging : ""}`}
+                style={{ transform: `translateX(${captureDrag}px)` }}
+                type="button"
+                role="slider"
+                aria-label="向左滑动拍摄，向右滑动打开相册"
+                aria-valuemin={-100}
+                aria-valuemax={100}
+                aria-valuenow={Math.round((captureDrag / captureSliderLimit()) * 100)}
+                onPointerDown={startCaptureDrag}
+                onPointerMove={moveCaptureDrag}
+                onPointerUp={finishCaptureDrag}
+                onPointerCancel={cancelCaptureDrag}
+                onKeyDown={(event) => {
+                  if (event.key === "ArrowLeft") cameraInputRef.current?.click();
+                  if (event.key === "ArrowRight") albumInputRef.current?.click();
                 }}
               >
-                <PenLine size={22} />
-                <span>只写字</span>
-                <small>没有照片，也可以记住这一刻</small>
+                <Plus size={24} strokeWidth={1.8} />
               </button>
             </div>
+            <p>左滑立即拍摄&nbsp;&nbsp;·&nbsp;&nbsp;右滑上传相册</p>
+            <input
+              ref={cameraInputRef}
+              className="file-input"
+              type="file"
+              accept="image/*,video/*"
+              capture="environment"
+              onChange={(event) => beginFileEncounter(event.target.files?.[0], "camera")}
+            />
+            <input
+              ref={albumInputRef}
+              className="file-input"
+              type="file"
+              accept="image/*,video/*"
+              onChange={(event) => beginFileEncounter(event.target.files?.[0], "album")}
+            />
           </div>
-        </div>
-      ) : null}
+
+          <button className={styles.textEncounter} onClick={() => router.push("/encounter?mode=text")}>
+            <PenLine size={15} />
+            没有照片？只写字也可以记住这一刻
+          </button>
+
+          <div className={styles.stats} aria-label="遇见统计">
+            <div><strong>{stats.discovered}</strong><span>已遇见</span></div>
+            <div><strong>{stats.firsts}</strong><span>第一次</span></div>
+            <div><strong>{stats.countries}</strong><span>国家</span></div>
+            <div><strong>{stats.locations}</strong><span>地点</span></div>
+          </div>
+
+          <div className={styles.insight}><InsightLine items={items} /></div>
+        </section>
+      </div>
+      <AppNav />
       {toast ? <div className="toast">{toast}</div> : null}
     </main>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { geoMercator, geoPath } from "d3-geo";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { getPhotoPresentation, type JourneyCollageData } from "@/lib/journey-collage";
 import { SmartPhotoCutout } from "@/components/SmartPhotoCutout";
@@ -62,15 +63,17 @@ export function JourneyCollageMap({ journey }: { journey: JourneyCollageData }) 
         const presentation = getPhotoPresentation(stop.hasDetectedSubject);
         const stackLevel = Math.floor(index / photoSlots.length);
         return (
-          <button
+          <Link
             className={`map-photo-cutout ${presentation} ${photoSlots[index % photoSlots.length]} ${activeStopId === stop.id ? "active" : ""}`}
             style={{ zIndex: activeStopId === stop.id ? 24 : 3 + (index % 12), translate: `${stackLevel * 5}px ${stackLevel * 4}px` }}
             key={`photo-${stop.id}`}
-            aria-label={`将${stop.place}的记忆置于顶层`}
-            onClick={() => setActiveStopId(stop.id)}
+            href={`/item/${stop.itemId}`}
+            aria-label={`打开${stop.place}的照片详情`}
+            onMouseEnter={() => setActiveStopId(stop.id)}
+            onFocus={() => setActiveStopId(stop.id)}
           >
             <SmartPhotoCutout src={stop.photo} alt={`${stop.place}旅程照片`} mode={presentation} /><span className="photo-date">{stop.date}</span>
-          </button>
+          </Link>
         );
       })}
 

@@ -10,12 +10,14 @@ export type Category =
 
 export type LocationSource =
   | "gps"
+  | "exif"
   | "previous"
   | "default"
   | "manual";
 
 export type PlaceSource =
   | "voice"
+  | "exif"
   | "manual"
   | "previous"
   | "default"

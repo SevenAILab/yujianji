@@ -13,6 +13,7 @@ export interface JourneyCollageRegion {
 
 export interface JourneyCollageStop {
   id: string;
+  itemId: string;
   date: string;
   place: string;
   detail: string;

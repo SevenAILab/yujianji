@@ -2,14 +2,9 @@
 
 import {
   ArrowLeft,
-  Camera,
   Check,
   FileVideo2,
-  Globe2,
-  ImagePlus,
-  Images,
   MapPin,
-  PenLine,
   RotateCcw,
   Sparkles,
 } from "lucide-react";
@@ -18,11 +13,10 @@ import { useEffect, useRef, useState } from "react";
 import { nanoid } from "nanoid";
 import { AppNav } from "@/components/AppNav";
 import { AvConfirm } from "@/components/AvConfirm";
-import { BatchImport } from "@/components/BatchImport";
 import { TextEncounter } from "@/components/TextEncounter";
 import { VoiceButton } from "@/components/VoiceButton";
 import { db, ensureSeeded } from "@/lib/db";
-import { takePendingEncounterFile } from "@/lib/encounter-transfer";
+import { takePendingEncounterFile, type EncounterFileSource } from "@/lib/encounter-transfer";
 import { createAvDraft, type AvDraft } from "@/lib/av-draft";
 import {
   AvExtractionError,
@@ -32,34 +26,42 @@ import {
 } from "@/lib/av";
 import { detectCountryFromPosition } from "@/lib/country";
 import { compressImage } from "@/lib/image";
+import { readImageLocation } from "@/lib/image-location";
 import { getPosition, type Position, type PositionFailure } from "@/lib/geo";
 import { toHistoryEntry } from "@/lib/history";
-import { CATEGORY_OPTIONS, type Category, type Item, type RecognizedAi } from "@/lib/types";
+import { CATEGORY_OPTIONS, type Category, type Item, type LocationSource, type PlaceSource, type RecognizedAi } from "@/lib/types";
 import { avResponseSchema, recognizeResultSchema } from "@/lib/schema";
-import { COUNTRY_OPTIONS, countryName } from "@/lib/iso";
+import styles from "./encounter.module.css";
 
 type LocationStatus = {
-  source: "gps" | "previous" | "default" | "manual";
+  source: LocationSource;
   text: string;
   position: Position;
   countryDetected: boolean;
 };
 
-type GeocodeResponse =
-  | {
-      found: true;
-      lat: number;
-      lng: number;
-      displayName: string;
-      country?: string;
-    }
-  | { found: false };
-
-type SaveLocation = {
-  location: LocationStatus;
-  country: string;
-};
 type LocatedItem = Item & { lat: number; lng: number };
+
+type ReverseGeocodeResponse = {
+  place: string;
+  displayName: string;
+  country?: string;
+};
+
+async function identifyPosition(position: Position): Promise<ReverseGeocodeResponse> {
+  const response = await fetch("/api/reverse-geocode", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(position),
+  });
+  if (!response.ok) throw new Error("GEOCODER_UNAVAILABLE");
+  return response.json() as Promise<ReverseGeocodeResponse>;
+}
+
+function placeSourceFor(source: LocationSource): PlaceSource {
+  if (source === "gps" || source === "exif") return source;
+  return source;
+}
 
 /** 只有带坐标的历史条目才能用作位置兜底；其余走深圳默认值。 */
 function hasCoordinates(item: Item): item is LocatedItem {
@@ -101,7 +103,6 @@ export default function EncounterPage() {
   const [preview, setPreview] = useState("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [avDraft, setAvDraft] = useState<AvDraft | null>(null);
-  const [batchFiles, setBatchFiles] = useState<File[]>([]);
   const [textMode, setTextMode] = useState(false);
   const [userNote, setUserNote] = useState("");
   const [place, setPlace] = useState("");
@@ -118,8 +119,7 @@ export default function EncounterPage() {
   const [savingManual, setSavingManual] = useState(false);
   const [geocodeLoading, setGeocodeLoading] = useState(false);
   const isSubmittingRef = useRef(false);
-  const countryTouchedRef = useRef(false);
-  const geocodeCacheRef = useRef(new Map<string, SaveLocation>());
+  const fileLocationAppliedRef = useRef(false);
 
   useEffect(() => {
     let active = true;
@@ -129,6 +129,7 @@ export default function EncounterPage() {
         .sort((a, b) => b.date.localeCompare(a.date))
         .find(hasCoordinates);
       if (previous) {
+        setPlace(previous.place);
         setCountry(previous.country === "UNK" ? "" : previous.country);
         setLocation({
           source: "previous",
@@ -137,6 +138,8 @@ export default function EncounterPage() {
           countryDetected: false,
         });
       } else {
+        setPlace("深圳");
+        setCountry("CHN");
         setLocation({
           source: "default",
           text: "正在尝试获取当前位置；暂以深圳记录。",
@@ -152,10 +155,6 @@ export default function EncounterPage() {
         const history = await db.items.orderBy("date").toArray();
         if (!active) return;
         setItems(history);
-        const previousItem = [...history].sort((a, b) =>
-          b.date.localeCompare(a.date),
-        )[0];
-        if (previousItem) setPlace(previousItem.place);
         const previous = [...history]
           .sort((a, b) => b.date.localeCompare(a.date))
           .find(hasCoordinates);
@@ -165,16 +164,27 @@ export default function EncounterPage() {
         const positionResult = await getPosition();
         if (!active) return;
         if (positionResult.position) {
-          const detectedCountry = detectCountryFromPosition(
+          setGeocodeLoading(true);
+          let identified: ReverseGeocodeResponse | null = null;
+          try {
+            identified = await identifyPosition(positionResult.position);
+          } catch {
+            identified = null;
+          } finally {
+            if (active) setGeocodeLoading(false);
+          }
+          if (!active || fileLocationAppliedRef.current) return;
+          const detectedCountry = identified?.country ?? detectCountryFromPosition(
             positionResult.position.lat,
             positionResult.position.lng,
           );
+          setPlace(identified?.place ?? "当前位置");
           setCountry(detectedCountry ?? "");
           setLocation({
             source: "gps",
-            text: detectedCountry
-              ? "已获取当前位置，并自动判断国家。地点名称仍由你确认。"
-              : "已获取坐标，但当前位置无法判断国家，请手动选择。",
+            text: identified
+              ? `已自动定位到 ${identified.place}`
+              : "已记录当前坐标，地点名称暂未识别。",
             position: positionResult.position,
             countryDetected: Boolean(detectedCountry),
           });
@@ -186,6 +196,8 @@ export default function EncounterPage() {
             countryDetected: false,
           });
         } else {
+          setPlace("深圳");
+          setCountry("CHN");
           setLocation({
             source: "default",
             text: `${positionFailureText(positionResult.failure)}暂以深圳记录；位置来源会明确标注。`,
@@ -196,6 +208,8 @@ export default function EncounterPage() {
         setLocationLoading(false);
       } catch {
         if (!active) return;
+        setPlace("深圳");
+        setCountry("CHN");
         setLocation({
           source: "default",
           text: "历史载入失败，暂以深圳记录；位置来源会明确标注。",
@@ -214,11 +228,11 @@ export default function EncounterPage() {
 
   useEffect(() => {
     const pendingFile = takePendingEncounterFile();
-    if (pendingFile) void handleFile(pendingFile);
+    if (pendingFile) void handleFile(pendingFile.file, pendingFile.source);
     if (window.location.search.includes("mode=text")) setTextMode(true);
   }, []);
 
-  async function handleFile(file: File | undefined) {
+  async function handleFile(file: File | undefined, source: EncounterFileSource) {
     if (!file) return;
     setError("");
     setShowManual(false);
@@ -230,50 +244,39 @@ export default function EncounterPage() {
     setVideoFile(null);
     try {
       setPreview(await compressImage(file));
+      if (source === "album") {
+        setGeocodeLoading(true);
+        const photoPosition = await readImageLocation(file);
+        if (photoPosition) {
+          fileLocationAppliedRef.current = true;
+          let identified: ReverseGeocodeResponse | null = null;
+          try {
+            identified = await identifyPosition(photoPosition);
+          } catch {
+            identified = null;
+          }
+          const detectedCountry = identified?.country ?? detectCountryFromPosition(photoPosition.lat, photoPosition.lng);
+          const detectedPlace = identified?.place ?? "照片拍摄地";
+          setPlace(detectedPlace);
+          setCountry(detectedCountry ?? "");
+          setLocation({
+            source: "exif",
+            text: identified ? `已读取照片地点：${detectedPlace}` : "已读取照片坐标，地点名称暂未识别。",
+            position: photoPosition,
+            countryDetected: Boolean(detectedCountry),
+          });
+          setLocationLoading(false);
+        } else {
+          setLocation((current) => current ? {
+            ...current,
+            text: "照片没有保留地点元数据，已使用设备自动定位。",
+          } : current);
+        }
+      }
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "图片处理失败");
-    }
-  }
-
-  async function resolvePlaceForSave(): Promise<SaveLocation> {
-    if (!location) throw new Error("GEOCODER_UNAVAILABLE");
-    const normalizedPlace = place.trim();
-    const requestedCountry = countryTouchedRef.current ? country : "";
-    const key = `${requestedCountry || "*"}:${normalizedPlace.toLocaleLowerCase()}`;
-    const cached = geocodeCacheRef.current.get(key);
-    if (cached) return cached;
-
-    setGeocodeLoading(true);
-    try {
-      const response = await fetch("/api/geocode", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          place: normalizedPlace,
-          ...(requestedCountry ? { country: requestedCountry } : {}),
-        }),
-      });
-      if (!response.ok) throw new Error("GEOCODER_UNAVAILABLE");
-
-      const result = (await response.json()) as GeocodeResponse;
-      if (!result.found) {
-        throw new Error("LOCATION_NOT_FOUND");
-      }
-
-      const resolvedCountry = result.country ?? (country || "UNK");
-      const resolvedLocation: LocationStatus = {
-        source: "manual",
-        text: `已根据“${normalizedPlace}”校准坐标。`,
-        position: { lat: result.lat, lng: result.lng },
-        countryDetected: Boolean(result.country),
-      };
-      const value = { location: resolvedLocation, country: resolvedCountry };
-      geocodeCacheRef.current.set(key, value);
-      setLocation(resolvedLocation);
-      setCountry(resolvedCountry === "UNK" ? "" : resolvedCountry);
-      return value;
     } finally {
-      setGeocodeLoading(false);
+      if (source === "album") setGeocodeLoading(false);
     }
   }
 
@@ -288,7 +291,7 @@ export default function EncounterPage() {
       return;
     }
     if (!place.trim()) {
-      setError("请补充你在哪里遇见它。");
+      setError("正在自动识别地点，请稍候。");
       return;
     }
     if (locationLoading || !location) {
@@ -299,12 +302,11 @@ export default function EncounterPage() {
     const occurrenceId = nanoid();
     isSubmittingRef.current = true;
     setLoading(true);
-    setLoadingStage("正在显影照片");
+    setLoadingStage("AI记录中");
     setError("");
     setShowManual(false);
 
     try {
-      const resolved = await resolvePlaceForSave();
       const response = await fetch("/api/recognize", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -342,11 +344,14 @@ export default function EncounterPage() {
         category: result.category,
         photo: preview,
         place: place.trim(),
-        country: resolved.country,
-        lat: resolved.location.position.lat,
-        lng: resolved.location.position.lng,
-        locationSource: resolved.location.source,
-        placeSource: "manual",
+        country:
+          country ||
+          detectCountryFromPosition(location.position.lat, location.position.lng) ||
+          "UNK",
+        lat: location.position.lat,
+        lng: location.position.lng,
+        locationSource: location.source,
+        placeSource: placeSourceFor(location.source),
         date: now,
         dateSource: "imported",
         userNote: userNote.trim(),
@@ -458,7 +463,6 @@ export default function EncounterPage() {
     }
     setSavingManual(true);
     try {
-      const resolved = await resolvePlaceForSave();
       const now = new Date().toISOString();
       const item: Item = {
         id: nanoid(),
@@ -466,11 +470,14 @@ export default function EncounterPage() {
         category: manualCategory,
         photo: preview,
         place: place.trim(),
-        country: resolved.country,
-        lat: resolved.location.position.lat,
-        lng: resolved.location.position.lng,
-        locationSource: resolved.location.source,
-        placeSource: "manual",
+        country:
+          country ||
+          detectCountryFromPosition(location.position.lat, location.position.lng) ||
+          "UNK",
+        lat: location.position.lat,
+        lng: location.position.lng,
+        locationSource: location.source,
+        placeSource: placeSourceFor(location.source),
         dateSource: "imported",
         date: now,
         userNote: userNote.trim(),
@@ -480,25 +487,12 @@ export default function EncounterPage() {
       };
       await db.items.put(item);
       router.push(`/item/${item.id}`);
-    } catch (caught) {
-      const code = caught instanceof Error ? caught.message : "";
-      setError(
-        errorMessage(
-          code === "LOCATION_NOT_FOUND" || code === "GEOCODER_UNAVAILABLE"
-            ? code
-            : "LOCAL_STORAGE_ERROR",
-        ),
-      );
+    } catch {
+      setError(errorMessage("LOCAL_STORAGE_ERROR"));
     } finally {
       setSavingManual(false);
     }
   }
-
-  const showCountrySelector =
-    !locationLoading &&
-    Boolean(location) &&
-    (!location?.countryDetected || location.source !== "gps");
-  const locationSource = location?.source ?? "manual";
 
   if (avDraft) {
     return (
@@ -506,18 +500,6 @@ export default function EncounterPage() {
         draft={avDraft}
         history={items}
         onCancel={() => setAvDraft(null)}
-      />
-    );
-  }
-
-  if (batchFiles.length) {
-    return (
-      <BatchImport
-        files={batchFiles}
-        history={items}
-        initialPlace={place}
-        initialCountry={country}
-        onCancel={() => setBatchFiles([])}
       />
     );
   }
@@ -541,9 +523,9 @@ export default function EncounterPage() {
     );
   }
   return (
-    <main className="app-shell">
-      <div className="phone-page">
-        <header className="page-header">
+    <main className={`app-shell ${styles.encounterShell}`}>
+      <div className={`phone-page ${styles.encounterPage}`}>
+        <header className={`page-header ${styles.encounterHeader}`}>
           <button className="icon-action" onClick={() => router.back()} aria-label="返回">
             <ArrowLeft size={18} />
           </button>
@@ -554,57 +536,9 @@ export default function EncounterPage() {
           <Sparkles size={18} color="var(--teal)" />
         </header>
 
-        <div className="form-stack">
+        <div className={`form-stack ${styles.encounterForm}`}>
           <section className="form-card surface">
-            <p className="eyebrow">01 / 留下画面</p>
-            <div className="file-actions">
-              <label className="secondary-action">
-                <Camera size={18} />
-                拍摄
-                <input
-                  className="file-input"
-                  type="file"
-                  accept="image/*,video/*"
-                  capture="environment"
-                  onChange={(event) => void handleFile(event.target.files?.[0])}
-                />
-              </label>
-              <label className="secondary-action">
-                <ImagePlus size={18} />
-                从相册选
-                <input
-                  className="file-input"
-                  type="file"
-                  accept="image/*,video/*"
-                  onChange={(event) => void handleFile(event.target.files?.[0])}
-                />
-              </label>
-              <button
-                className="secondary-action"
-                type="button"
-                onClick={() => setTextMode(true)}
-              >
-                <PenLine size={18} />
-                只写字
-              </button>
-              <label className="secondary-action">
-                <Images size={18} />
-                批量显影
-                <input
-                  className="file-input"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(event) => {
-                    const selected = Array.from(event.target.files ?? []);
-                    setBatchFiles(selected.slice(0, 8));
-                    if (selected.length > 8) {
-                      setError("单批最多处理 8 张，已选取前 8 张。");
-                    }
-                  }}
-                />
-              </label>
-            </div>
+            <p className="eyebrow">01 / 已选画面</p>
             {preview ? (
               <div className="photo-preview">
                 <img src={preview} alt="待显影的照片" />
@@ -616,7 +550,7 @@ export default function EncounterPage() {
                 <span>{videoFile.name} · 最长 60 秒 / 100MB</span>
               </div>
             ) : (
-              <div className="empty-state">拍下一张照片，或边拍边说一段短视频。</div>
+              <div className="empty-state">请返回首页，通过滑块选择拍摄或相册。</div>
             )}
           </section>
 
@@ -635,51 +569,14 @@ export default function EncounterPage() {
                 <VoiceButton value={userNote} onChange={setUserNote} />
               </div>
             </div>
-            <div className="field-row" style={{ marginTop: 12 }}>
-              <div className="field">
-                <label htmlFor="place">地点</label>
-                <input
-                  id="place"
-                  value={place}
-                  onChange={(event) => setPlace(event.target.value)}
-                  placeholder="比如：浙江 · 莫干山"
-                  maxLength={120}
-                />
-              </div>
-              <div className="field">
-                <label htmlFor="country">国家</label>
-                {locationLoading ? (
-                  <div className="readonly-field" aria-label="正在获取当前位置">
-                    正在获取当前位置…
-                  </div>
-                ) : showCountrySelector ? (
-                  <select
-                    id="country"
-                    value={country}
-                    onChange={(event) => {
-                      countryTouchedRef.current = true;
-                      setCountry(event.target.value);
-                    }}
-                  >
-                    <option value="">请选择</option>
-                    <option value="UNK">位置未定</option>
-                    {COUNTRY_OPTIONS.map(([value, label]) => (
-                      <option value={value} key={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <div className="readonly-field" aria-label="自动判断的国家">
-                    {countryName(country)}
-                  </div>
-                )}
-              </div>
-            </div>
             {!locationLoading && location ? (
               <div className={`status-note ${location.source === "default" ? "warning" : ""}`} style={{ marginTop: 12 }}>
-                {location.source === "gps" ? <Check size={15} /> : <MapPin size={15} />}
-                <span>{geocodeLoading ? "正在校准地点坐标…" : location.text}</span>
+                {location.source === "gps" || location.source === "exif" ? <Check size={15} /> : <MapPin size={15} />}
+                <span>
+                  {geocodeLoading
+                    ? "正在自动识别地点…"
+                    : `${location.text}${place ? ` · ${place}` : ""}`}
+                </span>
               </div>
             ) : null}
           </section>
@@ -727,12 +624,12 @@ export default function EncounterPage() {
           >
             <Sparkles size={19} />
             {loading
-              ? loadingStage || "正在显影…"
+              ? loadingStage || "AI记录中…"
               : geocodeLoading
                 ? "正在校准地点…"
                 : locationLoading && !videoFile
                   ? "正在确认位置…"
-                  : "显影"}
+                  : "AI记录"}
           </button>
           {error && !showManual ? (
             <button

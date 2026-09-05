@@ -109,3 +109,4 @@ export function SmartPhotoCutout({ src, alt, mode }: { src: string; alt: string;
 
   return <canvas ref={canvasRef} className="smart-cutout-canvas" role="img" aria-label={alt} />;
 }
+

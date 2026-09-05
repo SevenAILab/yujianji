@@ -1,23 +1,47 @@
 "use client";
 
-import { CalendarRange, LoaderCircle, WandSparkles } from "lucide-react";
+import { CalendarDays, LoaderCircle, WandSparkles, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { AppNav } from "@/components/AppNav";
 import { JourneyCollageMap } from "@/components/JourneyCollageMap";
 import { db, ensureSeeded } from "@/lib/db";
-import type { GeneratedJourney } from "@/lib/journey-generator";
+import { countryName } from "@/lib/iso";
 import type { JourneyCollageData } from "@/lib/journey-collage";
+import type { GeneratedJourney } from "@/lib/journey-generator";
 import type { Item } from "@/lib/types";
 import "./journeys.css";
 
+type SavedJourney = {
+  meta: GeneratedJourney;
+  createdAt: string;
+};
+
+const JOURNEY_ARCHIVE_KEY = "journey-archive-v1";
+
+function previousJourneyEnd(journey: SavedJourney | undefined) {
+  const candidate = journey?.meta.dateRange.split("—").at(-1)?.trim() ?? "";
+  return /^\d{4}-\d{2}-\d{2}$/.test(candidate) ? candidate : "";
+}
+
+function validJourneyItems(items: Item[]) {
+  return items.filter(
+    (item): item is Item & { lat: number; lng: number } =>
+      typeof item.lat === "number" && typeof item.lng === "number",
+  );
+}
+
 export default function JourneysPage() {
   const [seedReady, setSeedReady] = useState(false);
+  const [creatorOpen, setCreatorOpen] = useState(false);
+  const [journeyName, setJourneyName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [generating, setGenerating] = useState(false);
   const [generationError, setGenerationError] = useState("");
-  const [generated, setGenerated] = useState<{ meta: GeneratedJourney; collage: JourneyCollageData } | null>(null);
+  const [activeCountry, setActiveCountry] = useState("ALL");
+  const [savedJourneys, setSavedJourneys] = useState<SavedJourney[]>([]);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const items = useLiveQuery(
     () => (seedReady ? db.items.orderBy("date").toArray() : Promise.resolve([] as Item[])),
     [seedReady],
@@ -26,36 +50,91 @@ export default function JourneysPage() {
 
   useEffect(() => {
     let active = true;
-    void ensureSeeded().catch(() => undefined).finally(() => { if (active) setSeedReady(true); });
-    return () => { active = false; };
+    void ensureSeeded()
+      .catch(() => undefined)
+      .finally(() => {
+        if (active) setSeedReady(true);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
+
+  useEffect(() => {
+    if (!seedReady) return;
+    let active = true;
+    void db.meta.get(JOURNEY_ARCHIVE_KEY).then((stored) => {
+      if (!active || typeof stored?.value !== "string") return;
+      try {
+        const parsed = JSON.parse(stored.value) as SavedJourney[];
+        if (Array.isArray(parsed)) setSavedJourneys(parsed);
+      } catch {
+        // Ignore an unreadable local archive and let the next save replace it.
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [seedReady]);
 
   const dateBounds = useMemo(() => {
     if (!items.length) return null;
-    return { first: items[0].date.slice(0, 10), last: items[items.length - 1].date.slice(0, 10) };
+    return {
+      first: items[0].date.slice(0, 10),
+      last: items[items.length - 1].date.slice(0, 10),
+    };
   }, [items]);
 
-  useEffect(() => {
-    if (!dateBounds || startDate || endDate) return;
-    const latest = new Date(`${dateBounds.last}T00:00:00`);
-    const start = new Date(latest);
-    start.setDate(start.getDate() - 30);
-    const suggestedStart = start.toISOString().slice(0, 10);
-    setStartDate(suggestedStart < dateBounds.first ? dateBounds.first : suggestedStart);
-    setEndDate(dateBounds.last);
-  }, [dateBounds, endDate, startDate]);
+  const countries = useMemo(
+    () => [...new Set(savedJourneys.flatMap((journey) => journey.meta.regions.map((region) => region.country)))],
+    [savedJourneys],
+  );
 
-  async function generateSelectedJourney() {
+  const visibleJourneys = useMemo(
+    () => activeCountry === "ALL"
+      ? savedJourneys
+      : savedJourneys.filter((journey) => journey.meta.regions.some((region) => region.country === activeCountry)),
+    [activeCountry, savedJourneys],
+  );
+
+  const itemById = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
+
+  function openCreator() {
+    setGenerationError("");
+    if (dateBounds) {
+      const previousEnd = previousJourneyEnd(savedJourneys[0]);
+      const nextStart = previousEnd || dateBounds.first;
+      setStartDate(nextStart);
+      setEndDate(nextStart > dateBounds.last ? nextStart : dateBounds.last);
+    }
+    setJourneyName("");
+    setCreatorOpen(true);
+  }
+
+  function toCollage(journey: GeneratedJourney): JourneyCollageData {
+    return {
+      id: journey.id,
+      regions: journey.regions,
+      mapLabel: journey.mapLabel,
+      stops: journey.stops.flatMap((stop) => {
+        const source = itemById.get(stop.itemId);
+        return source ? [{ ...stop, photo: source.photo }] : [];
+      }),
+    };
+  }
+
+  async function createJourney() {
     setGenerating(true);
     setGenerationError("");
     try {
+      const sourceItems = validJourneyItems(items);
       const response = await fetch("/api/journeys/generate", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           startDate,
           endDate,
-          items: items.map((item) => ({
+          items: sourceItems.map((item) => ({
             id: item.id,
             name: item.name,
             category: item.category,
@@ -72,18 +151,21 @@ export default function JourneysPage() {
         }),
       });
       const payload = await response.json() as { journey?: GeneratedJourney; error?: string };
-      if (!response.ok || !payload.journey) throw new Error(payload.error ?? "旅程生成失败");
-      const byId = new Map(items.map((item) => [item.id, item]));
-      const collage: JourneyCollageData = {
-        id: payload.journey.id,
-        regions: payload.journey.regions,
-        mapLabel: payload.journey.mapLabel,
-        stops: payload.journey.stops.flatMap((stop) => {
-          const source = byId.get(stop.itemId);
-          return source ? [{ ...stop, photo: source.photo }] : [];
-        }),
+      if (!response.ok || !payload.journey) {
+        throw new Error(payload.error ?? "旅程生成失败");
+      }
+
+      const createdAt = new Date().toISOString();
+      const meta: GeneratedJourney = {
+        ...payload.journey,
+        id: `${payload.journey.id}-${Date.now()}`,
+        title: journeyName.trim() || payload.journey.title,
       };
-      setGenerated({ meta: payload.journey, collage });
+      const next = [{ meta, createdAt }, ...savedJourneys];
+      await db.meta.put({ key: JOURNEY_ARCHIVE_KEY, value: JSON.stringify(next) });
+      setSavedJourneys(next);
+      setActiveCountry("ALL");
+      setCreatorOpen(false);
     } catch (error) {
       setGenerationError(error instanceof Error ? error.message : "旅程生成失败");
     } finally {
@@ -91,37 +173,124 @@ export default function JourneysPage() {
     }
   }
 
+  async function deleteJourney() {
+    if (!pendingDeleteId) return;
+    const next = savedJourneys.filter((journey) => journey.meta.id !== pendingDeleteId);
+    await db.meta.put({ key: JOURNEY_ARCHIVE_KEY, value: JSON.stringify(next) });
+    setSavedJourneys(next);
+    setPendingDeleteId(null);
+  }
+
   return (
     <main className="app-shell journey-shell">
       <div className="phone-page journey-page">
-        <header className="journey-header"><p className="eyebrow">TRAVEL ARCHIVE · 2024</p><h1>我的旅程</h1><p>用时间，串起所有的遇见</p></header>
-
-        <section className="journey-builder surface">
-          <div className="journey-builder-heading"><span><CalendarRange size={16} /></span><div><strong>生成一段旅程</strong><small>选择你想重新翻开的时间</small></div></div>
-          <div className="journey-date-range">
-            <label>从<input type="date" min={dateBounds?.first} max={endDate || dateBounds?.last} value={startDate} onChange={(event) => setStartDate(event.target.value)} /></label>
-            <span>—</span>
-            <label>到<input type="date" min={startDate || dateBounds?.first} max={dateBounds?.last} value={endDate} onChange={(event) => setEndDate(event.target.value)} /></label>
+        <header className="journey-header">
+          <div>
+            <h1>我的旅程</h1>
+            <p>用时间，串起所有的遇见</p>
           </div>
-          <button className="primary-action journey-generate-action" disabled={!startDate || !endDate || generating || !items.length} onClick={() => void generateSelectedJourney()}>
-            {generating ? <LoaderCircle className="spin" size={16} /> : <WandSparkles size={16} />}
-            {generating ? "正在整理旅程…" : "生成手帐地图"}
+          <button className="journey-calendar" onClick={openCreator} aria-label="创建旅程" title="创建旅程">
+            <CalendarDays size={25} strokeWidth={1.8} />
           </button>
-          {generationError ? <div className="error-box">{generationError}</div> : null}
-        </section>
+        </header>
 
-        {generated ? (
-          <section className="journey-entry generated-journey is-open">
-            <div className="journey-title-row generated-title-row">
-              <span><small>{generated.meta.dateRange}</small><strong>{generated.meta.title}</strong><em>{generated.meta.stops.length} 个地点 · {generated.meta.recordCount} 条记录</em></span>
-            </div>
-            <JourneyCollageMap journey={generated.collage} />
-          </section>
-        ) : null}
+        <div className="journey-filters" role="group" aria-label="按国家筛选旅程">
+          <button className={activeCountry === "ALL" ? "active" : ""} onClick={() => setActiveCountry("ALL")}>全部</button>
+          {countries.map((code) => (
+            <button className={activeCountry === code ? "active" : ""} onClick={() => setActiveCountry(code)} key={code}>
+              {countryName(code).replace("中国", "国内")}
+            </button>
+          ))}
+        </div>
 
-        {!generated ? <div className="journey-coming-soon"><span>选择时间，翻开一段旅程</span><p>地图会自动裁切到这段旅程涉及的一级行政区。</p></div> : null}
+        <div className="journey-collage-list">
+          {visibleJourneys.map((journey) => {
+            const collage = toCollage(journey.meta);
+            return (
+              <article className="journey-collage-entry" key={journey.meta.id}>
+                <header className="journey-collage-heading">
+                  <div>
+                    <small>{journey.meta.dateRange}</small>
+                    <h2>{journey.meta.title}</h2>
+                    <p>{journey.meta.stops.length} 个地点 · {journey.meta.recordCount} 条记录</p>
+                  </div>
+                  <button className="journey-delete-button" onClick={() => setPendingDeleteId(journey.meta.id)} aria-label={`删除${journey.meta.title}`} title="删除旅程">
+                    <X size={18} strokeWidth={1.7} />
+                  </button>
+                </header>
+                <JourneyCollageMap journey={collage} />
+              </article>
+            );
+          })}
+
+          {!visibleJourneys.length ? (
+            <button className="journey-empty" onClick={openCreator}>
+              <CalendarDays size={22} strokeWidth={1.6} />
+              <strong>{savedJourneys.length ? "这里还没有对应的旅程" : "创建你的第一张旅程拼贴"}</strong>
+              <span>选择一段时间，照片、地点和路线会自动拼成一张旅行手帐。</span>
+            </button>
+          ) : null}
+        </div>
       </div>
       <AppNav />
+
+      {creatorOpen ? (
+        <div className="journey-modal-backdrop" role="presentation" onMouseDown={(event) => {
+          if (event.target === event.currentTarget && !generating) setCreatorOpen(false);
+        }}>
+          <section className="journey-creator" role="dialog" aria-modal="true" aria-labelledby="journey-creator-title">
+            <div className="journey-creator-head">
+              <div>
+                <span>NEW JOURNEY</span>
+                <h2 id="journey-creator-title">创建一段旅程</h2>
+              </div>
+              <button onClick={() => setCreatorOpen(false)} disabled={generating} aria-label="关闭创建旅程">
+                <X size={18} />
+              </button>
+            </div>
+
+            <label className="journey-name-field">
+              <span>旅程名称</span>
+              <input value={journeyName} onChange={(event) => setJourneyName(event.target.value)} placeholder="例如：冰岛之旅" maxLength={36} />
+            </label>
+
+            <div className="journey-date-range">
+              <label>
+                <span>开始日期</span>
+                <input type="date" min={dateBounds?.first} max={endDate || dateBounds?.last} value={startDate} onChange={(event) => setStartDate(event.target.value)} />
+              </label>
+              <i>—</i>
+              <label>
+                <span>结束日期</span>
+                <input type="date" min={startDate || dateBounds?.first} max={dateBounds?.last} value={endDate} onChange={(event) => setEndDate(event.target.value)} />
+              </label>
+            </div>
+
+            {generationError ? <div className="journey-error">{generationError}</div> : null}
+
+            <button className="journey-create-action" disabled={!startDate || !endDate || generating || !items.length} onClick={() => void createJourney()}>
+              {generating ? <LoaderCircle className="journey-spin" size={17} /> : <WandSparkles size={17} />}
+              {generating ? "正在整理这段旅程…" : "生成旅程拼贴"}
+            </button>
+          </section>
+        </div>
+      ) : null}
+
+      {pendingDeleteId ? (
+        <div className="journey-modal-backdrop" role="presentation" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) setPendingDeleteId(null);
+        }}>
+          <section className="journey-delete-dialog" role="alertdialog" aria-modal="true" aria-labelledby="journey-delete-title">
+            <span>DELETE JOURNEY</span>
+            <h2 id="journey-delete-title">删除这张旅程拼贴？</h2>
+            <p>只会删除这张拼贴，原始照片和遇见记录都会保留。</p>
+            <div>
+              <button onClick={() => setPendingDeleteId(null)}>取消</button>
+              <button className="confirm" onClick={() => void deleteJourney()}>删除旅程</button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </main>
   );
 }

@@ -1,18 +1,13 @@
 "use client";
 
-import { ArrowLeft, Check, PenLine } from "lucide-react";
+import { ArrowLeft, Check, MapPin, PenLine } from "lucide-react";
 import { nanoid } from "nanoid";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { db } from "@/lib/db";
 import { createTextCardDataUrl } from "@/lib/text-card";
-import {
-  CATEGORY_OPTIONS,
-  type Category,
-  type Item,
-  type LocationSource,
-} from "@/lib/types";
-import { COUNTRY_OPTIONS } from "@/lib/iso";
+import type { Item, LocationSource, PlaceSource } from "@/lib/types";
+import styles from "./TextEncounter.module.css";
 
 export function TextEncounter({
   initialPlace,
@@ -30,38 +25,40 @@ export function TextEncounter({
   onCancel: () => void;
 }) {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState<Category>("other");
   const [note, setNote] = useState("");
-  const [place, setPlace] = useState(initialPlace);
-  const [country, setCountry] = useState(initialCountry);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   async function save() {
     if (saving) return;
-    if (!name.trim() || !note.trim() || !place.trim() || !country) {
-      setError("请填写名称、那句话、地点和国家。");
+    if (!note.trim()) {
+      setError("先写下一点此刻想记住的事。");
+      return;
+    }
+    if (!coordinate) {
+      setError("正在识别当前位置，请稍候再保存。");
       return;
     }
     setSaving(true);
     setError("");
     const now = new Date().toISOString();
-    const coordinateStillApplies =
-      place.trim() === initialPlace && country === initialCountry;
+    const title = note.trim().replace(/\s+/g, " ").slice(0, 22);
+    const placeSource: PlaceSource = coordinate.source === "gps"
+      ? "gps"
+      : coordinate.source === "exif"
+        ? "exif"
+        : coordinate.source;
     const item: Item = {
       id: nanoid(),
-      name: name.trim(),
-      category,
+      name: title || "一段旅行心事",
+      category: "other",
       photo: createTextCardDataUrl(note),
-      place: place.trim(),
-      country,
-      lat: coordinateStillApplies ? coordinate?.lat ?? null : null,
-      lng: coordinateStillApplies ? coordinate?.lng ?? null : null,
-      locationSource: coordinateStillApplies
-        ? coordinate?.source ?? "manual"
-        : "manual",
-      placeSource: "manual",
+      place: initialPlace.trim() || "位置已记录",
+      country: initialCountry || "UNK",
+      lat: coordinate.lat,
+      lng: coordinate.lng,
+      locationSource: coordinate.source,
+      placeSource,
       date: now,
       dateSource: "imported",
       userNote: note.trim(),
@@ -79,9 +76,9 @@ export function TextEncounter({
   }
 
   return (
-    <main className="app-shell">
-      <div className="phone-page">
-        <header className="page-header">
+    <main className={`app-shell ${styles.textShell}`}>
+      <div className={`phone-page ${styles.textPage}`}>
+        <header className={`page-header ${styles.textHeader}`}>
           <button className="icon-action" onClick={onCancel} aria-label="返回">
             <ArrowLeft size={17} />
           </button>
@@ -92,67 +89,21 @@ export function TextEncounter({
           <PenLine size={18} color="var(--teal)" />
         </header>
 
-        <div className="form-stack">
+        <div className={`form-stack ${styles.textForm}`}>
           <section className="form-card surface">
             <div className="field">
-              <label htmlFor="text-name">这次遇见叫什么</label>
-              <input
-                id="text-name"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                maxLength={80}
-                placeholder="比如：傍晚闻到的桂花"
-              />
-            </div>
-            <div className="field" style={{ marginTop: 12 }}>
-              <label htmlFor="text-category">分类</label>
-              <select
-                id="text-category"
-                value={category}
-                onChange={(event) => setCategory(event.target.value as Category)}
-              >
-                {CATEGORY_OPTIONS.map(([value, label]) => (
-                  <option value={value} key={value}>{label}</option>
-                ))}
-              </select>
-            </div>
-            <div className="field" style={{ marginTop: 12 }}>
-              <label htmlFor="text-note">留下那句话</label>
+              <label htmlFor="text-note">今天想留下什么？</label>
               <textarea
                 id="text-note"
                 value={note}
                 onChange={(event) => setNote(event.target.value)}
                 maxLength={300}
-                placeholder="把当时最想记住的一句话写下来"
+                placeholder="写下旅途中没有说出口的心事……"
               />
             </div>
-          </section>
-
-          <section className="form-card surface">
-            <div className="field-row">
-              <div className="field">
-                <label htmlFor="text-place">地点</label>
-                <input
-                  id="text-place"
-                  value={place}
-                  onChange={(event) => setPlace(event.target.value)}
-                  maxLength={120}
-                />
-              </div>
-              <div className="field">
-                <label htmlFor="text-country">国家</label>
-                <select
-                  id="text-country"
-                  value={country}
-                  onChange={(event) => setCountry(event.target.value)}
-                >
-                  <option value="">请选择</option>
-                  <option value="UNK">位置未定</option>
-                  {COUNTRY_OPTIONS.map(([value, label]) => (
-                    <option value={value} key={value}>{label}</option>
-                  ))}
-                </select>
-              </div>
+            <div className={styles.autoLocation}>
+              <MapPin size={13} />
+              <span>{coordinate ? `自动记录于 ${initialPlace || "当前位置"}` : "正在识别当前位置…"}</span>
             </div>
           </section>
 
@@ -160,7 +111,7 @@ export function TextEncounter({
           <button
             className="primary-action"
             onClick={() => void save()}
-            disabled={saving}
+            disabled={saving || !coordinate}
           >
             <Check size={18} />
             {saving ? "正在保存…" : "保存文字记录"}
