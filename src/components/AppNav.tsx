@@ -1,6 +1,6 @@
 "use client";
 
-import { Compass, Sparkles } from "lucide-react";
+import { Compass, Route, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -11,6 +11,10 @@ export function AppNav() {
       <Link className={pathname === "/" ? "active" : ""} href="/">
         <Compass size={17} strokeWidth={2.3} />
         地图
+      </Link>
+      <Link className={pathname.startsWith("/journeys") ? "active" : ""} href="/journeys">
+        <Route size={17} strokeWidth={2.3} />
+        旅程
       </Link>
       <Link className={pathname.startsWith("/firsts") ? "active" : ""} href="/firsts">
         <Sparkles size={16} strokeWidth={2.3} />
