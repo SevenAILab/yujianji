@@ -36,6 +36,21 @@ const success = {
   memorySentence: "去年十月在莫干山，我们见过了。",
 };
 
+const unrecognized = {
+  unrecognized: true,
+  observation: "画面偏暗，中央是一团边缘模糊的浅色形状，表面细节不足。",
+  name: null,
+  nameEn: null,
+  category: null,
+  cognition: null,
+  fun: null,
+  luck: null,
+  question: null,
+  verdict: null,
+  relatedItemId: null,
+  memorySentence: null,
+};
+
 describe("extractJsonObject", () => {
   it("accepts plain JSON and explanatory text around JSON", () => {
     expect(extractJsonObject(JSON.stringify(success))).toEqual(success);
@@ -92,22 +107,14 @@ describe("recognize result validation", () => {
 
   it("accepts an unrecognized union branch", () => {
     expect(
-      parseRecognizeResult(
-        JSON.stringify({
-          unrecognized: true,
-          name: null,
-          nameEn: null,
-          category: null,
-          cognition: null,
-          fun: null,
-          luck: null,
-          question: null,
-          verdict: null,
-          relatedItemId: null,
-          memorySentence: null,
-        }),
-        history,
-      ),
-    ).toMatchObject({ unrecognized: true });
+      parseRecognizeResult(JSON.stringify(unrecognized), history),
+    ).toEqual(unrecognized);
+  });
+
+  it("requires a grounded observation for an unrecognized result", () => {
+    const { observation: _observation, ...withoutObservation } = unrecognized;
+    expect(
+      recognizeResultSchema.safeParse(withoutObservation).success,
+    ).toBe(false);
   });
 });

@@ -10,6 +10,16 @@ interface CallVisionOptions {
   timeoutMs?: number;
 }
 
+interface CallOmniOptions {
+  frames: string[];
+  frameTimes: number[];
+  audioDataUrl: string;
+  systemPrompt: string;
+  userText: string;
+  model?: string;
+  timeoutMs?: number;
+}
+
 function getClient(timeoutMs = 55_000): OpenAI {
   const apiKey = process.env.DASHSCOPE_API_KEY;
   const baseURL =
@@ -90,4 +100,66 @@ export async function callVision({
   );
 
   return content;
+}
+
+export async function callOmni({
+  frames,
+  frameTimes,
+  audioDataUrl,
+  systemPrompt,
+  userText,
+  model = process.env.OMNI_MODEL ?? "qwen3.5-omni-plus",
+  timeoutMs = 55_000,
+}: CallOmniOptions): Promise<string> {
+  const startedAt = Date.now();
+  const client = getClient(timeoutMs);
+  const content: Array<Record<string, unknown>> = [
+    {
+      type: "text",
+      text: `${userText}\n帧时间：${frameTimes.map((time) => time.toFixed(1)).join(" / ")} 秒`,
+    },
+    ...frames.map((url) => ({
+      type: "image_url",
+      image_url: { url, detail: "high" },
+    })),
+    {
+      type: "input_audio",
+      input_audio: { data: audioDataUrl, format: "wav" },
+    },
+  ];
+
+  const stream = (await client.chat.completions.create({
+    model,
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content },
+    ],
+    modalities: ["text"],
+    temperature: 0.2,
+    max_tokens: 2400,
+    stream: true,
+  } as never)) as unknown as AsyncIterable<{
+    choices?: Array<{ delta?: { content?: unknown } }>;
+  }>;
+
+  let result = "";
+  for await (const chunk of stream) {
+    const delta = chunk.choices?.[0]?.delta?.content;
+    if (typeof delta === "string") result += delta;
+    if (result.length > 20_000) {
+      throw new Error("模型返回内容过长");
+    }
+  }
+  if (!result.trim()) throw new Error("模型返回为空");
+
+  console.info(
+    JSON.stringify({
+      event: "omni_complete",
+      model,
+      durationMs: Date.now() - startedAt,
+      frameCount: frames.length,
+      responseLength: result.length,
+    }),
+  );
+  return result;
 }

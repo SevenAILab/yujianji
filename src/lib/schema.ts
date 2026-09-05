@@ -46,6 +46,7 @@ export const recognizedResultSchema = baseResultSchema.extend({
 
 export const unrecognizedResultSchema = z.object({
   unrecognized: z.literal(true),
+  observation: z.string().min(1).max(240),
   name: z.null(),
   nameEn: z.null(),
   category: z.null(),
@@ -80,11 +81,14 @@ export const itemSchema = z.object({
   photo: z.string().min(1),
   place: z.string().min(1),
   country: z.string().min(2),
-  lat: z.number().finite(),
-  lng: z.number().finite(),
+  lat: z.number().finite().nullable(),
+  lng: z.number().finite().nullable(),
   locationSource: z.enum(["gps", "previous", "default", "manual"]),
+  placeSource: z.enum(["voice", "manual", "previous", "default", "gps"]).optional(),
   date: z.string().min(1),
+  dateSource: z.enum(["exif", "fileModified", "imported"]).optional(),
   userNote: z.string(),
+  heard: z.string().max(500).optional(),
   ai: z.union([recognizedAiSchema, z.null()]),
   answer: z.string().optional(),
   isSeed: z.boolean(),
@@ -99,5 +103,55 @@ export const recognizeRequestSchema = z.object({
     z.string().max(120_000),
   ]),
 });
+
+export const avModelSegmentSchema = recognizedResultSchema.extend({
+  frameIndex: z.number().int().min(0).max(5),
+  heard: z.string().max(500),
+  relatedItemName: z.string().max(80).nullable(),
+  matchBasis: z.string().max(240).nullable(),
+  matchConfidence: z.enum(["low", "medium", "high"]).nullable(),
+}).strict();
+
+const avRecognizedResultSchema = z.object({
+  recognized: z.literal(true),
+  placeHint: z.string().min(1).max(60).nullable(),
+  segments: z.array(avModelSegmentSchema).min(1).max(6),
+}).strict();
+
+const avEmptyResultSchema = z.object({
+  recognized: z.literal(false),
+  placeHint: z.null(),
+  segments: z.tuple([]),
+}).strict();
+
+export const avModelResultSchema = z.discriminatedUnion("recognized", [
+  avRecognizedResultSchema,
+  avEmptyResultSchema,
+]);
+
+const avResponseSegmentSchema = avModelSegmentSchema.extend({
+  associationStatus: z.enum(["confirmed", "uncertain", "none"]),
+});
+
+export const avResponseSchema = z.discriminatedUnion("recognized", [
+  z.object({
+    recognized: z.literal(true),
+    placeHint: z.string().min(1).max(60).nullable(),
+    segments: z.array(avResponseSegmentSchema).min(1).max(6),
+  }).strict(),
+  avEmptyResultSchema,
+]);
+
+const avFrameSchema = z.object({
+  dataUrl: z.string().min(1),
+  atSec: z.number().finite().min(0).max(60),
+}).strict();
+
+export const encounterAvRequestSchema = z.object({
+  frames: z.array(avFrameSchema).min(1).max(6),
+  audioDataUrl: z.string().min(1).max(2_700_000),
+  history: z.array(historyEntrySchema),
+  placeFallback: z.string().max(120).nullable().optional(),
+}).strict();
 
 export type RecognizeResultInput = z.infer<typeof recognizeResultSchema>;

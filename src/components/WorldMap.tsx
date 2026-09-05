@@ -60,18 +60,29 @@ export function WorldMap({
     [items],
   );
   const pins = useMemo(() => {
-    const grouped = new Map<string, Item[]>();
-    items.forEach((item) => {
+    type LocatedItem = Item & { lat: number; lng: number };
+    const grouped = new Map<string, LocatedItem[]>();
+    items
+      .filter(
+        (item): item is LocatedItem =>
+          item.lat !== null && item.lng !== null,
+      )
+      .forEach((item) => {
       const key = `${item.lat.toFixed(1)}:${item.lng.toFixed(1)}`;
       grouped.set(key, [...(grouped.get(key) ?? []), item]);
-    });
+      });
     return [...grouped.values()]
       .map((group) => {
         const first = group[0];
         const point = projection([first.lng, first.lat]);
         return point ? { group, point } : null;
       })
-      .filter((value): value is { group: Item[]; point: [number, number] } => Boolean(value));
+      .filter(
+        (
+          value,
+        ): value is { group: LocatedItem[]; point: [number, number] } =>
+          Boolean(value),
+      );
   }, [items, projection]);
 
   useEffect(() => {
@@ -97,7 +108,6 @@ export function WorldMap({
       <svg
         ref={svgRef}
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        role="img"
         aria-label="遇见集世界地图"
       >
         <rect className="map-water" x="0" y="0" width={WIDTH} height={HEIGHT} rx="17" />
@@ -134,7 +144,8 @@ export function WorldMap({
                   role="button"
                   tabIndex={0}
                   onKeyDown={(event) => {
-                    if (event.key === "Enter") {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
                       if (group.length === 1) router.push(`/item/${group[0].id}`);
                       else setSelectedPin(group);
                     }

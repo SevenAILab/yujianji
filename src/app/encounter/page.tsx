@@ -4,9 +4,12 @@ import {
   ArrowLeft,
   Camera,
   Check,
+  FileVideo2,
   Globe2,
   ImagePlus,
+  Images,
   MapPin,
+  PenLine,
   RotateCcw,
   Sparkles,
 } from "lucide-react";
@@ -14,14 +17,25 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { nanoid } from "nanoid";
 import { AppNav } from "@/components/AppNav";
+import { AvConfirm } from "@/components/AvConfirm";
+import { BatchImport } from "@/components/BatchImport";
+import { TextEncounter } from "@/components/TextEncounter";
 import { VoiceButton } from "@/components/VoiceButton";
 import { db, ensureSeeded } from "@/lib/db";
+import { takePendingEncounterFile } from "@/lib/encounter-transfer";
+import { createAvDraft, type AvDraft } from "@/lib/av-draft";
+import {
+  AvExtractionError,
+  extractFramesAndAudio,
+  jsonByteLength,
+  MAX_AV_REQUEST_BYTES,
+} from "@/lib/av";
 import { detectCountryFromPosition } from "@/lib/country";
 import { compressImage } from "@/lib/image";
 import { getPosition, type Position, type PositionFailure } from "@/lib/geo";
 import { toHistoryEntry } from "@/lib/history";
 import { CATEGORY_OPTIONS, type Category, type Item, type RecognizedAi } from "@/lib/types";
-import { recognizeResultSchema } from "@/lib/schema";
+import { avResponseSchema, recognizeResultSchema } from "@/lib/schema";
 import { COUNTRY_OPTIONS, countryName } from "@/lib/iso";
 
 type LocationStatus = {
@@ -59,14 +73,30 @@ function errorMessage(code: string): string {
   if (code === "INVALID_MODEL_OUTPUT") return "模型没有给出可用的显影结果，请重试。";
   if (code === "INVALID_RELATED_ITEM") return "历史关联没有确认成功，请再试一次。";
   if (code === "LOCAL_STORAGE_ERROR") return "这台设备暂时无法保存记录，请检查浏览器存储空间后重试。";
+  if (code === "VIDEO_TOO_LONG") return "视频时长处理失败，请换一段更短的视频。";
+  if (code === "VIDEO_TOO_LARGE") return "视频文件太大，请先在相册里截短后再试。";
+  if (code === "NO_AUDIO") return "这段视频里没有可识别的声音。";
+  if (code === "UNSUPPORTED_CODEC") return "这台浏览器无法解码视频，请在影石 App 中导出为兼容的 MP4 后再试。";
+  if (code === "DECODE_TIMEOUT") return "视频处理超时，请换一段更短的视频。";
+  if (code === "REQUEST_TOO_LARGE" || code === "FRAMES_TOO_LARGE" || code === "AUDIO_TOO_LARGE") {
+    return "视频拆出的画面或声音仍然太大，请换一段更短的视频。";
+  }
   if (code === "LOCATION_NOT_FOUND") return "没有找到这个地点，请补充城市、省份或国家后再试。";
   if (code === "GEOCODER_UNAVAILABLE") return "地点服务暂时不可用，尚未保存，避免把照片放到错误区域。";
   return "网络或模型服务暂时不可用，请重试。";
 }
 
+function isVideoFile(file: File): boolean {
+  return file.type.startsWith("video/") || /\.(mp4|mov|m4v)$/i.test(file.name);
+}
+
 export default function EncounterPage() {
   const router = useRouter();
   const [preview, setPreview] = useState("");
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [avDraft, setAvDraft] = useState<AvDraft | null>(null);
+  const [batchFiles, setBatchFiles] = useState<File[]>([]);
+  const [textMode, setTextMode] = useState(false);
   const [userNote, setUserNote] = useState("");
   const [place, setPlace] = useState("");
   const [country, setCountry] = useState("");
@@ -76,6 +106,7 @@ export default function EncounterPage() {
   const [location, setLocation] = useState<LocationStatus | null>(null);
   const [locationLoading, setLocationLoading] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [loadingStage, setLoadingStage] = useState("");
   const [error, setError] = useState("");
   const [showManual, setShowManual] = useState(false);
   const [savingManual, setSavingManual] = useState(false);
@@ -91,7 +122,7 @@ export default function EncounterPage() {
       const previous = [...history].sort((a, b) =>
         b.date.localeCompare(a.date),
       )[0];
-      if (previous) {
+      if (previous && previous.lat !== null && previous.lng !== null) {
         setCountry(previous.country === "UNK" ? "" : previous.country);
         setLocation({
           source: "previous",
@@ -135,7 +166,7 @@ export default function EncounterPage() {
             position: positionResult.position,
             countryDetected: Boolean(detectedCountry),
           });
-        } else if (previous) {
+        } else if (previous && previous.lat !== null && previous.lng !== null) {
           setLocation({
             source: "previous",
             text: `${positionFailureText(positionResult.failure)}已按你上一条藏品的位置记录。`,
@@ -169,9 +200,22 @@ export default function EncounterPage() {
     };
   }, []);
 
+  useEffect(() => {
+    const pendingFile = takePendingEncounterFile();
+    if (pendingFile) void handleFile(pendingFile);
+    if (window.location.search.includes("mode=text")) setTextMode(true);
+  }, []);
+
   async function handleFile(file: File | undefined) {
     if (!file) return;
     setError("");
+    setShowManual(false);
+    if (isVideoFile(file)) {
+      setPreview("");
+      setVideoFile(file);
+      return;
+    }
+    setVideoFile(null);
     try {
       setPreview(await compressImage(file));
     } catch (caught) {
@@ -223,8 +267,12 @@ export default function EncounterPage() {
 
   async function submit() {
     if (isSubmittingRef.current) return;
-    if (!preview) {
-      setError("先选一张照片，再开始显影。");
+    if (!preview && !videoFile) {
+      setError("先选择一张照片或一段视频，再开始显影。");
+      return;
+    }
+    if (videoFile) {
+      await submitVideo(videoFile);
       return;
     }
     if (!place.trim()) {
@@ -239,6 +287,7 @@ export default function EncounterPage() {
     const occurrenceId = nanoid();
     isSubmittingRef.current = true;
     setLoading(true);
+    setLoadingStage("正在显影照片");
     setError("");
     setShowManual(false);
 
@@ -262,7 +311,9 @@ export default function EncounterPage() {
       const result = recognizeResultSchema.parse(payload);
       if (result.unrecognized) {
         setShowManual(true);
-        setError("这次还没认出来。可以手动填一个名字，把这次遇见先保存下来。");
+        setError(
+          `这次还没认出来。${result.observation} 可以手动填一个名字，把这次遇见先保存下来。`,
+        );
         return;
       }
       if (
@@ -285,7 +336,9 @@ export default function EncounterPage() {
         lat: resolved.location.position.lat,
         lng: resolved.location.position.lng,
         locationSource: resolved.location.source,
+        placeSource: "manual",
         date: now,
+        dateSource: "imported",
         userNote: userNote.trim(),
         ai: {
           cognition: result.cognition,
@@ -314,6 +367,76 @@ export default function EncounterPage() {
     } finally {
       isSubmittingRef.current = false;
       setLoading(false);
+      setLoadingStage("");
+    }
+  }
+
+  async function submitVideo(file: File) {
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+    setLoading(true);
+    setLoadingStage("正在拆出画面和声音");
+    setError("");
+    setShowManual(false);
+
+    try {
+      const extracted = await extractFramesAndAudio(file);
+      setLoadingStage("正在听你说，也在看画面");
+      const requestBody = {
+        frames: extracted.frames,
+        audioDataUrl: extracted.audioDataUrl,
+        history: items.map(toHistoryEntry),
+        placeFallback: place.trim() || null,
+      };
+      if (jsonByteLength(requestBody) > MAX_AV_REQUEST_BYTES) {
+        throw new AvExtractionError(
+          "REQUEST_TOO_LARGE",
+          "视频拆包后的请求仍然太大",
+        );
+      }
+      const response = await fetch("/api/encounter-av", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
+      const payload = (await response.json()) as unknown;
+      if (!response.ok) {
+        const failed = payload as { code?: string };
+        throw new Error(failed.code ?? "MODEL_ERROR");
+      }
+      const result = avResponseSchema.parse(payload);
+      if (!result.recognized) {
+        setError("这段视频里没有找到清晰的对象，可以换个角度或说得更具体一点。");
+        return;
+      }
+      setAvDraft(
+        createAvDraft(
+          {
+            ...result,
+            segments: result.segments.map((segment) => ({
+              ...segment,
+              nameEn: segment.nameEn ?? undefined,
+            })),
+          },
+          extracted.frames,
+          items,
+          file.lastModified,
+          place,
+          extracted.truncated,
+        ),
+      );
+    } catch (caught) {
+      const code =
+        caught instanceof AvExtractionError
+          ? caught.code
+          : caught instanceof Error
+            ? caught.message
+            : "MODEL_ERROR";
+      setError(errorMessage(code));
+    } finally {
+      isSubmittingRef.current = false;
+      setLoading(false);
+      setLoadingStage("");
     }
   }
 
@@ -337,6 +460,8 @@ export default function EncounterPage() {
         lat: resolved.location.position.lat,
         lng: resolved.location.position.lng,
         locationSource: resolved.location.source,
+        placeSource: "manual",
+        dateSource: "imported",
         date: now,
         userNote: userNote.trim(),
         ai: null,
@@ -359,7 +484,50 @@ export default function EncounterPage() {
     }
   }
 
-  const showCountrySelector = !locationLoading && Boolean(location);
+  const showCountrySelector =
+    !locationLoading && Boolean(location) && (!location?.countryDetected || location.source !== "gps");
+  const locationSource = location?.source ?? "manual";
+
+  if (avDraft) {
+    return (
+      <AvConfirm
+        draft={avDraft}
+        history={items}
+        onCancel={() => setAvDraft(null)}
+      />
+    );
+  }
+
+  if (batchFiles.length) {
+    return (
+      <BatchImport
+        files={batchFiles}
+        history={items}
+        initialPlace={place}
+        initialCountry={country}
+        onCancel={() => setBatchFiles([])}
+      />
+    );
+  }
+
+  if (textMode) {
+    return (
+      <TextEncounter
+        initialPlace={place}
+        initialCountry={country}
+        coordinate={
+          location
+            ? {
+                lat: location.position.lat,
+                lng: location.position.lng,
+                source: location.source,
+              }
+            : null
+        }
+        onCancel={() => setTextMode(false)}
+      />
+    );
+  }
   return (
     <main className="app-shell">
       <div className="phone-page">
@@ -376,15 +544,15 @@ export default function EncounterPage() {
 
         <div className="form-stack">
           <section className="form-card surface">
-            <p className="eyebrow">01 / 留下一张照片</p>
+            <p className="eyebrow">01 / 留下画面</p>
             <div className="file-actions">
               <label className="secondary-action">
                 <Camera size={18} />
-                拍一张
+                拍摄
                 <input
                   className="file-input"
                   type="file"
-                  accept="image/*"
+                  accept="image/*,video/*"
                   capture="environment"
                   onChange={(event) => void handleFile(event.target.files?.[0])}
                 />
@@ -395,8 +563,33 @@ export default function EncounterPage() {
                 <input
                   className="file-input"
                   type="file"
-                  accept="image/*"
+                  accept="image/*,video/*"
                   onChange={(event) => void handleFile(event.target.files?.[0])}
+                />
+              </label>
+              <button
+                className="secondary-action"
+                type="button"
+                onClick={() => setTextMode(true)}
+              >
+                <PenLine size={18} />
+                只写字
+              </button>
+              <label className="secondary-action">
+                <Images size={18} />
+                批量显影
+                <input
+                  className="file-input"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={(event) => {
+                    const selected = Array.from(event.target.files ?? []);
+                    setBatchFiles(selected.slice(0, 8));
+                    if (selected.length > 8) {
+                      setError("单批最多处理 8 张，已选取前 8 张。");
+                    }
+                  }}
                 />
               </label>
             </div>
@@ -404,8 +597,14 @@ export default function EncounterPage() {
               <div className="photo-preview">
                 <img src={preview} alt="待显影的照片" />
               </div>
+            ) : videoFile ? (
+              <div className="video-selected">
+                <FileVideo2 size={28} />
+                <strong>视频已选</strong>
+                <span>{videoFile.name} · 最长 60 秒 / 100MB</span>
+              </div>
             ) : (
-              <div className="empty-state">拍下一个你还叫不出名字的东西。</div>
+              <div className="empty-state">拍下一张照片，或边拍边说一段短视频。</div>
             )}
           </section>
 
@@ -513,7 +712,13 @@ export default function EncounterPage() {
             disabled={loading || geocodeLoading || locationLoading || !location}
           >
             <Sparkles size={19} />
-            {loading ? "正在显影…" : geocodeLoading ? "正在校准地点…" : locationLoading ? "正在确认位置…" : "显影"}
+            {loading
+              ? loadingStage || "正在显影…"
+              : geocodeLoading
+                ? "正在校准地点…"
+                : locationLoading && !videoFile
+                  ? "正在确认位置…"
+                  : "显影"}
           </button>
           {error && !showManual ? (
             <button
@@ -526,7 +731,7 @@ export default function EncounterPage() {
             </button>
           ) : null}
           <p className="privacy-note">
-            照片、文字和语音只在识别期间临时发送给相应 AI 服务，应用服务端不保存；地点名称会发送给 OpenStreetMap 地点服务用于校准坐标，查询结果会在服务端缓存。地点数据 © OpenStreetMap contributors。
+            照片，或视频中抽取的画面帧和音频，只在识别期间临时发送给百炼模型；原视频与应用服务端都不会保存这些内容。地点名称会发送给 OpenStreetMap 地点服务用于校准坐标，查询结果会在服务端缓存。
           </p>
         </div>
       </div>

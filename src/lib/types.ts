@@ -8,7 +8,20 @@ export type Category =
   | "artifact"
   | "other";
 
-export type LocationSource = "gps" | "previous" | "default" | "manual";
+export type LocationSource =
+  | "gps"
+  | "previous"
+  | "default"
+  | "manual";
+
+export type PlaceSource =
+  | "voice"
+  | "manual"
+  | "previous"
+  | "default"
+  | "gps";
+
+export type DateSource = "exif" | "fileModified" | "imported";
 
 export type LuckConfidence = "low" | "medium" | "high";
 
@@ -36,11 +49,14 @@ export interface Item {
   photo: string;
   place: string;
   country: string;
-  lat: number;
-  lng: number;
+  lat: number | null;
+  lng: number | null;
   locationSource: LocationSource;
+  placeSource?: PlaceSource;
   date: string;
+  dateSource?: DateSource;
   userNote: string;
+  heard?: string;
   ai: RecognizedAi | null;
   answer?: string;
   isSeed: boolean;
@@ -72,6 +88,7 @@ export interface RecognizeSuccess {
 
 export interface RecognizeUnrecognized {
   unrecognized: true;
+  observation: string;
   name: null;
   nameEn: null;
   category: null;
@@ -91,6 +108,32 @@ export interface RecognizeRequest {
   userNote: string;
   history: HistoryEntry[] | string;
 }
+
+export interface AvFrame {
+  dataUrl: string;
+  atSec: number;
+}
+
+export interface AvSegment extends RecognizeSuccess {
+  frameIndex: number;
+  heard: string;
+  relatedItemName: string | null;
+  matchBasis: string | null;
+  matchConfidence: LuckConfidence | null;
+  associationStatus: "confirmed" | "uncertain" | "none";
+}
+
+export type AvResult =
+  | {
+      recognized: false;
+      placeHint: null;
+      segments: [];
+    }
+  | {
+      recognized: true;
+      placeHint: string | null;
+      segments: AvSegment[];
+    };
 
 export const CATEGORY_LABELS: Record<Category, string> = {
   animal: "动物",
