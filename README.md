@@ -48,8 +48,13 @@ VISION_MODEL=qwen3-vl-plus
 常用检查：
 
 ```bash
+# 运行测试
 npm test
+
+# TypeScript 类型检查
 npx tsc --noEmit
+
+# 创建生产构建
 npm run build
 ```
 
