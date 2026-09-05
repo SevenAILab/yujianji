@@ -123,7 +123,6 @@ export default function FirstsPage() {
             <button className="summary-trigger" ref={summaryTriggerRef} onClick={openSummary}>
               <CalendarDays size={17} />
               总结最近一趟旅程
-              <span>P2</span>
             </button>
           ) : null}
           {firsts.length > 0 ? (
