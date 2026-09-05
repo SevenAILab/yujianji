@@ -36,7 +36,7 @@ class YujianjiDatabase extends Dexie {
 export const db = new YujianjiDatabase();
 let seedPromise: Promise<boolean> | null = null;
 
-export function ensureSeeded(): Promise<boolean> {
+export async function ensureSeeded(): Promise<boolean> {
   if (!seedPromise) {
     const pending = (async () => {
       const response = await fetch("/seed-data.json", { cache: "no-store" });
@@ -47,14 +47,33 @@ export function ensureSeeded(): Promise<boolean> {
       const seedIds = items.map((item) => item.id);
       const storedIds = await db.meta.get("seeded-ids");
       const legacyMarker = await db.meta.get("seeded");
-      const seededIds = new Set<string>(typeof storedIds?.value === "string" ? (JSON.parse(storedIds.value) as string[]) : legacyMarker?.value === true ? seedIds : []);
       const existing = await db.items.bulkGet(seedIds);
-      const missing = items.filter((item, index) => !existing[index] && !seededIds.has(item.id));
-      if (missing.length) await db.items.bulkPut(missing);
+      const legacyExistingIds = seedIds.filter((_, index) => Boolean(existing[index]));
+      const seededIds = new Set<string>(
+        typeof storedIds?.value === "string"
+          ? (JSON.parse(storedIds.value) as string[])
+          : legacyMarker?.value === true
+            ? legacyExistingIds
+            : [],
+      );
+      const missing = items.filter(
+        (item, index) => !existing[index] && !seededIds.has(item.id),
+      );
+      // Demo panoramas are refreshable fixtures: keep their optimized texture
+      // path in sync even when an earlier version is already in IndexedDB.
+      const refreshablePanoramas = items.filter((item) => item.mediaKind === "panorama");
+      const upserts = new Map(
+        [...missing, ...refreshablePanoramas].map((item) => [item.id, item]),
+      );
+      if (upserts.size) await db.items.bulkPut([...upserts.values()]);
       await db.meta.put({ key: "seeded-ids", value: JSON.stringify([...new Set([...seededIds, ...seedIds])]) });
       return missing.length > 0;
     })();
-    seedPromise = pending.catch((error) => { seedPromise = null; throw error; });
+    seedPromise = pending;
   }
-  return seedPromise;
+  try {
+    return await seedPromise;
+  } finally {
+    seedPromise = null;
+  }
 }

@@ -79,6 +79,7 @@ export const itemSchema = z.object({
   nameEn: z.string().optional(),
   category: categorySchema,
   photo: z.string().min(1),
+  mediaKind: z.enum(["standard", "panorama"]).optional(),
   place: z.string().min(1),
   country: z.string().min(2),
   lat: z.number().finite().nullable(),

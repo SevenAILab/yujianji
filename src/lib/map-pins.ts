@@ -17,6 +17,7 @@ export const mapPinSourceSchema = z.object({
   lng: z.number().finite().min(-180).max(180).nullable(),
   date: z.string().min(1).max(40),
   name: z.string().min(1).max(80),
+  mediaKind: z.enum(["standard", "panorama"]).optional(),
   userNote: z.string().max(300).default(""),
   isSeed: z.boolean().default(false),
 });
@@ -63,6 +64,8 @@ export interface MapPin {
     MapPinLocation & {
       itemIds: string[];
       coverItemId: string;
+      hasPanorama: boolean;
+      panoramaItemId: string | null;
       latestDate: string;
       /** 该地点下全部是示例数据——地图上用浅色画，和用户自己的记录区分开。 */
       allSeed: boolean;
@@ -71,6 +74,7 @@ export interface MapPin {
         name: string;
         date: string;
         note: string;
+        mediaKind: "standard" | "panorama";
       }>;
     }
   >;
@@ -85,6 +89,7 @@ export interface MapPin {
     name: string;
     date: string;
     note: string;
+    mediaKind: "standard" | "panorama";
   }>;
 }
 
@@ -162,6 +167,7 @@ export function buildMapPins(input: MapPinsRequest): MapPin[] {
           (a, b) => Date.parse(b.date) - Date.parse(a.date),
         );
         const latest = locationOrdered[0];
+        const latestPanorama = locationOrdered.find((item) => item.mediaKind === "panorama");
         return {
           id,
           name: latest.place,
@@ -170,6 +176,8 @@ export function buildMapPins(input: MapPinsRequest): MapPin[] {
           lng: locationItems.reduce((sum, item) => sum + item.lng, 0) / locationItems.length,
           itemIds: locationOrdered.map((item) => item.id),
           coverItemId: latest.id,
+          hasPanorama: Boolean(latestPanorama),
+          panoramaItemId: latestPanorama?.id ?? null,
           latestDate: latest.date,
           allSeed: locationOrdered.every((item) => item.isSeed),
           preview: locationOrdered.slice(0, 3).map((item) => ({
@@ -177,6 +185,7 @@ export function buildMapPins(input: MapPinsRequest): MapPin[] {
             name: item.name,
             date: item.date,
             note: item.userNote,
+            mediaKind: item.mediaKind ?? "standard",
           })),
         };
       });
@@ -208,6 +217,7 @@ export function buildMapPins(input: MapPinsRequest): MapPin[] {
           name: item.name,
           date: item.date,
           note: item.userNote,
+          mediaKind: item.mediaKind ?? "standard",
         })),
       } satisfies MapPin;
     })

@@ -27,6 +27,8 @@ export type PlaceSource =
 
 export type DateSource = "exif" | "fileModified" | "imported";
 
+export type MediaKind = "standard" | "panorama";
+
 export type LuckConfidence = "low" | "medium" | "high";
 
 export interface Luck {
@@ -51,6 +53,7 @@ export interface Item {
   nameEn?: string;
   category: Category;
   photo: string;
+  mediaKind?: MediaKind;
   place: string;
   country: string;
   lat: number | null;

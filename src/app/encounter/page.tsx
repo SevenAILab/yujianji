@@ -25,12 +25,12 @@ import {
   MAX_AV_REQUEST_BYTES,
 } from "@/lib/av";
 import { detectCountryFromPosition } from "@/lib/country";
-import { compressImage } from "@/lib/image";
+import { isPanoramaDimensions, prepareImage } from "@/lib/image";
 import { readImageCapturedDate } from "@/lib/image-date";
 import { readImageLocation } from "@/lib/image-location";
 import { getPosition, type Position } from "@/lib/geo";
 import { toHistoryEntry } from "@/lib/history";
-import { CATEGORY_OPTIONS, type Category, type DateSource, type Item, type LocationSource, type PlaceSource, type RecognizedAi } from "@/lib/types";
+import { CATEGORY_OPTIONS, type Category, type DateSource, type Item, type LocationSource, type MediaKind, type PlaceSource, type RecognizedAi } from "@/lib/types";
 import { avResponseSchema, recognizeResultSchema } from "@/lib/schema";
 import styles from "./encounter.module.css";
 
@@ -89,6 +89,7 @@ export default function EncounterPage() {
   const router = useRouter();
   const [preview, setPreview] = useState("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [mediaKind, setMediaKind] = useState<MediaKind>("standard");
   const [capturedAt, setCapturedAt] = useState(() => new Date().toISOString());
   const [dateSource, setDateSource] = useState<DateSource>("imported");
   const [avDraft, setAvDraft] = useState<AvDraft | null>(null);
@@ -194,6 +195,7 @@ export default function EncounterPage() {
 
   async function handleFile(file: File | undefined, source: EncounterFileSource) {
     if (!file) return;
+    setMediaKind(source === "insta360" ? "panorama" : "standard");
     setError("");
     setShowManual(false);
     if (isVideoFile(file)) {
@@ -203,11 +205,16 @@ export default function EncounterPage() {
     }
     setVideoFile(null);
     try {
-      const [compressed, captured] = await Promise.all([
-        compressImage(file),
+      const [prepared, captured] = await Promise.all([
+        prepareImage(file),
         readImageCapturedDate(file),
       ]);
-      setPreview(compressed);
+      setPreview(prepared.dataUrl);
+      setMediaKind(
+        source === "insta360" || isPanoramaDimensions(prepared.width, prepared.height)
+          ? "panorama"
+          : "standard",
+      );
       setCapturedAt(captured.date);
       setDateSource(captured.source);
       if (source === "album" || source === "insta360") {
@@ -305,6 +312,7 @@ export default function EncounterPage() {
         nameEn: result.nameEn ?? undefined,
         category: result.category,
         photo: preview,
+        mediaKind,
         place: location ? place.trim() || "当前位置" : "?",
         country: location
           ? country ||
@@ -444,6 +452,7 @@ export default function EncounterPage() {
         name: manualName.trim(),
         category: manualCategory,
         photo: preview,
+        mediaKind,
         place: location ? place.trim() || "当前位置" : "?",
         country: location
           ? country ||

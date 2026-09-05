@@ -1,0 +1,99 @@
+.globeWrap {
+  position: relative;
+  width: 100%;
+  height: clamp(360px, 74vw, 610px);
+  overflow: hidden;
+  border: 1px solid rgba(44, 130, 120, .18);
+  border-radius: 24px;
+  background: #f7f5ed;
+}
+
+.globeHint {
+  position: absolute;
+  top: 16px;
+  left: 18px;
+  color: #568078;
+  font-size: 12px;
+  letter-spacing: .14em;
+}
+
+.photoBubble {
+  position: absolute;
+  z-index: 6;
+  width: 52px;
+  height: 52px;
+  padding: 3px;
+  overflow: visible;
+  border: 2px solid rgba(255, 253, 247, .96);
+  border-radius: 50%;
+  background: #fffdf7;
+  box-shadow: 0 0 0 2px rgba(50, 145, 132, .55), 0 9px 22px rgba(35, 91, 83, .2);
+  cursor: zoom-in;
+  transform: translate(-50%, -50%) scale(0);
+  animation: bubble-in 220ms cubic-bezier(.2, .9, .3, 1.2) forwards;
+}
+
+.photoBubble img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.photoBubble svg,
+.photoBubble span {
+  position: absolute;
+  right: -5px;
+  bottom: -4px;
+  display: grid;
+  min-width: 20px;
+  height: 20px;
+  place-items: center;
+  padding: 0 4px;
+  border: 2px solid #fffdf7;
+  border-radius: 999px;
+  background: #2d887e;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.panoramaBubble {
+  box-shadow: 0 0 0 2px rgba(91, 143, 194, .82), 0 9px 24px rgba(68, 113, 157, .28);
+}
+
+.panoramaBubble span { background: #5b8fc2; }
+
+@keyframes bubble-in {
+  to { transform: translate(-50%, -50%) scale(1); }
+}
+
+@media (max-width: 560px) {
+  .globeWrap {
+    height: 100%;
+    min-height: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .globeHint {
+    top: 10px;
+    left: 16px;
+    font-size: 9px;
+  }
+
+  .photoBubble {
+    width: 46px;
+    height: 46px;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photoBubble {
+    animation: none;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}

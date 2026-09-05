@@ -9,7 +9,6 @@ import {
   useState,
   type ChangeEvent as ReactChangeEvent,
   type PointerEvent as ReactPointerEvent,
-  type TouchEvent as ReactTouchEvent,
 } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { AppNav } from "@/components/AppNav";
@@ -18,6 +17,7 @@ import { MapErrorBoundary } from "@/components/MapErrorBoundary";
 import { MemoryGlobe, type MemoryGlobeApiPin, type MemoryGlobePin } from "@/components/MemoryGlobe";
 import { db, ensureSeeded } from "@/lib/db";
 import { setPendingEncounterFile } from "@/lib/encounter-transfer";
+import { hydrateMapPins } from "@/lib/local-map-pins";
 import type { Item } from "@/lib/types";
 import styles from "./home.module.css";
 
@@ -32,7 +32,6 @@ export default function Home() {
   const captureStartXRef = useRef(0);
   const captureDragRef = useRef(0);
   const captureDraggingRef = useRef(false);
-  const captureTouchActiveRef = useRef(false);
   const [captureDrag, setCaptureDrag] = useState(0);
   const [captureDragging, setCaptureDragging] = useState(false);
   const items = useLiveQuery(
@@ -72,7 +71,6 @@ export default function Home() {
   }
 
   function startCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
-    if (event.pointerType === "touch") return;
     captureStartXRef.current = event.clientX;
     captureDragRef.current = 0;
     captureDraggingRef.current = true;
@@ -81,8 +79,8 @@ export default function Home() {
   }
 
   function moveCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
-    if (event.pointerType === "touch") return;
     if (!captureDraggingRef.current) return;
+    event.preventDefault();
     const limit = captureSliderLimit();
     const next = Math.max(-limit, Math.min(limit, event.clientX - captureStartXRef.current));
     captureDragRef.current = next;
@@ -101,7 +99,6 @@ export default function Home() {
   }
 
   function finishCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
-    if (event.pointerType === "touch") return;
     const completedDrag = captureDragRef.current;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
@@ -114,41 +111,6 @@ export default function Home() {
     captureDragRef.current = 0;
     setCaptureDragging(false);
     setCaptureDrag(0);
-  }
-
-  function startCaptureTouch(event: ReactTouchEvent<HTMLButtonElement>) {
-    const touch = event.touches[0];
-    if (!touch) return;
-    captureTouchActiveRef.current = true;
-    captureStartXRef.current = touch.clientX;
-    captureDragRef.current = 0;
-    captureDraggingRef.current = true;
-    setCaptureDragging(true);
-  }
-
-  function moveCaptureTouch(event: ReactTouchEvent<HTMLButtonElement>) {
-    if (!captureTouchActiveRef.current) return;
-    const touch = event.touches[0];
-    if (!touch) return;
-    event.preventDefault();
-    const limit = captureSliderLimit();
-    const next = Math.max(
-      -limit,
-      Math.min(limit, touch.clientX - captureStartXRef.current),
-    );
-    captureDragRef.current = next;
-    setCaptureDrag(next);
-  }
-
-  function finishCaptureTouch() {
-    if (!captureTouchActiveRef.current) return;
-    captureTouchActiveRef.current = false;
-    completeCaptureDrag(captureDragRef.current);
-  }
-
-  function cancelCaptureTouch() {
-    captureTouchActiveRef.current = false;
-    cancelCaptureDrag();
   }
 
   useEffect(() => {
@@ -172,14 +134,7 @@ export default function Home() {
       })
       .then((result) => {
         if (!active) return;
-        setMapPins(result.pins.map((pin) => ({
-          ...pin,
-          coverPhoto: items.find((item) => item.id === pin.coverItemId)?.photo ?? "",
-          locations: pin.locations.map((location) => ({
-            ...location,
-            coverPhoto: items.find((item) => item.id === location.coverItemId)?.photo ?? "",
-          })),
-        })));
+        setMapPins(hydrateMapPins(result.pins, items));
       })
       .catch(() => {
         if (active) setToast("地图地点暂时无法加载，请稍后重试。");
@@ -275,13 +230,7 @@ export default function Home() {
                 onPointerDown={startCaptureDrag}
                 onPointerMove={moveCaptureDrag}
                 onPointerUp={finishCaptureDrag}
-                onPointerCancel={(event) => {
-                  if (event.pointerType !== "touch") cancelCaptureDrag();
-                }}
-                onTouchStart={startCaptureTouch}
-                onTouchMove={moveCaptureTouch}
-                onTouchEnd={finishCaptureTouch}
-                onTouchCancel={cancelCaptureTouch}
+                onPointerCancel={cancelCaptureDrag}
                 onKeyDown={(event) => {
                   if (event.key === "ArrowLeft") openFilePicker(photoInputRef.current);
                   if (event.key === "ArrowRight") openFilePicker(albumInputRef.current);

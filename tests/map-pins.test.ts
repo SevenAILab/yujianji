@@ -4,6 +4,8 @@ import {
   deriveLocationId,
   mapPinsRequestSchema,
 } from "../src/lib/map-pins";
+import { hydrateMapPins } from "../src/lib/local-map-pins";
+import type { Item } from "../src/lib/types";
 
 const shanghai = {
   id: "memory-1",
@@ -82,6 +84,43 @@ describe("map pins", () => {
     const pins = buildMapPins(input);
     expect(pins).toHaveLength(1);
     expect(pins[0].itemIds).toEqual(["with-coordinates"]);
+  });
+
+  it("marks a Shenzhen panorama so the globe can render its distinct pin", () => {
+    const input = mapPinsRequestSchema.parse({
+      items: [{
+        ...shanghai,
+        id: "shenzhen-panorama",
+        place: "中国 · 深圳",
+        lat: 22.5431,
+        lng: 114.0579,
+        mediaKind: "panorama",
+      }],
+    });
+
+    const [pin] = buildMapPins(input);
+    expect(pin.region?.id).toBe("CN-GD");
+    expect(pin.locations[0]).toMatchObject({
+      hasPanorama: true,
+      panoramaItemId: "shenzhen-panorama",
+    });
+  });
+
+  it("hydrates three Shenzhen panorama bubbles with their own images and 360 flags", () => {
+    const items = [
+      { ...shanghai, id: "shenzhen-studio", name: "创意空间", photo: "/studio.jpg", mediaKind: "panorama" as const, place: "中国 · 深圳", lat: 22.5431, lng: 114.0579, date: "2026-09-06T21:00:00+08:00" },
+      { ...shanghai, id: "shenzhen-night", name: "夜巷", photo: "/night.jpg", mediaKind: "panorama" as const, place: "中国 · 深圳", lat: 22.5431, lng: 114.0579, date: "2026-09-06T20:30:00+08:00" },
+      { ...shanghai, id: "shenzhen-office", name: "工作室", photo: "/office.jpg", mediaKind: "panorama" as const, place: "中国 · 深圳", lat: 22.5431, lng: 114.0579, date: "2026-09-06T14:55:00+08:00" },
+    ] satisfies Item[];
+    const apiPins = buildMapPins(mapPinsRequestSchema.parse({ items }));
+    const [pin] = hydrateMapPins(apiPins, items);
+
+    expect(pin.locations).toHaveLength(1);
+    expect(pin.locations[0].preview.map(({ id, photo, mediaKind }) => ({ id, photo, mediaKind }))).toEqual([
+      { id: "shenzhen-studio", photo: "/studio.jpg", mediaKind: "panorama" },
+      { id: "shenzhen-night", photo: "/night.jpg", mediaKind: "panorama" },
+      { id: "shenzhen-office", photo: "/office.jpg", mediaKind: "panorama" },
+    ]);
   });
 });
 
