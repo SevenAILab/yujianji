@@ -31,6 +31,21 @@ type LocationStatus = {
   countryDetected: boolean;
 };
 
+type GeocodeResponse =
+  | {
+      found: true;
+      lat: number;
+      lng: number;
+      displayName: string;
+      country?: string;
+    }
+  | { found: false };
+
+type SaveLocation = {
+  location: LocationStatus;
+  country: string;
+};
+
 function positionFailureText(failure: PositionFailure | null): string {
   if (failure === "unsupported") return "这台设备不支持定位。";
   if (failure === "denied") return "定位权限没有开启。";
@@ -44,6 +59,8 @@ function errorMessage(code: string): string {
   if (code === "INVALID_MODEL_OUTPUT") return "模型没有给出可用的显影结果，请重试。";
   if (code === "INVALID_RELATED_ITEM") return "历史关联没有确认成功，请再试一次。";
   if (code === "LOCAL_STORAGE_ERROR") return "这台设备暂时无法保存记录，请检查浏览器存储空间后重试。";
+  if (code === "LOCATION_NOT_FOUND") return "没有找到这个地点，请补充城市、省份或国家后再试。";
+  if (code === "GEOCODER_UNAVAILABLE") return "地点服务暂时不可用，尚未保存，避免把照片放到错误区域。";
   return "网络或模型服务暂时不可用，请重试。";
 }
 
@@ -62,7 +79,10 @@ export default function EncounterPage() {
   const [error, setError] = useState("");
   const [showManual, setShowManual] = useState(false);
   const [savingManual, setSavingManual] = useState(false);
+  const [geocodeLoading, setGeocodeLoading] = useState(false);
   const isSubmittingRef = useRef(false);
+  const countryTouchedRef = useRef(false);
+  const geocodeCacheRef = useRef(new Map<string, SaveLocation>());
 
   useEffect(() => {
     let active = true;
@@ -96,9 +116,6 @@ export default function EncounterPage() {
         if (!active) return;
         setItems(history);
         const previous = [...history].sort((a, b) => b.date.localeCompare(a.date))[0];
-        if (previous) {
-          setPlace(previous.place);
-        }
         applyFallbackLocation(history);
         setLocationLoading(true);
 
@@ -162,6 +179,48 @@ export default function EncounterPage() {
     }
   }
 
+  async function resolvePlaceForSave(): Promise<SaveLocation> {
+    if (!location) throw new Error("GEOCODER_UNAVAILABLE");
+    const normalizedPlace = place.trim();
+    const requestedCountry = countryTouchedRef.current ? country : "";
+    const key = `${requestedCountry || "*"}:${normalizedPlace.toLocaleLowerCase()}`;
+    const cached = geocodeCacheRef.current.get(key);
+    if (cached) return cached;
+
+    setGeocodeLoading(true);
+    try {
+      const response = await fetch("/api/geocode", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          place: normalizedPlace,
+          ...(requestedCountry ? { country: requestedCountry } : {}),
+        }),
+      });
+      if (!response.ok) throw new Error("GEOCODER_UNAVAILABLE");
+
+      const result = (await response.json()) as GeocodeResponse;
+      if (!result.found) {
+        throw new Error("LOCATION_NOT_FOUND");
+      }
+
+      const resolvedCountry = result.country ?? (country || "UNK");
+      const resolvedLocation: LocationStatus = {
+        source: "manual",
+        text: `已根据“${normalizedPlace}”校准坐标。`,
+        position: { lat: result.lat, lng: result.lng },
+        countryDetected: Boolean(result.country),
+      };
+      const value = { location: resolvedLocation, country: resolvedCountry };
+      geocodeCacheRef.current.set(key, value);
+      setLocation(resolvedLocation);
+      setCountry(resolvedCountry === "UNK" ? "" : resolvedCountry);
+      return value;
+    } finally {
+      setGeocodeLoading(false);
+    }
+  }
+
   async function submit() {
     if (isSubmittingRef.current) return;
     if (!preview) {
@@ -184,6 +243,7 @@ export default function EncounterPage() {
     setShowManual(false);
 
     try {
+      const resolved = await resolvePlaceForSave();
       const response = await fetch("/api/recognize", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -221,10 +281,10 @@ export default function EncounterPage() {
         category: result.category,
         photo: preview,
         place: place.trim(),
-        country: country || "UNK",
-        lat: location?.position.lat ?? 22.54,
-        lng: location?.position.lng ?? 114.06,
-        locationSource,
+        country: resolved.country,
+        lat: resolved.location.position.lat,
+        lng: resolved.location.position.lng,
+        locationSource: resolved.location.source,
         date: now,
         userNote: userNote.trim(),
         ai: {
@@ -246,7 +306,11 @@ export default function EncounterPage() {
       }
       router.push(`/item/${item.id}`);
     } catch (caught) {
-      setError(errorMessage(caught instanceof Error ? caught.message : "MODEL_ERROR"));
+      const code = caught instanceof Error ? caught.message : "MODEL_ERROR";
+      setError(errorMessage(code));
+      if (code !== "LOCATION_NOT_FOUND" && code !== "GEOCODER_UNAVAILABLE") {
+        setShowManual(true);
+      }
     } finally {
       isSubmittingRef.current = false;
       setLoading(false);
@@ -255,42 +319,47 @@ export default function EncounterPage() {
 
   async function saveManual() {
     if (savingManual) return;
-    if (locationLoading || !location || !preview || !manualName.trim() || !place.trim() || !country) {
-      setError("手动保存至少需要照片、名称、地点和国家。");
+    if (locationLoading || !location || !preview || !manualName.trim() || !place.trim()) {
+      setError("手动保存至少需要照片、名称和地点。");
       return;
     }
     setSavingManual(true);
-    const now = new Date().toISOString();
-    const item: Item = {
-      id: nanoid(),
-      name: manualName.trim(),
-      category: manualCategory,
-      photo: preview,
-      place: place.trim(),
-      country: country || "UNK",
-      lat: location?.position.lat ?? 22.54,
-      lng: location?.position.lng ?? 114.06,
-      locationSource,
-      date: now,
-      userNote: userNote.trim(),
-      ai: null,
-      isSeed: false,
-      createdAt: now,
-    };
     try {
+      const resolved = await resolvePlaceForSave();
+      const now = new Date().toISOString();
+      const item: Item = {
+        id: nanoid(),
+        name: manualName.trim(),
+        category: manualCategory,
+        photo: preview,
+        place: place.trim(),
+        country: resolved.country,
+        lat: resolved.location.position.lat,
+        lng: resolved.location.position.lng,
+        locationSource: resolved.location.source,
+        date: now,
+        userNote: userNote.trim(),
+        ai: null,
+        isSeed: false,
+        createdAt: now,
+      };
       await db.items.put(item);
       router.push(`/item/${item.id}`);
-    } catch {
-      setError("这台设备暂时无法保存记录，请检查浏览器存储空间后重试。");
+    } catch (caught) {
+      const code = caught instanceof Error ? caught.message : "";
+      setError(
+        errorMessage(
+          code === "LOCATION_NOT_FOUND" || code === "GEOCODER_UNAVAILABLE"
+            ? code
+            : "LOCAL_STORAGE_ERROR",
+        ),
+      );
     } finally {
       setSavingManual(false);
     }
   }
 
-  const showCountrySelector =
-    !locationLoading && Boolean(location) && (!location?.countryDetected || location.source !== "gps");
-  const locationSource = location?.source ?? "manual";
-
+  const showCountrySelector = !locationLoading && Boolean(location);
   return (
     <main className="app-shell">
       <div className="phone-page">
@@ -376,7 +445,10 @@ export default function EncounterPage() {
                   <select
                     id="country"
                     value={country}
-                    onChange={(event) => setCountry(event.target.value)}
+                    onChange={(event) => {
+                      countryTouchedRef.current = true;
+                      setCountry(event.target.value);
+                    }}
                   >
                     <option value="">请选择</option>
                     <option value="UNK">位置未定</option>
@@ -394,7 +466,7 @@ export default function EncounterPage() {
             {!locationLoading && location ? (
               <div className={`status-note ${location.source === "default" ? "warning" : ""}`} style={{ marginTop: 12 }}>
                 {location.source === "gps" ? <Check size={15} /> : <MapPin size={15} />}
-                <span>{location.text}</span>
+                <span>{geocodeLoading ? "正在校准地点坐标…" : location.text}</span>
               </div>
             ) : null}
           </section>
@@ -438,23 +510,23 @@ export default function EncounterPage() {
           <button
             className="primary-action"
             onClick={() => void submit()}
-            disabled={loading || locationLoading || !location}
+            disabled={loading || geocodeLoading || locationLoading || !location}
           >
             <Sparkles size={19} />
-            {loading ? "正在显影…" : locationLoading ? "正在确认位置…" : "显影"}
+            {loading ? "正在显影…" : geocodeLoading ? "正在校准地点…" : locationLoading ? "正在确认位置…" : "显影"}
           </button>
           {error && !showManual ? (
             <button
               className="secondary-action"
               onClick={() => void submit()}
-              disabled={loading || locationLoading || !location}
+              disabled={loading || geocodeLoading || locationLoading || !location}
             >
               <RotateCcw size={17} />
               重试
             </button>
           ) : null}
           <p className="privacy-note">
-            照片、文字和语音只在识别期间临时发送给相应 AI 服务；应用服务端不保存这些内容。
+            照片、文字和语音只在识别期间临时发送给相应 AI 服务，应用服务端不保存；地点名称会发送给 OpenStreetMap 地点服务用于校准坐标，查询结果会在服务端缓存。地点数据 © OpenStreetMap contributors。
           </p>
         </div>
       </div>

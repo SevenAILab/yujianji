@@ -7,7 +7,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { AppNav } from "@/components/AppNav";
 import { ItemCard } from "@/components/ItemCard";
 import { MapErrorBoundary } from "@/components/MapErrorBoundary";
-import { WorldMap } from "@/components/WorldMap";
+import { MemoryGlobe, type MemoryGlobeApiPin, type MemoryGlobePin } from "@/components/MemoryGlobe";
 import { db, ensureSeeded } from "@/lib/db";
 import type { Item } from "@/lib/types";
 
@@ -15,12 +15,49 @@ export default function Home() {
   const router = useRouter();
   const [seedReady, setSeedReady] = useState(false);
   const [mapResetToken, setMapResetToken] = useState(0);
+  const [mapPins, setMapPins] = useState<MemoryGlobePin[]>([]);
   const items = useLiveQuery(
     () => (seedReady ? db.items.orderBy("date").toArray() : Promise.resolve([] as Item[])),
     [seedReady],
     [],
   );
   const [toast, setToast] = useState("");
+
+  useEffect(() => {
+    if (!items.length) {
+      setMapPins([]);
+      return;
+    }
+    let active = true;
+    fetch("/api/map-pins", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        items: items.map(({ photo: _photo, ai: _ai, ...item }) => item),
+      }),
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("map pins failed");
+        return response.json() as Promise<{
+          pins: MemoryGlobeApiPin[];
+        }>;
+      })
+      .then((result) => {
+        if (!active) return;
+        setMapPins(result.pins.map((pin) => ({
+          ...pin,
+          coverPhoto: items.find((item) => item.id === pin.coverItemId)?.photo ?? "",
+          locations: pin.locations.map((location) => ({
+            ...location,
+            coverPhoto: items.find((item) => item.id === location.coverItemId)?.photo ?? "",
+          })),
+        })));
+      })
+      .catch(() => {
+        if (active) setToast("地图地点暂时无法加载，请稍后重试。");
+      });
+    return () => { active = false; };
+  }, [items]);
 
   useEffect(() => {
     let active = true;
@@ -74,7 +111,7 @@ export default function Home() {
         </header>
 
         <MapErrorBoundary>
-          <WorldMap items={items} resetToken={mapResetToken} />
+          <MemoryGlobe key={mapResetToken} pins={mapPins} />
         </MapErrorBoundary>
 
         <section className="stats-grid" aria-label="遇见统计">

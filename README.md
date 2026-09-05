@@ -43,7 +43,11 @@ npm run dev
 DASHSCOPE_API_KEY=你的百炼APIKey
 DASHSCOPE_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
 VISION_MODEL=qwen3-vl-plus
+GEOCODING_BASE_URL=https://nominatim.openstreetmap.org
+GEOCODING_USER_AGENT=yujianji/0.1 (+https://github.com/SevenAILab/yujianji)
 ```
+
+地点校准默认通过服务端代理调用 Nominatim，只在用户保存记录时查询一次，并进行缓存和限速。公开服务最多允许每秒一次请求，正式扩大用户量前应通过 `GEOCODING_BASE_URL` 切换到自建或商业服务。地点数据来自 OpenStreetMap contributors，使用时需遵守 ODbL 和 [Nominatim Usage Policy](https://operations.osmfoundation.org/policies/nominatim/)。
 
 常用检查：
 

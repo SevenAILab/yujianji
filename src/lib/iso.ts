@@ -4,6 +4,14 @@ export const NUMERIC_TO_ALPHA3: Record<string, string> = Object.fromEntries(
   countries.map((country) => [country.isoNo, country.iso3]),
 );
 
+export const ALPHA3_TO_ALPHA2: Record<string, string> = Object.fromEntries(
+  countries.map((country) => [country.iso3, country.iso2]),
+);
+
+export const ALPHA2_TO_ALPHA3: Record<string, string> = Object.fromEntries(
+  countries.map((country) => [country.iso2, country.iso3]),
+);
+
 const regionNames =
   typeof Intl !== "undefined" && "DisplayNames" in Intl
     ? new Intl.DisplayNames(["zh-CN"], { type: "region" })
