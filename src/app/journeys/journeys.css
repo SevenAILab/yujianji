@@ -653,4 +653,11 @@
   .journey-filters button { min-width: 74px; min-height: 40px; padding: 0 15px; font-size: 13px; }
   .journey-modal-backdrop { padding: 12px; }
   .journey-creator { padding: 20px 17px; border-radius: 25px; }
+  .journey-date-range {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .journey-date-range label { min-width: 0; }
+  .journey-date-range input { max-width: 100%; }
+  .journey-date-range i { display: none; }
 }
