@@ -64,6 +64,16 @@ npm run seed:ai
 
 `public/seed/` 中的公开风景素材用于黑客松演示，不代表用户真实上传内容。来源包括团队确认的自有旅行照片，以及按可公开演示要求下载并压缩到仓库中的 Unsplash 图片；如果替换或新增素材，必须同步记录原始页面、作者和许可证信息，并先确认没有人脸、车牌、住址或其他私人可识别信息。模型生成的识别、趣闻和地点关联均需人工复核，页面会保留“AI 生成，未经核实”提示。
 
+本轮新增素材来自 Unsplash 图片直链，按 Unsplash License 用于演示：
+
+- `ceramic-mug.jpg`: photo id `1514228742587-6b1558fcca3d`
+- `coffee-cup.jpg`: photo id `1495474472287-4d71bcdd2085`
+- `pizza.jpg`: photo id `1513104890138-7c749659a591`
+- `dog.jpg`: photo id `1552053831-71594a27632d`
+- `cat.jpg`: photo id `1518791841217-8f162f1e1131`
+
+图片均已人工检查为无可识别人物信息的物件、食物或动物素材。
+
 ## 页面
 
 - `/` 世界地图、国家高亮、统计和最近遇见
@@ -89,6 +99,13 @@ npm run seed:check
 ```
 
 自动化测试只覆盖三类契约：Zod schema、模型 JSON 提取、`relatedItemId` 合法性。相机、GPS、断网、压缩和双设备流程需要用 iPhone Safari 与 Android Chrome 真机验收。
+
+2026-09-05 本轮真实验收：
+
+- `npm run ping`：`qwen3-vl-plus` thinking off/on 分别无/有 `reasoning_content`；JSON mode 可用；`qwen-vl-max` 的 thinking 参数被服务商拒绝，因此备用模型仅验证 thinking off 和 JSON mode。
+- 本地 API：日常水瓶连续 3 次均为 `unrecognized:false / artifact / first`；粉色叶子为 `reunion → moganshan-pink-leaf-2025-10`。
+- 生产 API：JSON mode 连续 5 次均为 `unrecognized:false / artifact / first`；粉色叶子重逢关联正确。
+- 生产页面截图：`screenshots/gate5-production.png`。真实蜂窝网络截图仍需用手机蜂窝网络现场补拍，不能由桌面网络验收代替。
 
 ## Vercel
 
