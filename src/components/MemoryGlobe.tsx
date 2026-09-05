@@ -57,7 +57,6 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
   const router = useRouter();
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const cardActiveRef = useRef(false);
   const [hover, setHover] = useState<Hover>(null);
   const wrapWidth = wrapRef.current?.clientWidth ?? 360;
   const wrapHeight = wrapRef.current?.clientHeight ?? 420;
@@ -71,10 +70,12 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
     const context = canvas.getContext("2d");
     if (!context) return;
 
-    let width = 0, height = 0, radius = 0, centerX = 0, centerY = 0;
+    let width = 0, height = 0, baseRadius = 0, radius = 0, centerX = 0, centerY = 0;
     let longitude = -105, latitude = -10, lastX = 0, lastY = 0, pressX = 0, pressY = 0, velocity = 0;
     let dragging = false, pointerX = -999, pointerY = -999, frame = 0;
-    let previous = performance.now(), hoverId = "", hoverHoldUntil = 0, moved = false, tapLocked = false;
+    let previous = performance.now(), hoverId = "", hoverVisibleUntil = 0, candidateId = "", moved = false;
+    let zoom = 1, pinchStartDistance = 0, pinchStartZoom = 1;
+    const activePointers = new Map<number, { x: number; y: number }>();
     let hitTargets: Array<{ pin: MemoryGlobePin; location: MemoryGlobeLocation; x: number; y: number }> = [];
     const projection = geoOrthographic().clipAngle(90).precision(0.4);
     const path = geoPath(projection, context);
@@ -86,7 +87,8 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
       canvas!.width = width * ratio; canvas!.height = height * ratio;
       canvas!.style.width = `${width}px`; canvas!.style.height = `${height}px`;
       context!.setTransform(ratio, 0, 0, ratio, 0, 0);
-      radius = Math.min(width, height) * 0.39;
+      baseRadius = Math.min(width, height) * 0.39;
+      radius = baseRadius * zoom;
       centerX = width * 0.5; centerY = height * 0.51;
     }
 
@@ -109,8 +111,9 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
     function draw(timestamp: number) {
       const elapsed = timestamp - previous;
       previous = timestamp;
-      if (!dragging && !hoverId && !cardActiveRef.current) longitude += elapsed * 0.006 + velocity;
+      if (!dragging && activePointers.size < 2) longitude += elapsed * 0.006 + velocity;
       velocity *= 0.94;
+      radius = baseRadius * zoom;
       configureProjection();
       context!.clearRect(0, 0, width, height);
 
@@ -187,7 +190,6 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
           hitTargets.push({ pin, location, x: centerX, y: centerY });
           if (Math.hypot(pointerX - centerX, pointerY - centerY) < 15) {
             nearest = { pin, location, x: centerX, y: centerY };
-            hoverHoldUntil = timestamp + 650;
           }
         });
       });
@@ -206,9 +208,15 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
       }
 
       const nextId = nearest ? `${nearest.pin.id}:${nearest.location.id}` : "";
-      if (nextId) {
-        if (nextId !== hoverId) { hoverId = nextId; setHover(nearest); }
-      } else if (!cardActiveRef.current && !tapLocked && timestamp > hoverHoldUntil && hoverId) {
+      if (nextId !== candidateId) {
+        candidateId = nextId;
+        if (nearest) {
+          hoverId = nextId;
+          hoverVisibleUntil = timestamp + 3_000;
+          setHover(nearest);
+        }
+      }
+      if (hoverId && timestamp >= hoverVisibleUntil) {
         hoverId = "";
         setHover(null);
       }
@@ -220,22 +228,42 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
       pointerX = event.clientX - bounds.left; pointerY = event.clientY - bounds.top;
       const target = hitTargets.find((candidate) => Math.hypot(pointerX - candidate.x, pointerY - candidate.y) < 19);
       if (event.pointerType !== "mouse" && target) {
-        tapLocked = true;
         hoverId = `${target.pin.id}:${target.location.id}`;
-        hoverHoldUntil = Number.POSITIVE_INFINITY;
+        candidateId = hoverId;
+        hoverVisibleUntil = performance.now() + 3_000;
         setHover(target);
         return;
       }
-      tapLocked = false;
-      hoverId = "";
-      setHover(null);
+      activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      canvas!.setPointerCapture(event.pointerId);
+      if (activePointers.size === 2) {
+        const [first, second] = [...activePointers.values()];
+        if (!first || !second) return;
+        pinchStartDistance = Math.hypot(second.x - first.x, second.y - first.y);
+        pinchStartZoom = zoom;
+        dragging = false;
+        moved = true;
+        return;
+      }
       dragging = true; moved = false; pressX = event.clientX; pressY = event.clientY;
       lastX = event.clientX; lastY = event.clientY;
-      canvas!.setPointerCapture(event.pointerId);
     }
     function pointerMove(event: PointerEvent) {
       const bounds = canvas!.getBoundingClientRect();
       pointerX = event.clientX - bounds.left; pointerY = event.clientY - bounds.top;
+      if (activePointers.has(event.pointerId)) {
+        activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      }
+      if (activePointers.size >= 2) {
+        const [first, second] = [...activePointers.values()];
+        if (!first || !second) return;
+        const distance = Math.hypot(second.x - first.x, second.y - first.y);
+        if (pinchStartDistance > 0) {
+          zoom = Math.max(0.72, Math.min(1.75, pinchStartZoom * distance / pinchStartDistance));
+        }
+        moved = true;
+        return;
+      }
       if (!dragging) return;
       if (Math.hypot(event.clientX - pressX, event.clientY - pressY) > 5) moved = true;
       const dx = event.clientX - lastX, dy = event.clientY - lastY;
@@ -243,30 +271,37 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
       velocity = dx * 0.025; lastX = event.clientX; lastY = event.clientY;
     }
     function pointerUp(event: PointerEvent) {
+      activePointers.delete(event.pointerId);
       dragging = false;
       if (moved && event.pointerType !== "mouse") { pointerX = -999; pointerY = -999; }
     }
     function pointerLeave() {
       pointerX = -999; pointerY = -999;
-      if (!tapLocked && !cardActiveRef.current) hoverHoldUntil = performance.now() + 400;
+      candidateId = "";
+    }
+    function wheel(event: WheelEvent) {
+      event.preventDefault();
+      zoom = Math.max(0.72, Math.min(1.75, zoom * Math.exp(-event.deltaY * 0.0012)));
     }
 
     const observer = new ResizeObserver(resize);
     observer.observe(wrap); resize();
     canvas.addEventListener("pointerdown", pointerDown); canvas.addEventListener("pointermove", pointerMove);
     canvas.addEventListener("pointerup", pointerUp); canvas.addEventListener("pointercancel", pointerUp); canvas.addEventListener("pointerleave", pointerLeave);
+    canvas.addEventListener("wheel", wheel, { passive: false });
     frame = requestAnimationFrame(draw);
     return () => {
       observer.disconnect(); cancelAnimationFrame(frame);
       canvas.removeEventListener("pointerdown", pointerDown); canvas.removeEventListener("pointermove", pointerMove);
       canvas.removeEventListener("pointerup", pointerUp); canvas.removeEventListener("pointercancel", pointerUp); canvas.removeEventListener("pointerleave", pointerLeave);
+      canvas.removeEventListener("wheel", wheel);
     };
   }, [pins]);
 
   return (
     <div ref={wrapRef} style={{ position: "relative", width: "100%", height: "clamp(360px, 74vw, 610px)", overflow: "hidden", borderRadius: 24, border: "1px solid rgba(44,130,120,.18)", background: "#f7f5ed" }}>
       <canvas ref={canvasRef} style={{ display: "block", cursor: "grab", touchAction: "none" }} />
-      <div style={{ position: "absolute", left: 18, top: 16, color: "#568078", fontSize: 12, letterSpacing: ".14em" }}>拖动旋转 · 悬停大头针</div>
+      <div style={{ position: "absolute", left: 18, top: 16, color: "#568078", fontSize: 12, letterSpacing: ".14em" }}>拖动旋转 · 双指缩放 · 悬停查看</div>
       {pins.some((pin) => pin.allSeed) ? (
         <div
           style={{ position: "absolute", left: 18, bottom: 14, display: "flex", alignItems: "center", gap: 6, color: "#7d9a93", fontSize: 11 }}
@@ -278,8 +313,6 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
       {hover ? (
         <button
           type="button"
-          onMouseEnter={() => { cardActiveRef.current = true; }}
-          onMouseLeave={() => { cardActiveRef.current = false; setHover(null); }}
           onClick={() => router.push(`/item/${hover.location.preview[0]?.id ?? hover.location.itemIds[0]}`)}
           style={{ position: "absolute", left: Math.min(Math.max(8, hover.x + 6), Math.max(8, wrapWidth - hoverCardWidth - 8)), top: Math.min(Math.max(18, hover.y - 92), Math.max(18, wrapHeight - hoverCardHeight - 10)), width: hoverCardWidth, padding: 8, textAlign: "left", font: "inherit", cursor: "pointer", background: "rgba(255,253,247,.97)", border: "1px solid rgba(57,139,128,.3)", boxShadow: "7px 9px 0 rgba(98,160,139,.11), 0 16px 34px rgba(42,91,84,.13)", transform: "rotate(-1deg)" }}
           aria-label={`打开${hover.location.name}的记录`}
