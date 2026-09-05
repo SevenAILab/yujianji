@@ -111,14 +111,27 @@
   font-family: var(--serif);
   font-size: 12px;
   font-weight: 750;
-  pointer-events: none;
 }
 
-.captureSliderLabels span {
+.captureSliderLabels span,
+.captureSliderLabels button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
+
+.captureSliderLabels button {
+  padding: 8px 5px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  touch-action: none;
+  user-select: none;
+}
+
+.captureSliderLabels span { pointer-events: none; }
 
 .captureSliderRail {
   position: relative;
@@ -213,6 +226,54 @@
 }
 
 .textEncounter:hover { color: #176c68; }
+
+.recordingOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: end center;
+  padding: 28px 24px calc(36px + env(safe-area-inset-bottom));
+  overflow: hidden;
+  background: #102c2d;
+  color: #fff;
+  pointer-events: none;
+}
+
+.recordingOverlay video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: .82;
+}
+
+.recordingOverlay::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 45%, rgba(7, 35, 35, .76));
+  content: "";
+}
+
+.recordingOverlay > div {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  width: min(100%, 420px);
+  align-items: center;
+  gap: 3px 10px;
+  padding: 15px 18px;
+  border: 1px solid rgba(255, 255, 255, .24);
+  border-radius: 999px;
+  background: rgba(12, 63, 61, .68);
+  backdrop-filter: blur(16px);
+}
+
+.recordingOverlay svg { grid-row: 1 / 3; color: #ef8f75; }
+.recordingOverlay strong { font-family: var(--serif); font-size: 14px; }
+.recordingOverlay span { color: rgba(255, 255, 255, .76); font-size: 10px; }
 
 .stats {
   display: grid;
