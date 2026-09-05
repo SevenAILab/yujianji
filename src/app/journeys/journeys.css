@@ -658,26 +658,54 @@
     padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
   }
   .journey-creator {
-    width: min(88vw, 400px);
-    max-width: calc(100vw - 32px);
+    width: 100%;
+    max-width: 400px;
     max-height: calc(100svh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     min-width: 0;
     padding: 20px 17px;
+    contain: inline-size;
     overflow-x: hidden;
     overflow-y: auto;
     border-radius: 25px;
   }
+  .journey-name-field,
+  .journey-date-range,
+  .journey-date-range label {
+    max-width: 100%;
+    min-width: 0;
+  }
   .journey-date-range {
     width: 100%;
-    min-width: 0;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 100%);
     gap: 10px;
+    overflow: hidden;
   }
-  .journey-date-range label { width: 100%; min-width: 0; }
+  .journey-date-range label {
+    width: 100%;
+    overflow: hidden;
+  }
+  .journey-name-field input,
   .journey-date-range input {
     display: block;
+    box-sizing: border-box;
+    width: 100%;
     max-width: 100%;
+    min-width: 0;
+    inline-size: 100%;
+    max-inline-size: 100%;
     min-inline-size: 0;
+    font-size: 16px;
+  }
+  .journey-date-range input[type="date"] {
+    overflow: hidden;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .journey-date-range input[type="date"]::-webkit-date-and-time-value,
+  .journey-date-range input[type="date"]::-webkit-datetime-edit {
+    min-width: 0;
+    padding: 0;
+    text-align: left;
   }
   .journey-date-range i { display: none; }
 }
