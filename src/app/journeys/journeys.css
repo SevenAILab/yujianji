@@ -651,13 +651,33 @@
   .journey-calendar { width: 52px; height: 52px; flex-basis: 52px; }
   .journey-filters { margin-top: 29px; }
   .journey-filters button { min-width: 74px; min-height: 40px; padding: 0 15px; font-size: 13px; }
-  .journey-modal-backdrop { padding: 12px; }
-  .journey-creator { padding: 20px 17px; border-radius: 25px; }
+}
+
+@media (max-width: 560px) {
+  .journey-modal-backdrop {
+    padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+  }
+  .journey-creator {
+    width: min(88vw, 400px);
+    max-width: calc(100vw - 32px);
+    max-height: calc(100svh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    min-width: 0;
+    padding: 20px 17px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-radius: 25px;
+  }
   .journey-date-range {
+    width: 100%;
+    min-width: 0;
     grid-template-columns: minmax(0, 1fr);
     gap: 10px;
   }
-  .journey-date-range label { min-width: 0; }
-  .journey-date-range input { max-width: 100%; }
+  .journey-date-range label { width: 100%; min-width: 0; }
+  .journey-date-range input {
+    display: block;
+    max-width: 100%;
+    min-inline-size: 0;
+  }
   .journey-date-range i { display: none; }
 }

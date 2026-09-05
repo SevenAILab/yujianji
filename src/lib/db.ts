@@ -7,11 +7,21 @@ import type { NativeHealthSample } from "./native-bridge";
 
 type SeedMeta = { key: string; value: boolean | string };
 
+export type PendingEncounterRow = {
+  key: "current";
+  file: Blob;
+  name: string;
+  type: string;
+  lastModified: number;
+  source: "camera" | "album" | "insta360";
+};
+
 class YujianjiDatabase extends Dexie {
   items!: Table<Item, string>;
   trips!: Table<Trip, string>;
   meta!: Table<SeedMeta, string>;
   healthSamples!: Table<NativeHealthSample & { key: string }, string>;
+  pendingEncounters!: Table<PendingEncounterRow, string>;
 
   constructor() {
     super("yujianji");
@@ -19,6 +29,7 @@ class YujianjiDatabase extends Dexie {
     this.version(2).stores({ items: "id,date,country", meta: "key" });
     this.version(3).stores({ items: "id,date,country", meta: "key", trips: "id,status,startedAt,createdAt" });
     this.version(4).stores({ healthSamples: "key,timestamp,originId,metric" });
+    this.version(5).stores({ pendingEncounters: "key" });
   }
 }
 

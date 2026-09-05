@@ -1,12 +1,13 @@
 "use client";
 
-import { Camera, Globe2, ImagePlus, PenLine, Plus, Video } from "lucide-react";
+import { Camera, Globe2, ImagePlus, PenLine, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
   useEffect,
   useMemo,
   useRef,
   useState,
+  type ChangeEvent as ReactChangeEvent,
   type PointerEvent as ReactPointerEvent,
   type TouchEvent as ReactTouchEvent,
 } from "react";
@@ -26,27 +27,14 @@ export default function Home() {
   const [mapResetToken, setMapResetToken] = useState(0);
   const [mapPins, setMapPins] = useState<MemoryGlobePin[]>([]);
   const photoInputRef = useRef<HTMLInputElement>(null);
-  const videoInputRef = useRef<HTMLInputElement>(null);
   const albumInputRef = useRef<HTMLInputElement>(null);
   const captureSliderRef = useRef<HTMLDivElement>(null);
   const captureStartXRef = useRef(0);
   const captureDragRef = useRef(0);
   const captureDraggingRef = useRef(false);
   const captureTouchActiveRef = useRef(false);
-  const capturePressTimerRef = useRef<number | null>(null);
-  const captureLongPressRef = useRef(false);
-  const recordingReleaseRequestedRef = useRef(false);
-  const recorderRef = useRef<MediaRecorder | null>(null);
-  const recordingStreamRef = useRef<MediaStream | null>(null);
-  const recordingChunksRef = useRef<Blob[]>([]);
-  const recordingStartedAtRef = useRef(0);
-  const recordingClockRef = useRef<number | null>(null);
-  const recordingLimitRef = useRef<number | null>(null);
-  const recordingVideoRef = useRef<HTMLVideoElement>(null);
   const [captureDrag, setCaptureDrag] = useState(0);
   const [captureDragging, setCaptureDragging] = useState(false);
-  const [recordingState, setRecordingState] = useState<"idle" | "preparing" | "recording">("idle");
-  const [recordingSeconds, setRecordingSeconds] = useState(0);
   const items = useLiveQuery(
     () => (seedReady ? db.items.orderBy("date").toArray() : Promise.resolve([] as Item[])),
     [seedReady],
@@ -54,138 +42,33 @@ export default function Home() {
   );
   const [toast, setToast] = useState("");
 
-  function beginFileEncounter(file: File | undefined, source: "camera" | "album") {
+  async function beginFileEncounter(
+    file: File | undefined,
+    source: "camera" | "album",
+  ) {
     if (!file) return;
-    setPendingEncounterFile(file, source);
+    setToast(source === "camera" ? "正在准备拍摄内容…" : "正在读取相册内容…");
+    await setPendingEncounterFile(file, source);
     router.push("/encounter");
+  }
+
+  function openFilePicker(input: HTMLInputElement | null) {
+    if (!input) return;
+    input.value = "";
+    input.click();
+  }
+
+  function handleSelectedFile(
+    event: ReactChangeEvent<HTMLInputElement>,
+    source: "camera" | "album",
+  ) {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+    void beginFileEncounter(file, source);
   }
 
   function captureSliderLimit() {
     return 54;
-  }
-
-  function clearCapturePressTimer() {
-    if (capturePressTimerRef.current !== null) {
-      window.clearTimeout(capturePressTimerRef.current);
-      capturePressTimerRef.current = null;
-    }
-  }
-
-  function clearRecordingTimers() {
-    if (recordingClockRef.current !== null) window.clearInterval(recordingClockRef.current);
-    if (recordingLimitRef.current !== null) window.clearTimeout(recordingLimitRef.current);
-    recordingClockRef.current = null;
-    recordingLimitRef.current = null;
-  }
-
-  function closeRecordingStream() {
-    recordingStreamRef.current?.getTracks().forEach((track) => track.stop());
-    recordingStreamRef.current = null;
-    if (recordingVideoRef.current) recordingVideoRef.current.srcObject = null;
-  }
-
-  function stopVideoRecording() {
-    recordingReleaseRequestedRef.current = true;
-    const recorder = recorderRef.current;
-    if (recorder?.state === "recording") recorder.stop();
-  }
-
-  async function startVideoRecording() {
-    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
-      videoInputRef.current?.click();
-      return;
-    }
-
-    recordingReleaseRequestedRef.current = false;
-    setRecordingState("preparing");
-    setRecordingSeconds(0);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: "environment" } },
-        audio: true,
-      });
-      if (recordingReleaseRequestedRef.current) {
-        stream.getTracks().forEach((track) => track.stop());
-        setRecordingState("idle");
-        return;
-      }
-
-      recordingStreamRef.current = stream;
-      if (recordingVideoRef.current) {
-        recordingVideoRef.current.srcObject = stream;
-        void recordingVideoRef.current.play();
-      }
-      const supportedType = ["video/mp4", "video/webm;codecs=vp8,opus", "video/webm"]
-        .find((type) => MediaRecorder.isTypeSupported(type));
-      const recorder = new MediaRecorder(stream, supportedType ? { mimeType: supportedType } : undefined);
-      recorderRef.current = recorder;
-      recordingChunksRef.current = [];
-      recorder.ondataavailable = (event) => {
-        if (event.data.size) recordingChunksRef.current.push(event.data);
-      };
-      recorder.onerror = () => {
-        clearRecordingTimers();
-        closeRecordingStream();
-        recorderRef.current = null;
-        setRecordingState("idle");
-        setToast("录像没有保存成功，请重新长按拍摄。");
-      };
-      recorder.onstop = () => {
-        const mimeType = recorder.mimeType || supportedType || "video/webm";
-        const blob = new Blob(recordingChunksRef.current, { type: mimeType });
-        const extension = mimeType.includes("mp4") ? "mp4" : "webm";
-        clearRecordingTimers();
-        closeRecordingStream();
-        recorderRef.current = null;
-        setRecordingState("idle");
-        if (!blob.size) {
-          setToast("录像时间太短，请稍微多按一会儿。");
-          return;
-        }
-        beginFileEncounter(
-          new File([blob], `encounter-${Date.now()}.${extension}`, { type: mimeType }),
-          "camera",
-        );
-      };
-      recorder.start(250);
-      recordingStartedAtRef.current = Date.now();
-      setRecordingState("recording");
-      recordingClockRef.current = window.setInterval(() => {
-        setRecordingSeconds(Math.max(1, Math.ceil((Date.now() - recordingStartedAtRef.current) / 1000)));
-      }, 200);
-      recordingLimitRef.current = window.setTimeout(stopVideoRecording, 60_000);
-    } catch {
-      clearRecordingTimers();
-      closeRecordingStream();
-      recorderRef.current = null;
-      setRecordingState("idle");
-      setToast("需要允许相机和麦克风权限，才能长按录像。");
-    }
-  }
-
-  function startCapturePress(event: ReactPointerEvent<HTMLButtonElement>) {
-    event.currentTarget.setPointerCapture(event.pointerId);
-    captureLongPressRef.current = false;
-    recordingReleaseRequestedRef.current = false;
-    clearCapturePressTimer();
-    capturePressTimerRef.current = window.setTimeout(() => {
-      captureLongPressRef.current = true;
-      void startVideoRecording();
-    }, 520);
-  }
-
-  function finishCapturePress(event: ReactPointerEvent<HTMLButtonElement>) {
-    clearCapturePressTimer();
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-    if (captureLongPressRef.current) stopVideoRecording();
-    else photoInputRef.current?.click();
-  }
-
-  function cancelCapturePress() {
-    clearCapturePressTimer();
-    if (captureLongPressRef.current) stopVideoRecording();
   }
 
   function startCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
@@ -213,8 +96,8 @@ export default function Home() {
     setCaptureDragging(false);
     setCaptureDrag(0);
     captureDragRef.current = 0;
-    if (completedDrag >= threshold) albumInputRef.current?.click();
-    if (completedDrag <= -threshold) photoInputRef.current?.click();
+    if (completedDrag >= threshold) openFilePicker(albumInputRef.current);
+    if (completedDrag <= -threshold) openFilePicker(photoInputRef.current);
   }
 
   function finishCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
@@ -373,17 +256,12 @@ export default function Home() {
             <div className={`${styles.captureSliderRail} ${captureDragging ? styles.active : ""}`} ref={captureSliderRef}>
               <span className={styles.captureSliderLine} />
               <div className={styles.captureSliderLabels}>
-                <button
-                  type="button"
-                  aria-label="点按拍照，长按录像"
-                  onPointerDown={startCapturePress}
-                  onPointerUp={finishCapturePress}
-                  onPointerCancel={cancelCapturePress}
-                  onContextMenu={(event) => event.preventDefault()}
-                >
+                <label htmlFor="home-camera-input">
                   <Camera size={18} strokeWidth={1.7} />拍摄
-                </button>
-                <span>相册<ImagePlus size={17} strokeWidth={1.7} /></span>
+                </label>
+                <label htmlFor="home-album-input">
+                  相册<ImagePlus size={17} strokeWidth={1.7} />
+                </label>
               </div>
               <button
                 className={`${styles.captureSliderThumb} ${captureDragging ? styles.dragging : ""}`}
@@ -405,36 +283,30 @@ export default function Home() {
                 onTouchEnd={finishCaptureTouch}
                 onTouchCancel={cancelCaptureTouch}
                 onKeyDown={(event) => {
-                  if (event.key === "ArrowLeft") photoInputRef.current?.click();
-                  if (event.key === "ArrowRight") albumInputRef.current?.click();
+                  if (event.key === "ArrowLeft") openFilePicker(photoInputRef.current);
+                  if (event.key === "ArrowRight") openFilePicker(albumInputRef.current);
                 }}
               >
                 <Plus size={24} strokeWidth={1.8} />
               </button>
             </div>
-            <p>点按拍照&nbsp;&nbsp;·&nbsp;&nbsp;长按录像&nbsp;&nbsp;·&nbsp;&nbsp;右滑相册</p>
+            <p>左滑拍摄&nbsp;&nbsp;·&nbsp;&nbsp;右滑相册</p>
             <input
+              id="home-camera-input"
               ref={photoInputRef}
               className="file-input"
               type="file"
-              accept="image/*"
+              accept="image/*,video/*"
               capture="environment"
-              onChange={(event) => beginFileEncounter(event.target.files?.[0], "camera")}
+              onChange={(event) => handleSelectedFile(event, "camera")}
             />
             <input
-              ref={videoInputRef}
-              className="file-input"
-              type="file"
-              accept="video/*"
-              capture="environment"
-              onChange={(event) => beginFileEncounter(event.target.files?.[0], "camera")}
-            />
-            <input
+              id="home-album-input"
               ref={albumInputRef}
               className="file-input"
               type="file"
               accept="image/*,video/*"
-              onChange={(event) => beginFileEncounter(event.target.files?.[0], "album")}
+              onChange={(event) => handleSelectedFile(event, "album")}
             />
           </div>
 
@@ -454,16 +326,6 @@ export default function Home() {
         </section>
       </div>
       <AppNav />
-      {recordingState !== "idle" ? (
-        <div className={styles.recordingOverlay} aria-live="polite">
-          <video ref={recordingVideoRef} muted playsInline />
-          <div>
-            <Video size={18} />
-            <strong>{recordingState === "preparing" ? "正在打开相机…" : `录像中 ${recordingSeconds}s`}</strong>
-            <span>{recordingState === "recording" ? "松手结束并进入 AI 记录" : "请继续按住"}</span>
-          </div>
-        </div>
-      ) : null}
       {toast ? <div className="toast">{toast}</div> : null}
     </main>
   );

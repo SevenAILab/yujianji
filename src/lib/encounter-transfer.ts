@@ -1,3 +1,5 @@
+import { db } from "./db";
+
 export type EncounterFileSource = "camera" | "album" | "insta360";
 
 type PendingEncounterFile = {
@@ -7,12 +9,44 @@ type PendingEncounterFile = {
 
 let pendingFile: PendingEncounterFile | null = null;
 
-export function setPendingEncounterFile(file: File, source: EncounterFileSource): void {
+export async function setPendingEncounterFile(
+  file: File,
+  source: EncounterFileSource,
+): Promise<void> {
   pendingFile = { file, source };
+  try {
+    await db.pendingEncounters.put({
+      key: "current",
+      file,
+      name: file.name,
+      type: file.type,
+      lastModified: file.lastModified,
+      source,
+    });
+  } catch {
+    // The in-memory copy still supports ordinary client-side navigation.
+  }
 }
 
-export function takePendingEncounterFile(): PendingEncounterFile | null {
-  const file = pendingFile;
+export async function takePendingEncounterFile(): Promise<PendingEncounterFile | null> {
+  const memoryCopy = pendingFile;
   pendingFile = null;
-  return file;
+  if (memoryCopy) {
+    void db.pendingEncounters.delete("current").catch(() => undefined);
+    return memoryCopy;
+  }
+  try {
+    const stored = await db.pendingEncounters.get("current");
+    if (!stored) return null;
+    await db.pendingEncounters.delete("current");
+    return {
+      file: new File([stored.file], stored.name, {
+        type: stored.type,
+        lastModified: stored.lastModified,
+      }),
+      source: stored.source,
+    };
+  } catch {
+    return null;
+  }
 }

@@ -302,14 +302,6 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
     <div ref={wrapRef} style={{ position: "relative", width: "100%", height: "clamp(360px, 74vw, 610px)", overflow: "hidden", borderRadius: 24, border: "1px solid rgba(44,130,120,.18)", background: "#f7f5ed" }}>
       <canvas ref={canvasRef} style={{ display: "block", cursor: "grab", touchAction: "none" }} />
       <div style={{ position: "absolute", left: 18, top: 16, color: "#568078", fontSize: 12, letterSpacing: ".14em" }}>拖动旋转 · 双指缩放 · 悬停查看</div>
-      {pins.some((pin) => pin.allSeed) ? (
-        <div
-          style={{ position: "absolute", left: 18, bottom: 14, display: "flex", alignItems: "center", gap: 6, color: "#7d9a93", fontSize: 11 }}
-        >
-          <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#40aaa1", opacity: 0.4 }} />
-          浅色 = 示例数据
-        </div>
-      ) : null}
       {hover ? (
         <button
           type="button"

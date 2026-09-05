@@ -186,8 +186,9 @@ export default function EncounterPage() {
   }, []);
 
   useEffect(() => {
-    const pendingFile = takePendingEncounterFile();
-    if (pendingFile) void handleFile(pendingFile.file, pendingFile.source);
+    void takePendingEncounterFile().then((pendingFile) => {
+      if (pendingFile) void handleFile(pendingFile.file, pendingFile.source);
+    });
     if (window.location.search.includes("mode=text")) setTextMode(true);
   }, []);
 
