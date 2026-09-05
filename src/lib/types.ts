@@ -1,4 +1,4 @@
-﻿export type Category =
+export type Category =
   | "animal"
   | "plant"
   | "mineral"
@@ -8,7 +8,63 @@
   | "artifact"
   | "other";
 
-export type LocationSource = "gps" | "previous" | "default" | "manual";
+export type LocationSource =
+  | "gps"
+  | "exif"
+  | "previous"
+  | "default"
+  | "manual";
+
+export type PlaceSource =
+  | "voice"
+  | "exif"
+  | "manual"
+  | "previous"
+  | "default"
+  | "gps";
+
+export type DateSource = "exif" | "fileModified" | "imported";
+
+export type LuckConfidence = "low" | "medium" | "high";
+
+export interface Luck {
+  text: string;
+  basis: string;
+  confidence: LuckConfidence;
+}
+
+export interface RecognizedAi {
+  cognition: string;
+  fun: string;
+  luck: Luck;
+  question: string;
+  verdict: "first" | "reunion";
+  relatedItemId: string | null;
+  memorySentence: string;
+}
+
+export interface Item {
+  id: string;
+  name: string;
+  nameEn?: string;
+  category: Category;
+  photo: string;
+  place: string;
+  country: string;
+  lat: number | null;
+  lng: number | null;
+  locationSource: LocationSource;
+  placeSource?: PlaceSource;
+  date: string;
+  dateSource?: DateSource;
+  userNote: string;
+  heard?: string;
+  ai: RecognizedAi | null;
+  answer?: string;
+  isSeed: boolean;
+  createdAt: string;
+}
+
 export type DeviceSource = "manual" | "bluetooth-heart-rate" | "health-provider";
 
 export interface HealthSnapshot {
@@ -60,47 +116,6 @@ export interface Trip {
   createdAt: string;
 }
 
-export type LuckConfidence = "low" | "medium" | "high";
-
-export interface Luck {
-  text: string;
-  basis: string;
-  confidence: LuckConfidence;
-}
-
-export interface RecognizedAi {
-  cognition: string;
-  fun: string;
-  luck: Luck;
-  question: string;
-  verdict: "first" | "reunion";
-  relatedItemId: string | null;
-  memorySentence: string;
-}
-
-export interface Item {
-  id: string;
-  name: string;
-  nameEn?: string;
-  category: Category;
-  photo: string;
-  place: string;
-  country: string;
-  lat: number;
-  lng: number;
-  locationSource: LocationSource;
-  date: string;
-  userNote: string;
-  ai: RecognizedAi | null;
-  answer?: string;
-  isSeed: boolean;
-  createdAt: string;
-  mediaType?: "photo" | "panorama";
-  tripId?: string;
-  healthSnapshot?: HealthSnapshot;
-  trackPoint?: TrackPoint;
-}
-
 export interface HistoryEntry {
   id: string;
   name: string;
@@ -126,6 +141,7 @@ export interface RecognizeSuccess {
 
 export interface RecognizeUnrecognized {
   unrecognized: true;
+  observation: string;
   name: null;
   nameEn: null;
   category: null;
@@ -146,6 +162,32 @@ export interface RecognizeRequest {
   history: HistoryEntry[] | string;
 }
 
+export interface AvFrame {
+  dataUrl: string;
+  atSec: number;
+}
+
+export interface AvSegment extends RecognizeSuccess {
+  frameIndex: number;
+  heard: string;
+  relatedItemName: string | null;
+  matchBasis: string | null;
+  matchConfidence: LuckConfidence | null;
+  associationStatus: "confirmed" | "uncertain" | "none";
+}
+
+export type AvResult =
+  | {
+      recognized: false;
+      placeHint: null;
+      segments: [];
+    }
+  | {
+      recognized: true;
+      placeHint: string | null;
+      segments: AvSegment[];
+    };
+
 export const CATEGORY_LABELS: Record<Category, string> = {
   animal: "动物",
   plant: "植物",
@@ -157,4 +199,7 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   other: "其他",
 };
 
-export const CATEGORY_OPTIONS = Object.entries(CATEGORY_LABELS) as [Category, string][];
+export const CATEGORY_OPTIONS = Object.entries(CATEGORY_LABELS) as [
+  Category,
+  string,
+][];

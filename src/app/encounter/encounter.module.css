@@ -1,0 +1,187 @@
+.encounterShell {
+  overflow-x: hidden;
+  padding: 0 0 116px;
+  background:
+    radial-gradient(circle at 16% 3%, rgba(233, 173, 105, .08), transparent 22%),
+    #f8f6ef;
+}
+
+.encounterPage {
+  width: min(100%, 560px);
+  padding: 38px 26px 30px;
+}
+
+.encounterHeader {
+  min-height: 56px;
+}
+
+.encounterHeader > :global(.icon-action) {
+  width: 46px;
+  min-height: 46px;
+  border-color: rgba(255, 255, 255, .9);
+  background: rgba(255, 255, 255, .7);
+  color: #247d75;
+  box-shadow: 0 8px 22px rgba(43, 92, 83, .06);
+}
+
+.encounterHeader :global(.brand-lockup) {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+
+.encounterHeader :global(.brand-lockup h1) {
+  color: #0b5659;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.encounterHeader :global(.brand-lockup span) {
+  color: #81999a;
+  font-size: 9px;
+  letter-spacing: .12em;
+}
+
+.encounterForm {
+  gap: 15px;
+  margin-top: 23px;
+}
+
+.encounterShell :global(.form-card) {
+  padding: 19px;
+  border: 1px solid rgba(255, 255, 255, .84);
+  border-radius: 25px;
+  background: rgba(250, 249, 243, .91);
+  box-shadow: 0 14px 34px rgba(43, 92, 83, .065);
+  backdrop-filter: blur(14px);
+}
+
+.encounterShell :global(.eyebrow) {
+  margin-bottom: 13px;
+  color: #2b8077;
+  font-size: 9px;
+  letter-spacing: .13em;
+}
+
+.encounterShell :global(.file-actions) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.encounterShell :global(.file-actions .secondary-action) {
+  min-height: 45px;
+  padding: 0 10px;
+  border: 1px solid rgba(113, 164, 154, .16);
+  border-radius: 999px;
+  background: #e7f0eb;
+  color: #176a66;
+  font-family: var(--serif);
+  font-size: 12px;
+  box-shadow: none;
+}
+
+.encounterShell :global(.file-actions .secondary-action:hover) {
+  background: #dcebe5;
+}
+
+.encounterShell :global(.photo-preview) {
+  margin-top: 15px;
+  overflow: hidden;
+  border: 5px solid rgba(255, 255, 255, .76);
+  border-radius: 20px;
+  background: #dbe9e4;
+  box-shadow: 0 13px 28px rgba(39, 83, 77, .11);
+}
+
+.encounterShell :global(.video-selected),
+.encounterShell :global(.empty-state) {
+  margin-top: 15px;
+  border: 1px dashed rgba(65, 130, 119, .18);
+  border-radius: 18px;
+  background: rgba(231, 240, 235, .72);
+  color: #718d8a;
+}
+
+.encounterShell :global(.field) {
+  gap: 8px;
+}
+
+.encounterShell :global(.field label) {
+  color: #2c6865;
+  font-family: var(--serif);
+  font-size: 11px;
+}
+
+.encounterShell :global(.field input),
+.encounterShell :global(.field select),
+.encounterShell :global(.field textarea),
+.encounterShell :global(.readonly-field) {
+  border-color: #d9e5df;
+  border-radius: 13px;
+  background: #f7faf6;
+  color: #245d5a;
+}
+
+.encounterShell :global(.field textarea) {
+  min-height: 94px;
+}
+
+.encounterShell :global(.status-note) {
+  border-radius: 13px;
+  background: #e8f1ec;
+  color: #39716d;
+}
+
+.encounterShell :global(.primary-action) {
+  min-height: 50px;
+  border-radius: 999px;
+  background: #83bdb4;
+  color: #075e60;
+  font-family: var(--serif);
+  font-size: 14px;
+  box-shadow: 0 10px 23px rgba(43, 111, 103, .1);
+}
+
+.encounterShell :global(.error-box) {
+  border-color: rgba(218, 141, 112, .34);
+  border-radius: 18px;
+  background: #f8eae3;
+}
+
+.encounterShell :global(.privacy-note) {
+  color: #91a19f;
+  font-size: 9px;
+  line-height: 1.65;
+}
+
+.encounterShell :global(.bottom-nav) {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: min(100%, 560px);
+  padding: 11px 18px calc(11px + env(safe-area-inset-bottom));
+  border-width: 1px 0 0;
+  border-radius: 24px 24px 0 0;
+  background: rgba(250, 249, 243, .96);
+  box-shadow: 0 -12px 28px rgba(45, 86, 79, .07);
+}
+
+.encounterShell :global(.bottom-nav a) {
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 7px 9px;
+  font-family: var(--serif);
+  font-size: 12px;
+}
+
+@media (max-width: 430px) {
+  .encounterPage { padding: 27px 18px 24px; }
+  .encounterShell :global(.form-card) { padding: 17px; }
+}
+
+@media (max-width: 350px) {
+  .encounterShell :global(.file-actions .secondary-action) { padding: 0 7px; font-size: 11px; }
+  .encounterShell :global(.field-row) { grid-template-columns: 1fr; }
+}

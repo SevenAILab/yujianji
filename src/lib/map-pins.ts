@@ -13,11 +13,12 @@ export const mapPinSourceSchema = z.object({
   regionId: z.string().min(1).max(160).optional(),
   place: z.string().min(1).max(120),
   country: z.string().min(2).max(5),
-  lat: z.number().finite().min(-90).max(90),
-  lng: z.number().finite().min(-180).max(180),
+  lat: z.number().finite().min(-90).max(90).nullable(),
+  lng: z.number().finite().min(-180).max(180).nullable(),
   date: z.string().min(1).max(40),
   name: z.string().min(1).max(80),
   userNote: z.string().max(300).default(""),
+  isSeed: z.boolean().default(false),
 });
 
 export const mapPinsRequestSchema = z.object({
@@ -38,6 +39,7 @@ export const mapPinsRequestSchema = z.object({
 
 export type MapPinSource = z.infer<typeof mapPinSourceSchema>;
 export type MapPinsRequest = z.infer<typeof mapPinsRequestSchema>;
+type CoordinateMapPinSource = MapPinSource & { lat: number; lng: number };
 
 export interface MapPinLocation {
   id: string;
@@ -62,6 +64,8 @@ export interface MapPin {
       itemIds: string[];
       coverItemId: string;
       latestDate: string;
+      /** 该地点下全部是示例数据——地图上用浅色画，和用户自己的记录区分开。 */
+      allSeed: boolean;
       preview: Array<{
         id: string;
         name: string;
@@ -70,6 +74,8 @@ export interface MapPin {
       }>;
     }
   >;
+  /** 该钉子下全部是示例数据。只要有一条是用户自己拍的，就不算示例。 */
+  allSeed: boolean;
   memoryCount: number;
   itemIds: string[];
   coverItemId: string;
@@ -87,7 +93,7 @@ function normalizePart(value: string): string {
 }
 
 export function deriveLocationId(
-  item: Pick<MapPinSource, "locationId" | "country" | "place" | "lat" | "lng">,
+  item: Pick<CoordinateMapPinSource, "locationId" | "country" | "place" | "lat" | "lng">,
   coordinatePrecision = 3,
 ): string {
   if (item.locationId) return item.locationId;
@@ -101,7 +107,7 @@ export function deriveLocationId(
 }
 
 function isInsideBounds(
-  item: MapPinSource,
+  item: CoordinateMapPinSource,
   bounds: NonNullable<MapPinsRequest["bounds"]>,
 ): boolean {
   const insideLatitude = item.lat >= bounds.south && item.lat <= bounds.north;
@@ -112,11 +118,22 @@ function isInsideBounds(
   return insideLatitude && insideLongitude;
 }
 
+function hasCoordinates(item: MapPinSource): item is CoordinateMapPinSource {
+  return item.lat !== null && item.lng !== null;
+}
+
 export function buildMapPins(input: MapPinsRequest): MapPin[] {
+  const coordinateItems = input.items.filter(hasCoordinates);
   const candidates = input.bounds
-    ? input.items.filter((item) => isInsideBounds(item, input.bounds!))
-    : input.items;
-  const groups = new Map<string, { region: ReturnType<typeof resolveAdmin1Region>; items: MapPinSource[] }>();
+    ? coordinateItems.filter((item) => isInsideBounds(item, input.bounds!))
+    : coordinateItems;
+  const groups = new Map<
+    string,
+    {
+      region: ReturnType<typeof resolveAdmin1Region>;
+      items: CoordinateMapPinSource[];
+    }
+  >();
 
   for (const item of candidates) {
     const region = resolveAdmin1Region(item);
@@ -135,7 +152,7 @@ export function buildMapPins(input: MapPinsRequest): MapPin[] {
       const lat = items.reduce((sum, item) => sum + item.lat, 0) / items.length;
       const lng = items.reduce((sum, item) => sum + item.lng, 0) / items.length;
 
-      const locationGroups = new Map<string, MapPinSource[]>();
+      const locationGroups = new Map<string, CoordinateMapPinSource[]>();
       items.forEach((item) => {
         const id = deriveLocationId(item, input.coordinatePrecision);
         locationGroups.set(id, [...(locationGroups.get(id) ?? []), item]);
@@ -154,6 +171,7 @@ export function buildMapPins(input: MapPinsRequest): MapPin[] {
           itemIds: locationOrdered.map((item) => item.id),
           coverItemId: latest.id,
           latestDate: latest.date,
+          allSeed: locationOrdered.every((item) => item.isSeed),
           preview: locationOrdered.slice(0, 3).map((item) => ({
             id: item.id,
             name: item.name,
@@ -180,6 +198,7 @@ export function buildMapPins(input: MapPinsRequest): MapPin[] {
           geometry: region.geometry,
         } : null,
         locations,
+        allSeed: ordered.every((item) => item.isSeed),
         memoryCount: ordered.length,
         itemIds: ordered.map((item) => item.id),
         coverItemId: anchor.id,

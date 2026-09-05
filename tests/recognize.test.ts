@@ -5,6 +5,7 @@ import {
   recognizeRequestSchema,
   recognizeResultSchema,
 } from "../src/lib/schema";
+import { normalizeHistory } from "../src/lib/history";
 import type { HistoryEntry } from "../src/lib/types";
 
 const history: HistoryEntry[] = [
@@ -36,6 +37,21 @@ const success = {
   memorySentence: "去年十月在莫干山，我们见过了。",
 };
 
+const unrecognized = {
+  unrecognized: true,
+  observation: "画面偏暗，中央是一团边缘模糊的浅色形状，表面细节不足。",
+  name: null,
+  nameEn: null,
+  category: null,
+  cognition: null,
+  fun: null,
+  luck: null,
+  question: null,
+  verdict: null,
+  relatedItemId: null,
+  memorySentence: null,
+};
+
 describe("extractJsonObject", () => {
   it("accepts plain JSON and explanatory text around JSON", () => {
     expect(extractJsonObject(JSON.stringify(success))).toEqual(success);
@@ -63,18 +79,27 @@ describe("recognize result validation", () => {
     ).toBe(false);
   });
 
-  it("rejects more than 200 history entries at the request boundary", () => {
+  it("accepts oversized history and trims it to the newest 200 entries", () => {
     const entry = history[0];
-    expect(
-      recognizeRequestSchema.safeParse({
-        image: "data:image/jpeg;base64,AA==",
-        userNote: "",
-        history: Array.from({ length: 201 }, (_, index) => ({
-          ...entry,
-          id: `${entry.id}-${index}`,
-        })),
-      }).success,
-    ).toBe(false);
+    const historyInput = Array.from({ length: 201 }, (_, index) => ({
+      ...entry,
+      id: `${entry.id}-${index}`,
+      date: `2025-${String((index % 12) + 1).padStart(2, "0")}-01T00:00:00+08:00`,
+    }));
+    const parsed = recognizeRequestSchema.safeParse({
+      image: "data:image/jpeg;base64,AA==",
+      userNote: "",
+      history: historyInput,
+    });
+
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    const normalized = normalizeHistory(parsed.data.history);
+    expect(normalized.truncated).toBe(true);
+    expect(normalized.entries).toHaveLength(200);
+    expect(normalized.entries.map(({ id }) => id)).not.toContain(
+      "moganshan-pink-leaf-2025-10-0",
+    );
   });
 
   it("accepts a valid reunion id", () => {
@@ -92,22 +117,14 @@ describe("recognize result validation", () => {
 
   it("accepts an unrecognized union branch", () => {
     expect(
-      parseRecognizeResult(
-        JSON.stringify({
-          unrecognized: true,
-          name: null,
-          nameEn: null,
-          category: null,
-          cognition: null,
-          fun: null,
-          luck: null,
-          question: null,
-          verdict: null,
-          relatedItemId: null,
-          memorySentence: null,
-        }),
-        history,
-      ),
-    ).toMatchObject({ unrecognized: true });
+      parseRecognizeResult(JSON.stringify(unrecognized), history),
+    ).toEqual(unrecognized);
+  });
+
+  it("requires a grounded observation for an unrecognized result", () => {
+    const { observation: _observation, ...withoutObservation } = unrecognized;
+    expect(
+      recognizeResultSchema.safeParse(withoutObservation).success,
+    ).toBe(false);
   });
 });

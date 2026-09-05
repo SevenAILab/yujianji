@@ -1,0 +1,123 @@
+.textShell {
+  min-height: 100svh;
+  overflow-x: hidden;
+  padding: 0;
+  background:
+    radial-gradient(circle at 16% 3%, rgba(233, 173, 105, .08), transparent 22%),
+    #f8f6ef;
+}
+
+.textPage {
+  width: min(100%, 560px);
+  padding: 38px 26px 42px;
+}
+
+.textHeader {
+  min-height: 56px;
+}
+
+.textHeader > :global(.icon-action) {
+  width: 46px;
+  min-height: 46px;
+  border-color: rgba(255, 255, 255, .9);
+  background: rgba(255, 255, 255, .7);
+  color: #247d75;
+  box-shadow: 0 8px 22px rgba(43, 92, 83, .06);
+}
+
+.textHeader :global(.brand-lockup) {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+
+.textHeader :global(.brand-lockup h1) {
+  color: #0b5659;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.textHeader :global(.brand-lockup span) {
+  color: #81999a;
+  font-size: 9px;
+  letter-spacing: .12em;
+}
+
+.textHeader > svg { color: #27897e; }
+
+.textForm {
+  gap: 15px;
+  margin-top: 23px;
+}
+
+.textShell :global(.form-card) {
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, .84);
+  border-radius: 25px;
+  background: rgba(250, 249, 243, .93);
+  box-shadow: 0 14px 34px rgba(43, 92, 83, .065);
+  backdrop-filter: blur(14px);
+}
+
+.textShell :global(.field) { gap: 8px; }
+
+.textShell :global(.field label) {
+  color: #2c6865;
+  font-family: var(--serif);
+  font-size: 11px;
+}
+
+.textShell :global(.field input),
+.textShell :global(.field select),
+.textShell :global(.field textarea) {
+  border-color: #d9e5df;
+  border-radius: 13px;
+  background: #f7faf6;
+  color: #245d5a;
+}
+
+.textShell :global(.field textarea) {
+  min-height: 240px;
+  line-height: 1.7;
+}
+
+.autoLocation {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  color: #819795;
+  font-size: 10px;
+}
+
+.textShell :global(.field input:focus),
+.textShell :global(.field select:focus),
+.textShell :global(.field textarea:focus) {
+  border-color: #72afa5;
+  box-shadow: 0 0 0 3px rgba(114, 175, 165, .12);
+}
+
+.textShell :global(.primary-action) {
+  min-height: 50px;
+  border-radius: 999px;
+  background: #83bdb4;
+  color: #075e60;
+  font-family: var(--serif);
+  font-size: 14px;
+  box-shadow: 0 10px 23px rgba(43, 111, 103, .1);
+}
+
+.textShell :global(.error-box) {
+  border-color: rgba(218, 141, 112, .34);
+  border-radius: 18px;
+  background: #f8eae3;
+}
+
+@media (max-width: 430px) {
+  .textPage { padding: 27px 18px 34px; }
+  .textShell :global(.form-card) { padding: 18px; }
+}
+
+@media (max-width: 350px) {
+  .textShell :global(.field-row) { grid-template-columns: 1fr; }
+}

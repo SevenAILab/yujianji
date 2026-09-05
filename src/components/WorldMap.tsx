@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation";
 import world from "world-atlas/countries-110m.json";
 import { NUMERIC_TO_ALPHA3 } from "@/lib/iso";
 import type { Item } from "@/lib/types";
-import { itemHref } from "@/lib/app-mode";
 
 const WIDTH = 800;
 const HEIGHT = 430;
@@ -61,18 +60,29 @@ export function WorldMap({
     [items],
   );
   const pins = useMemo(() => {
-    const grouped = new Map<string, Item[]>();
-    items.forEach((item) => {
+    type LocatedItem = Item & { lat: number; lng: number };
+    const grouped = new Map<string, LocatedItem[]>();
+    items
+      .filter(
+        (item): item is LocatedItem =>
+          item.lat !== null && item.lng !== null,
+      )
+      .forEach((item) => {
       const key = `${item.lat.toFixed(1)}:${item.lng.toFixed(1)}`;
       grouped.set(key, [...(grouped.get(key) ?? []), item]);
-    });
+      });
     return [...grouped.values()]
       .map((group) => {
         const first = group[0];
         const point = projection([first.lng, first.lat]);
         return point ? { group, point } : null;
       })
-      .filter((value): value is { group: Item[]; point: [number, number] } => Boolean(value));
+      .filter(
+        (
+          value,
+        ): value is { group: LocatedItem[]; point: [number, number] } =>
+          Boolean(value),
+      );
   }, [items, projection]);
 
   useEffect(() => {
@@ -98,7 +108,6 @@ export function WorldMap({
       <svg
         ref={svgRef}
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        role="img"
         aria-label="遇见集世界地图"
       >
         <rect className="map-water" x="0" y="0" width={WIDTH} height={HEIGHT} rx="17" />
@@ -127,7 +136,7 @@ export function WorldMap({
                   aria-label={`打开${group[0].place}的${group.length}件藏品`}
                   onClick={() => {
                     if (group.length === 1) {
-                      router.push(itemHref(group[0].id));
+                      router.push(`/item/${group[0].id}`);
                     } else {
                       setSelectedPin(group);
                     }
@@ -135,8 +144,9 @@ export function WorldMap({
                   role="button"
                   tabIndex={0}
                   onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      if (group.length === 1) router.push(itemHref(group[0].id));
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      if (group.length === 1) router.push(`/item/${group[0].id}`);
                       else setSelectedPin(group);
                     }
                   }}
@@ -171,7 +181,7 @@ export function WorldMap({
             <button
               className="map-sheet-item"
               key={item.id}
-              onClick={() => router.push(itemHref(item.id))}
+              onClick={() => router.push(`/item/${item.id}`)}
             >
               <img src={item.photo} alt="" />
               <span>

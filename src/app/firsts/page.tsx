@@ -2,7 +2,7 @@
 
 import { ArrowLeft, CalendarDays, Sparkles, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { AppNav } from "@/components/AppNav";
 import { ItemCard } from "@/components/ItemCard";
@@ -20,6 +20,8 @@ export default function FirstsPage() {
   const [summaryText, setSummaryText] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const summaryTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const summaryCloseRef = useRef<HTMLButtonElement | null>(null);
   const items = useLiveQuery(
     () => (seedReady ? db.items.orderBy("date").reverse().toArray() : Promise.resolve([] as Item[])),
     [seedReady],
@@ -37,6 +39,19 @@ export default function FirstsPage() {
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!summaryOpen) {
+      summaryTriggerRef.current?.focus();
+      return;
+    }
+    summaryCloseRef.current?.focus();
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setSummaryOpen(false);
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [summaryOpen]);
 
   const firsts = items.filter((item) => item.ai?.verdict === "first");
   const latestDate = useMemo(
@@ -110,10 +125,9 @@ export default function FirstsPage() {
 
         <div className="content-stack">
           {firsts.length > 0 ? (
-            <button className="summary-trigger" onClick={openSummary}>
+            <button className="summary-trigger" ref={summaryTriggerRef} onClick={openSummary}>
               <CalendarDays size={17} />
               总结最近一趟旅程
-              <span>P2</span>
             </button>
           ) : null}
           {firsts.length > 0 ? (
@@ -140,7 +154,7 @@ export default function FirstsPage() {
                 <p className="eyebrow">一段时间的遇见</p>
                 <h2 id="summary-title">总结最近一趟旅程</h2>
               </div>
-              <button className="icon-action" onClick={() => setSummaryOpen(false)} aria-label="关闭总结">
+              <button className="icon-action" ref={summaryCloseRef} onClick={() => setSummaryOpen(false)} aria-label="关闭总结">
                 <X size={17} />
               </button>
             </div>
