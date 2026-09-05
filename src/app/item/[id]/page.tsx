@@ -19,6 +19,7 @@ import { CATEGORY_LABELS } from "@/lib/types";
 import type { Item } from "@/lib/types";
 import { formatDate, formatMonth } from "@/lib/format";
 import { recognizeResultSchema } from "@/lib/schema";
+import { usePageZoomLock } from "@/lib/use-page-zoom-lock";
 import styles from "./item-detail.module.css";
 
 const ITEM_LOADING = Symbol("item-loading");
@@ -26,6 +27,7 @@ const ITEM_LOADING = Symbol("item-loading");
 export default function ItemPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  usePageZoomLock({ onZoomOut: () => router.replace("/") });
   const id = params.id;
   const [seedReady, setSeedReady] = useState(false);
   const item = useLiveQuery(

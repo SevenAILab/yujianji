@@ -1,6 +1,7 @@
 .homeShell {
   overflow-x: hidden;
   padding: 0 0 118px;
+  touch-action: pan-x pan-y;
   background:
     radial-gradient(circle at 18% 6%, rgba(233, 173, 105, .08), transparent 24%),
     #f8f6ef;

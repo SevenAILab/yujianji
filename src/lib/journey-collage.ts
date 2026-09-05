@@ -31,7 +31,7 @@ export interface JourneyCollageData {
 }
 
 export const JOURNEY_COLLAGE_RULES = {
-  photoPresentation: "有明确人物或物体主体时按主体轮廓抠图；没有主体时保留完整照片，裁为正方形并使用拍立得相框。",
+  photoPresentation: "全部使用原始照片并沿用既有拍立得相框与拼贴位置，不再进行人物或物体抠图。",
   geography: "地图按旅程地点所属的一级行政区裁切；跨省旅程合并展示涉及区域，只显示真实陆地边界，不填充海面颜色。",
   route: "按地点时间顺序生成平滑曲线，路线可以被照片或便签遮挡。",
   locationPriority: "地点圆点与地点名称始终位于最高视觉层，不允许被地图、路线、照片或便签遮挡。",
@@ -40,5 +40,6 @@ export const JOURNEY_COLLAGE_RULES = {
 } as const;
 
 export function getPhotoPresentation(hasDetectedSubject: boolean): JourneyPhotoPresentation {
-  return hasDetectedSubject ? "subject" : "polaroid";
+  void hasDetectedSubject;
+  return "polaroid";
 }

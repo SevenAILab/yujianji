@@ -106,7 +106,7 @@ describe("map pins", () => {
     });
   });
 
-  it("hydrates three Shenzhen panorama bubbles with their own images and 360 flags", () => {
+  it("hydrates three Shenzhen panorama pin previews with their own images and 360 flags", () => {
     const items = [
       { ...shanghai, id: "shenzhen-studio", name: "创意空间", photo: "/studio.jpg", mediaKind: "panorama" as const, place: "中国 · 深圳", lat: 22.5431, lng: 114.0579, date: "2026-09-06T21:00:00+08:00" },
       { ...shanghai, id: "shenzhen-night", name: "夜巷", photo: "/night.jpg", mediaKind: "panorama" as const, place: "中国 · 深圳", lat: 22.5431, lng: 114.0579, date: "2026-09-06T20:30:00+08:00" },

@@ -65,7 +65,7 @@ export function JourneyCollageMap({ journey }: { journey: JourneyCollageData }) 
         return (
           <Link
             className={`map-photo-cutout ${presentation} ${photoSlots[index % photoSlots.length]} ${activeStopId === stop.id ? "active" : ""}`}
-            style={{ zIndex: activeStopId === stop.id ? 24 : 3 + (index % 12), translate: `${stackLevel * 5}px ${stackLevel * 4}px` }}
+            style={{ zIndex: activeStopId === stop.id ? 32 : 14 + (index % 12), translate: `${stackLevel * 5}px ${stackLevel * 4}px` }}
             key={`photo-${stop.id}`}
             href={`/item/${stop.itemId}`}
             aria-label={`打开${stop.place}的照片详情`}
@@ -77,16 +77,24 @@ export function JourneyCollageMap({ journey }: { journey: JourneyCollageData }) 
         );
       })}
 
-      {journey.stops.map((stop, index) => (
-        <button
-          className={`map-sticky-note ${noteSlots[index % noteSlots.length]} ${activeStopId === stop.id ? "active" : ""}`}
-          style={{ zIndex: activeStopId === stop.id ? 25 : 4 + (index % 12), translate: `${Math.floor(index / noteSlots.length) * -4}px ${Math.floor(index / noteSlots.length) * 5}px` }}
-          key={`note-${stop.id}`}
-          onClick={() => setActiveStopId(stop.id)}
-        >
-          <small>FIRST TIME · {stop.date}</small><strong>{stop.detail}</strong><p>{stop.note}</p>
-        </button>
-      ))}
+      {journey.stops.map((stop, index) => {
+        const slot = index % noteSlots.length;
+        const stackLevel = Math.floor(index / noteSlots.length);
+        const anchoredRight = slot === 0 || slot === 2 || slot === 4;
+        return (
+          <button
+            className={`map-sticky-note ${noteSlots[slot]} ${activeStopId === stop.id ? "active" : ""}`}
+            style={{
+              zIndex: activeStopId === stop.id ? 31 : 4 + (index % 10),
+              translate: `${stackLevel * (anchoredRight ? -54 : 54)}px ${stackLevel * 48}px`,
+            }}
+            key={`note-${stop.id}`}
+            onClick={() => setActiveStopId(stop.id)}
+          >
+            <small>FIRST TIME · {stop.date}</small><strong>{stop.detail}</strong><p>{stop.note}</p>
+          </button>
+        );
+      })}
 
       {map.points.map(([x, y], index) => {
         const stop = journey.stops[index];

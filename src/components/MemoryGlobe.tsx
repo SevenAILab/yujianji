@@ -75,7 +75,14 @@ const coastlines = mesh(world as never, world.objects.countries as never, (a, b)
 const countryBorders = mesh(world as never, world.objects.countries as never, (a, b) => a !== b);
 const palette = ["#e9ad69", "#79bd76", "#40aaa1", "#b7ca59"];
 const panoramaPinColor = "#5b8fc2";
-type Hover = { pin: MemoryGlobePin; location: MemoryGlobeLocation; x: number; y: number } | null;
+type PreviewItem = MemoryGlobeLocation["preview"][number];
+type Hover = {
+  pin: MemoryGlobePin;
+  location: MemoryGlobeLocation;
+  item: PreviewItem;
+  x: number;
+  y: number;
+} | null;
 
 export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
   const router = useRouter();
@@ -91,16 +98,7 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
   }
 
   function activateTarget(target: NonNullable<Hover>) {
-    const panoramaItemId = target.location.panoramaItemId;
-    if (target.location.hasPanorama && panoramaItemId) {
-      router.push(`/panorama/${panoramaItemId}`);
-      return;
-    }
-    router.push(`/item/${target.location.preview[0]?.id ?? target.location.itemIds[0]}`);
-  }
-
-  function activatePreview(item: MemoryGlobeLocation["preview"][number]) {
-    router.push(item.mediaKind === "panorama" ? `/panorama/${item.id}` : `/item/${item.id}`);
+    router.push(target.item.mediaKind === "panorama" ? `/panorama/${target.item.id}` : `/item/${target.item.id}`);
   }
 
   useEffect(() => {
@@ -116,7 +114,7 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
     let previous = performance.now(), hoverId = "", hoverVisibleUntil = 0, candidateId = "", moved = false;
     let zoom = 1, pinchStartDistance = 0, pinchStartZoom = 1;
     const activePointers = new Map<number, { x: number; y: number }>();
-    let hitTargets: Array<{ pin: MemoryGlobePin; location: MemoryGlobeLocation; x: number; y: number }> = [];
+    let hitTargets: Array<NonNullable<Hover>> = [];
     const projection = geoOrthographic().clipAngle(90).precision(0.4);
     const path = geoPath(projection, context);
 
@@ -168,6 +166,7 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
       }
 
       let nearest: Hover = null;
+      let nearestDistance = Number.POSITIVE_INFINITY;
 
       // Only regions derived from the GitHub seed records are filled.
       pins.forEach((pin, index) => {
@@ -204,40 +203,45 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
           if (!isFront(location.lng, location.lat)) return;
           const base = projection([location.lng, location.lat]);
           if (!base) return;
-          const color = location.hasPanorama
-            ? panoramaPinColor
-            : palette[(pinIndex + locationIndex) % palette.length];
           const isSeedPin = location.allSeed;
-          const markerHeight = 12 + Math.min(location.itemIds.length - 1, 2) * 2;
-          const centerX = base[0];
-          const centerY = base[1] - markerHeight;
-          context!.strokeStyle = isSeedPin
-            ? "rgba(40,137,125,.34)"
-            : "rgba(40,137,125,.78)";
-          context!.lineWidth = 0.9;
-          context!.beginPath();
-          context!.moveTo(base[0], base[1]);
-          context!.lineTo(centerX, centerY);
-          context!.stroke();
-          const pulse = Math.sin(timestamp / 520 + pinIndex + locationIndex);
-          context!.shadowColor = color;
-          context!.shadowBlur = (isSeedPin ? 9 : 13) + pulse * 2;
-          context!.fillStyle = isSeedPin ? `${color}d9` : color;
-          context!.beginPath(); context!.arc(centerX, centerY, isSeedPin ? 3.3 : 3.8, 0, Math.PI * 2); context!.fill();
-          context!.shadowBlur = 0;
-          if (location.hasPanorama) {
-            context!.strokeStyle = "rgba(255,253,247,.9)";
-            context!.lineWidth = 1;
-            context!.beginPath(); context!.arc(centerX, centerY, 5.8, 0, Math.PI * 2); context!.stroke();
-          }
-          context!.fillStyle = isSeedPin
-            ? "rgba(255,253,247,.7)"
-            : "rgba(255,253,247,.94)";
-          context!.beginPath(); context!.arc(centerX, centerY, 1.05, 0, Math.PI * 2); context!.fill();
-          hitTargets.push({ pin, location, x: centerX, y: centerY });
-          if (Math.hypot(pointerX - centerX, pointerY - centerY) < 15) {
-            nearest = { pin, location, x: centerX, y: centerY };
-          }
+          location.preview.slice(0, 3).forEach((item, itemIndex, visibleItems) => {
+            const spread = itemIndex - (visibleItems.length - 1) / 2;
+            const centerX = base[0] + spread * 8;
+            const centerY = base[1] - 13 - Math.abs(spread) * 2;
+            const color = item.mediaKind === "panorama"
+              ? panoramaPinColor
+              : palette[(pinIndex + locationIndex + itemIndex) % palette.length];
+            context!.strokeStyle = isSeedPin
+              ? "rgba(40,137,125,.34)"
+              : "rgba(40,137,125,.78)";
+            context!.lineWidth = 0.8;
+            context!.beginPath();
+            context!.moveTo(base[0], base[1]);
+            context!.lineTo(centerX, centerY);
+            context!.stroke();
+            const pulse = Math.sin(timestamp / 520 + pinIndex + locationIndex + itemIndex * 0.7);
+            context!.shadowColor = color;
+            context!.shadowBlur = (isSeedPin ? 8 : 12) + pulse * 2;
+            context!.fillStyle = isSeedPin ? `${color}d9` : color;
+            context!.beginPath(); context!.arc(centerX, centerY, isSeedPin ? 3.1 : 3.7, 0, Math.PI * 2); context!.fill();
+            context!.shadowBlur = 0;
+            if (item.mediaKind === "panorama") {
+              context!.strokeStyle = "rgba(255,253,247,.9)";
+              context!.lineWidth = 1;
+              context!.beginPath(); context!.arc(centerX, centerY, 5.5, 0, Math.PI * 2); context!.stroke();
+            }
+            context!.fillStyle = isSeedPin
+              ? "rgba(255,253,247,.7)"
+              : "rgba(255,253,247,.94)";
+            context!.beginPath(); context!.arc(centerX, centerY, 1, 0, Math.PI * 2); context!.fill();
+            const target = { pin, location, item, x: centerX, y: centerY };
+            hitTargets.push(target);
+            const distance = Math.hypot(pointerX - centerX, pointerY - centerY);
+            if (distance < 12 && distance < nearestDistance) {
+              nearestDistance = distance;
+              nearest = target;
+            }
+          });
         });
       });
 
@@ -250,11 +254,12 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
         context!.beginPath(); context!.arc(point[0], point[1], 4.5, 0, Math.PI * 2); context!.fill();
         if (Math.hypot(pointerX - point[0], pointerY - point[1]) < 20) {
           const location = pin.locations[0];
-          if (location) nearest = { pin, location, x: point[0], y: point[1] };
+          const item = location?.preview[0];
+          if (location && item) nearest = { pin, location, item, x: point[0], y: point[1] };
         }
       }
 
-      const nextId = nearest ? `${nearest.pin.id}:${nearest.location.id}` : "";
+      const nextId = nearest ? `${nearest.pin.id}:${nearest.location.id}:${nearest.item.id}` : "";
       if (nextId !== candidateId) {
         candidateId = nextId;
         if (nearest) {
@@ -273,17 +278,15 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
     function pointerDown(event: PointerEvent) {
       const bounds = canvas!.getBoundingClientRect();
       pointerX = event.clientX - bounds.left; pointerY = event.clientY - bounds.top;
-      const target = hitTargets.find((candidate) => Math.hypot(pointerX - candidate.x, pointerY - candidate.y) < 19);
+      const target = hitTargets
+        .map((candidate) => ({ candidate, distance: Math.hypot(pointerX - candidate.x, pointerY - candidate.y) }))
+        .filter(({ distance }) => distance < 15)
+        .sort((a, b) => a.distance - b.distance)[0]?.candidate;
       if (event.pointerType !== "mouse" && target) {
-        hoverId = `${target.pin.id}:${target.location.id}`;
+        hoverId = `${target.pin.id}:${target.location.id}:${target.item.id}`;
         candidateId = hoverId;
         hoverVisibleUntil = performance.now() + 3_000;
         showHover(target);
-        activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-        canvas!.setPointerCapture(event.pointerId);
-        dragging = false;
-        moved = false;
-        return;
       }
       activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
       canvas!.setPointerCapture(event.pointerId);
@@ -294,6 +297,11 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
         pinchStartZoom = zoom;
         dragging = false;
         moved = true;
+        return;
+      }
+      if (event.pointerType !== "mouse" && target) {
+        dragging = false;
+        moved = false;
         return;
       }
       dragging = true; moved = false; pressX = event.clientX; pressY = event.clientY;
@@ -363,34 +371,24 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
     <div ref={wrapRef} className={styles.globeWrap}>
       <canvas ref={canvasRef} style={{ display: "block", cursor: "grab", touchAction: "none" }} />
       <div className={styles.globeHint}>拖动旋转 · 双指缩放 · 悬停查看</div>
-      {hover
-        ? hover.location.preview.map((item, index, previews) => {
-            const center = (previews.length - 1) / 2;
-            const spread = index - center;
-            const x = hover.x + spread * 46;
-            const y = hover.y - 38 - Math.abs(spread) * 8;
-            const isPanorama = item.mediaKind === "panorama";
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => activatePreview(item)}
-                onWheel={(event) => {
-                  if (event.deltaY < 0) {
-                    event.preventDefault();
-                    activatePreview(item);
-                  }
-                }}
-                className={`${styles.photoBubble} ${isPanorama ? styles.panoramaBubble : ""}`}
-                style={{ left: x, top: y, animationDelay: `${index * 45}ms` }}
-                aria-label={isPanorama ? `展开${item.name}的360度全景` : `打开${item.name}的记录`}
-              >
-                <img src={item.photo || hover.location.coverPhoto} alt="" />
-                {isPanorama ? <span>360°</span> : <ArrowUpRight size={13} />}
-              </button>
-            );
-          })
-        : null}
+      {hover ? (
+        <button
+          type="button"
+          onClick={() => activateTarget(hover)}
+          onWheel={(event) => {
+            if (event.deltaY < 0) {
+              event.preventDefault();
+              activateTarget(hover);
+            }
+          }}
+          className={`${styles.photoBubble} ${hover.item.mediaKind === "panorama" ? styles.panoramaBubble : ""}`}
+          style={{ left: hover.x, top: hover.y - 38 }}
+          aria-label={hover.item.mediaKind === "panorama" ? `展开${hover.item.name}的360度全景` : `打开${hover.item.name}的记录`}
+        >
+          <img src={hover.item.photo || hover.location.coverPhoto} alt="" />
+          {hover.item.mediaKind === "panorama" ? <span>360°</span> : <ArrowUpRight size={13} />}
+        </button>
+      ) : null}
     </div>
   );
 }

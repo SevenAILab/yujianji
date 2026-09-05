@@ -18,17 +18,21 @@ import { MemoryGlobe, type MemoryGlobeApiPin, type MemoryGlobePin } from "@/comp
 import { db, ensureSeeded } from "@/lib/db";
 import { setPendingEncounterFile } from "@/lib/encounter-transfer";
 import { hydrateMapPins } from "@/lib/local-map-pins";
+import { usePageZoomLock } from "@/lib/use-page-zoom-lock";
 import type { Item } from "@/lib/types";
 import styles from "./home.module.css";
 
 export default function Home() {
   const router = useRouter();
+  usePageZoomLock();
   const [seedReady, setSeedReady] = useState(false);
   const [mapResetToken, setMapResetToken] = useState(0);
   const [mapPins, setMapPins] = useState<MemoryGlobePin[]>([]);
   const photoInputRef = useRef<HTMLInputElement>(null);
   const albumInputRef = useRef<HTMLInputElement>(null);
   const captureSliderRef = useRef<HTMLDivElement>(null);
+  const cameraLabelRef = useRef<HTMLLabelElement>(null);
+  const albumLabelRef = useRef<HTMLLabelElement>(null);
   const captureStartXRef = useRef(0);
   const captureDragRef = useRef(0);
   const captureDraggingRef = useRef(false);
@@ -66,8 +70,16 @@ export default function Home() {
     void beginFileEncounter(file, source);
   }
 
-  function captureSliderLimit() {
-    return 54;
+  function captureSliderBounds() {
+    const rail = captureSliderRef.current?.getBoundingClientRect();
+    const camera = cameraLabelRef.current?.getBoundingClientRect();
+    const album = albumLabelRef.current?.getBoundingClientRect();
+    if (!rail || !camera || !album) return { left: -54, right: 54 };
+    const railCenter = rail.left + rail.width / 2;
+    return {
+      left: camera.left + camera.width / 2 - railCenter,
+      right: album.left + album.width / 2 - railCenter,
+    };
   }
 
   function startCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
@@ -81,21 +93,22 @@ export default function Home() {
   function moveCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
     if (!captureDraggingRef.current) return;
     event.preventDefault();
-    const limit = captureSliderLimit();
-    const next = Math.max(-limit, Math.min(limit, event.clientX - captureStartXRef.current));
+    const bounds = captureSliderBounds();
+    const next = Math.max(bounds.left, Math.min(bounds.right, event.clientX - captureStartXRef.current));
     captureDragRef.current = next;
     setCaptureDrag(next);
   }
 
   function completeCaptureDrag(completedDrag: number) {
-    const limit = captureSliderLimit();
-    const threshold = limit * .58;
+    const bounds = captureSliderBounds();
+    const cameraThreshold = bounds.left * .78;
+    const albumThreshold = bounds.right * .78;
     captureDraggingRef.current = false;
     setCaptureDragging(false);
     setCaptureDrag(0);
     captureDragRef.current = 0;
-    if (completedDrag >= threshold) openFilePicker(albumInputRef.current);
-    if (completedDrag <= -threshold) openFilePicker(photoInputRef.current);
+    if (completedDrag >= albumThreshold) openFilePicker(albumInputRef.current);
+    if (completedDrag <= cameraThreshold) openFilePicker(photoInputRef.current);
   }
 
   function finishCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
@@ -211,10 +224,10 @@ export default function Home() {
             <div className={`${styles.captureSliderRail} ${captureDragging ? styles.active : ""}`} ref={captureSliderRef}>
               <span className={styles.captureSliderLine} />
               <div className={styles.captureSliderLabels}>
-                <label htmlFor="home-camera-input">
+                <label ref={cameraLabelRef} htmlFor="home-camera-input">
                   <Camera size={18} strokeWidth={1.7} />拍摄
                 </label>
-                <label htmlFor="home-album-input">
+                <label ref={albumLabelRef} htmlFor="home-album-input">
                   相册<ImagePlus size={17} strokeWidth={1.7} />
                 </label>
               </div>
@@ -226,7 +239,11 @@ export default function Home() {
                 aria-label="向左滑动拍摄，向右滑动打开相册"
                 aria-valuemin={-100}
                 aria-valuemax={100}
-                aria-valuenow={Math.round((captureDrag / captureSliderLimit()) * 100)}
+                aria-valuenow={Math.round(
+                  captureDrag < 0
+                    ? (captureDrag / Math.abs(captureSliderBounds().left)) * 100
+                    : (captureDrag / captureSliderBounds().right) * 100,
+                )}
                 onPointerDown={startCaptureDrag}
                 onPointerMove={moveCaptureDrag}
                 onPointerUp={finishCaptureDrag}
