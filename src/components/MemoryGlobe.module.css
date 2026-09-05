@@ -18,10 +18,12 @@
 }
 
 .photoBubble {
+  --bubble-base-size: 52px;
+  --globe-photo-scale: 1;
   position: absolute;
   z-index: 6;
-  width: 52px;
-  height: 52px;
+  width: calc(var(--bubble-base-size) * var(--globe-photo-scale));
+  height: calc(var(--bubble-base-size) * var(--globe-photo-scale));
   padding: 3px;
   overflow: visible;
   border: 2px solid rgba(255, 253, 247, .96);
@@ -65,6 +67,11 @@
 
 .panoramaBubble span { background: #5b8fc2; }
 
+.standardBubble {
+  pointer-events: none;
+  cursor: default;
+}
+
 @keyframes bubble-in {
   to { transform: translate(-50%, -50%) scale(1); }
 }
@@ -85,8 +92,7 @@
   }
 
   .photoBubble {
-    width: 46px;
-    height: 46px;
+    --bubble-base-size: 46px;
   }
 
 }

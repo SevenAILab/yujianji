@@ -1,7 +1,6 @@
 "use client";
 
 import { geoDistance, geoOrthographic, geoPath } from "d3-geo";
-import { ArrowUpRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { mesh } from "topojson-client";
@@ -75,6 +74,7 @@ const coastlines = mesh(world as never, world.objects.countries as never, (a, b)
 const countryBorders = mesh(world as never, world.objects.countries as never, (a, b) => a !== b);
 const palette = ["#e9ad69", "#79bd76", "#40aaa1", "#b7ca59"];
 const panoramaPinColor = "#5b8fc2";
+const MAX_GLOBE_ZOOM = 24;
 type PreviewItem = MemoryGlobeLocation["preview"][number];
 type Hover = {
   pin: MemoryGlobePin;
@@ -88,6 +88,7 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
   const router = useRouter();
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const bubbleElementRef = useRef<HTMLElement | null>(null);
   const [hover, setHover] = useState<Hover>(null);
   const hoverRef = useRef<Hover>(null);
   const zoomEntryLockRef = useRef(false);
@@ -98,7 +99,11 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
   }
 
   function activateTarget(target: NonNullable<Hover>) {
-    router.push(target.item.mediaKind === "panorama" ? `/panorama/${target.item.id}` : `/item/${target.item.id}`);
+    if (target.item.mediaKind === "panorama") router.push(`/panorama/${target.item.id}`);
+  }
+
+  function setBubbleElement(node: HTMLElement | null) {
+    bubbleElementRef.current = node;
   }
 
   useEffect(() => {
@@ -259,6 +264,25 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
         }
       }
 
+      // The preview is a DOM element, so keep it attached to the projected pin
+      // while the globe continues rotating and zooming.
+      const activeHover = hoverRef.current;
+      if (activeHover) {
+        const currentTarget = hitTargets.find((target) =>
+          target.location.id === activeHover.location.id && target.item.id === activeHover.item.id,
+        );
+        const bubble = bubbleElementRef.current;
+        if (currentTarget && bubble) {
+          bubble.style.left = `${currentTarget.x}px`;
+          bubble.style.top = `${currentTarget.y - 38}px`;
+          bubble.style.setProperty(
+            "--globe-photo-scale",
+            String(Math.min(3.2, Math.max(1, Math.sqrt(zoom)))),
+          );
+          hoverRef.current = currentTarget;
+        }
+      }
+
       const nextId = nearest ? `${nearest.pin.id}:${nearest.location.id}:${nearest.item.id}` : "";
       if (nextId !== candidateId) {
         candidateId = nextId;
@@ -318,9 +342,13 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
         if (!first || !second) return;
         const distance = Math.hypot(second.x - first.x, second.y - first.y);
         if (pinchStartDistance > 0) {
-          zoom = Math.max(0.72, Math.min(1.75, pinchStartZoom * distance / pinchStartDistance));
+          zoom = Math.max(0.42, Math.min(MAX_GLOBE_ZOOM, pinchStartZoom * distance / pinchStartDistance));
           if (zoom < 1.42) zoomEntryLockRef.current = false;
-          if (zoom >= 1.55 && hoverRef.current && !zoomEntryLockRef.current) {
+          if (
+            zoom >= 1.55 &&
+            hoverRef.current?.item.mediaKind === "panorama" &&
+            !zoomEntryLockRef.current
+          ) {
             zoomEntryLockRef.current = true;
             activateTarget(hoverRef.current);
           }
@@ -345,9 +373,13 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
     }
     function wheel(event: WheelEvent) {
       event.preventDefault();
-      zoom = Math.max(0.72, Math.min(1.75, zoom * Math.exp(-event.deltaY * 0.0012)));
+      zoom = Math.max(0.42, Math.min(MAX_GLOBE_ZOOM, zoom * Math.exp(-event.deltaY * 0.0015)));
       if (zoom < 1.42) zoomEntryLockRef.current = false;
-      if (zoom >= 1.55 && hoverRef.current && !zoomEntryLockRef.current) {
+      if (
+        zoom >= 1.55 &&
+        hoverRef.current?.item.mediaKind === "panorama" &&
+        !zoomEntryLockRef.current
+      ) {
         zoomEntryLockRef.current = true;
         activateTarget(hoverRef.current);
       }
@@ -371,8 +403,9 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
     <div ref={wrapRef} className={styles.globeWrap}>
       <canvas ref={canvasRef} style={{ display: "block", cursor: "grab", touchAction: "none" }} />
       <div className={styles.globeHint}>拖动旋转 · 双指缩放 · 悬停查看</div>
-      {hover ? (
+      {hover?.item.mediaKind === "panorama" ? (
         <button
+          ref={setBubbleElement}
           type="button"
           onClick={() => activateTarget(hover)}
           onWheel={(event) => {
@@ -381,13 +414,23 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
               activateTarget(hover);
             }
           }}
-          className={`${styles.photoBubble} ${hover.item.mediaKind === "panorama" ? styles.panoramaBubble : ""}`}
+          className={`${styles.photoBubble} ${styles.panoramaBubble}`}
           style={{ left: hover.x, top: hover.y - 38 }}
-          aria-label={hover.item.mediaKind === "panorama" ? `展开${hover.item.name}的360度全景` : `打开${hover.item.name}的记录`}
+          aria-label={`展开${hover.item.name}的360度全景`}
         >
           <img src={hover.item.photo || hover.location.coverPhoto} alt="" />
-          {hover.item.mediaKind === "panorama" ? <span>360°</span> : <ArrowUpRight size={13} />}
+          <span>360°</span>
         </button>
+      ) : hover ? (
+        <div
+          ref={setBubbleElement}
+          className={`${styles.photoBubble} ${styles.standardBubble}`}
+          style={{ left: hover.x, top: hover.y - 38 }}
+          role="img"
+          aria-label={`${hover.item.name}的地图缩略图`}
+        >
+          <img src={hover.item.photo || hover.location.coverPhoto} alt="" />
+        </div>
       ) : null}
     </div>
   );

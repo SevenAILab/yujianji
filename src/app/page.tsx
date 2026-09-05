@@ -36,8 +36,10 @@ export default function Home() {
   const captureStartXRef = useRef(0);
   const captureDragRef = useRef(0);
   const captureDraggingRef = useRef(false);
+  const captureTargetRef = useRef<"camera" | "album" | null>(null);
   const [captureDrag, setCaptureDrag] = useState(0);
   const [captureDragging, setCaptureDragging] = useState(false);
+  const [captureTarget, setCaptureTarget] = useState<"camera" | "album" | null>(null);
   const items = useLiveQuery(
     () => (seedReady ? db.items.orderBy("date").toArray() : Promise.resolve([] as Item[])),
     [seedReady],
@@ -82,21 +84,31 @@ export default function Home() {
     };
   }
 
-  function startCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
+  function setSliderTarget(target: "camera" | "album" | null) {
+    if (captureTargetRef.current === target) return;
+    captureTargetRef.current = target;
+    setCaptureTarget(target);
+  }
+
+  function startCaptureDrag(event: ReactPointerEvent<HTMLLabelElement>) {
     captureStartXRef.current = event.clientX;
     captureDragRef.current = 0;
     captureDraggingRef.current = true;
+    setSliderTarget(null);
+    event.currentTarget.htmlFor = "";
     setCaptureDragging(true);
     event.currentTarget.setPointerCapture(event.pointerId);
   }
 
-  function moveCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
+  function moveCaptureDrag(event: ReactPointerEvent<HTMLLabelElement>) {
     if (!captureDraggingRef.current) return;
-    event.preventDefault();
     const bounds = captureSliderBounds();
     const next = Math.max(bounds.left, Math.min(bounds.right, event.clientX - captureStartXRef.current));
     captureDragRef.current = next;
     setCaptureDrag(next);
+    if (next <= bounds.left * .78) setSliderTarget("camera");
+    else if (next >= bounds.right * .78) setSliderTarget("album");
+    else setSliderTarget(null);
   }
 
   function completeCaptureDrag(completedDrag: number) {
@@ -107,21 +119,32 @@ export default function Home() {
     setCaptureDragging(false);
     setCaptureDrag(0);
     captureDragRef.current = 0;
-    if (completedDrag >= albumThreshold) openFilePicker(albumInputRef.current);
-    if (completedDrag <= cameraThreshold) openFilePicker(photoInputRef.current);
+    const target = completedDrag >= albumThreshold
+      ? "album"
+      : completedDrag <= cameraThreshold
+        ? "camera"
+        : null;
+    setSliderTarget(target);
+    return target;
   }
 
-  function finishCaptureDrag(event: ReactPointerEvent<HTMLButtonElement>) {
+  function finishCaptureDrag(event: ReactPointerEvent<HTMLLabelElement>) {
     const completedDrag = captureDragRef.current;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
-    completeCaptureDrag(completedDrag);
+    const target = completeCaptureDrag(completedDrag);
+    event.currentTarget.htmlFor = target === "camera"
+      ? "home-camera-input"
+      : target === "album"
+        ? "home-album-input"
+        : "";
   }
 
   function cancelCaptureDrag() {
     captureDraggingRef.current = false;
     captureDragRef.current = 0;
+    setSliderTarget(null);
     setCaptureDragging(false);
     setCaptureDrag(0);
   }
@@ -231,11 +254,13 @@ export default function Home() {
                   相册<ImagePlus size={17} strokeWidth={1.7} />
                 </label>
               </div>
-              <button
+              <label
+                htmlFor={captureTarget === "camera" ? "home-camera-input" : captureTarget === "album" ? "home-album-input" : undefined}
                 className={`${styles.captureSliderThumb} ${captureDragging ? styles.dragging : ""}`}
                 style={{ transform: `translateX(${captureDrag}px)` }}
-                type="button"
                 role="slider"
+                tabIndex={0}
+                data-target={captureTarget ?? undefined}
                 aria-label="向左滑动拍摄，向右滑动打开相册"
                 aria-valuemin={-100}
                 aria-valuemax={100}
@@ -248,13 +273,20 @@ export default function Home() {
                 onPointerMove={moveCaptureDrag}
                 onPointerUp={finishCaptureDrag}
                 onPointerCancel={cancelCaptureDrag}
+                onClick={(event) => {
+                  if (!captureTargetRef.current) {
+                    event.preventDefault();
+                    return;
+                  }
+                  window.setTimeout(() => setSliderTarget(null), 0);
+                }}
                 onKeyDown={(event) => {
                   if (event.key === "ArrowLeft") openFilePicker(photoInputRef.current);
                   if (event.key === "ArrowRight") openFilePicker(albumInputRef.current);
                 }}
               >
                 <Plus size={24} strokeWidth={1.8} />
-              </button>
+              </label>
             </div>
             <p>左滑拍摄&nbsp;&nbsp;·&nbsp;&nbsp;右滑相册</p>
             <input
