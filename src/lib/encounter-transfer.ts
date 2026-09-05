@@ -1,4 +1,4 @@
-export type EncounterFileSource = "camera" | "album";
+export type EncounterFileSource = "camera" | "album" | "insta360";
 
 type PendingEncounterFile = {
   file: File;

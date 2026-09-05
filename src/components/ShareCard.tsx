@@ -1,10 +1,11 @@
 "use client";
 
-import { Download, Image as ImageIcon, Share2 } from "lucide-react";
+import { Download, Image as ImageIcon, Link2, Share2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { Item } from "@/lib/types";
 import { CATEGORY_LABELS } from "@/lib/types";
 import { formatDate } from "@/lib/format";
+import { buildSharePayload, buildShareUrl } from "@/lib/share";
 
 const CARD_WIDTH = 1080;
 const CARD_HEIGHT = 1920;
@@ -135,6 +136,8 @@ export function ShareCard({ item }: { item: Item }) {
   const [previewUrl, setPreviewUrl] = useState("");
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
+  const [linking, setLinking] = useState(false);
+  const [linkStatus, setLinkStatus] = useState("");
   const fileName = useMemo(
     () => `yujianji-${item.id.slice(0, 18)}.png`,
     [item.id],
@@ -195,6 +198,47 @@ export function ShareCard({ item }: { item: Item }) {
     }
   }
 
+  async function getShareUrl() {
+    const payload = await buildSharePayload(item);
+    return buildShareUrl(payload);
+  }
+
+  async function copyLink() {
+    setLinking(true);
+    setLinkStatus("");
+    try {
+      const url = await getShareUrl();
+      await navigator.clipboard.writeText(url);
+      setLinkStatus("网页分享链接已复制，可发给朋友");
+    } catch {
+      setLinkStatus("浏览器未允许自动复制，请改用系统分享");
+    } finally {
+      setLinking(false);
+    }
+  }
+
+  async function shareLink() {
+    setLinking(true);
+    setLinkStatus("");
+    try {
+      const url = await getShareUrl();
+      if (!navigator.share) {
+        await copyLink();
+        return;
+      }
+      await navigator.share({
+        title: item.name,
+        text: item.ai?.memorySentence ?? "一起看我的遇见",
+        url,
+      });
+      setLinkStatus("已打开系统分享");
+    } catch {
+      setLinkStatus("已取消分享，链接仍可复制");
+    } finally {
+      setLinking(false);
+    }
+  }
+
   return (
     <section className="share-card-panel surface">
       <div className="section-heading compact">
@@ -228,8 +272,17 @@ export function ShareCard({ item }: { item: Item }) {
             </button>
           </>
         ) : null}
+        <button className="secondary-action" onClick={() => void copyLink()} disabled={linking}>
+          <Link2 size={16} />
+          复制网页
+        </button>
+        <button className="secondary-action" onClick={() => void shareLink()} disabled={linking}>
+          <Share2 size={16} />
+          分享链接
+        </button>
       </div>
       {status ? <p className="share-status">{status}</p> : null}
+      {linkStatus ? <p className="share-status">{linkStatus}</p> : null}
     </section>
   );
 }

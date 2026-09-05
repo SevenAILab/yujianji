@@ -209,7 +209,7 @@ export default function EncounterPage() {
       setPreview(compressed);
       setCapturedAt(captured.date);
       setDateSource(captured.source);
-      if (source === "album") {
+      if (source === "album" || source === "insta360") {
         setGeocodeLoading(true);
         const photoPosition = await readImageLocation(file);
         if (photoPosition) {
