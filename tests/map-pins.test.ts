@@ -84,3 +84,41 @@ describe("map pins", () => {
     expect(pins[0].itemIds).toEqual(["with-coordinates"]);
   });
 });
+
+describe("示例数据钉子", () => {
+  const base = {
+    id: "seed-1",
+    name: "粉色叶子",
+    place: "浙江 · 莫干山",
+    country: "CHN",
+    lat: 30.61,
+    lng: 119.9,
+    date: "2025-10-12T16:32:00+08:00",
+    userNote: "",
+    isSeed: true,
+  };
+
+  it("整组都是示例时 allSeed 为 true", () => {
+    const input = mapPinsRequestSchema.parse({
+      items: [base, { ...base, id: "seed-2", date: "2024-05-01T10:00:00+08:00" }],
+    });
+    const [pin] = buildMapPins(input);
+    expect(pin.allSeed).toBe(true);
+    expect(pin.locations.every((location) => location.allSeed)).toBe(true);
+  });
+
+  it("只要混进一条用户自己的记录就不算示例", () => {
+    const input = mapPinsRequestSchema.parse({
+      items: [base, { ...base, id: "mine-1", isSeed: false, date: "2026-09-05T10:00:00+08:00" }],
+    });
+    const [pin] = buildMapPins(input);
+    expect(pin.allSeed).toBe(false);
+  });
+
+  it("缺省 isSeed 时按用户记录处理，不会被误标成示例", () => {
+    const { isSeed: _drop, ...withoutFlag } = base;
+    const input = mapPinsRequestSchema.parse({ items: [withoutFlag] });
+    const [pin] = buildMapPins(input);
+    expect(pin.allSeed).toBe(false);
+  });
+});

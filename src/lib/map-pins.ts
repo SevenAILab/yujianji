@@ -18,6 +18,7 @@ export const mapPinSourceSchema = z.object({
   date: z.string().min(1).max(40),
   name: z.string().min(1).max(80),
   userNote: z.string().max(300).default(""),
+  isSeed: z.boolean().default(false),
 });
 
 export const mapPinsRequestSchema = z.object({
@@ -63,6 +64,8 @@ export interface MapPin {
       itemIds: string[];
       coverItemId: string;
       latestDate: string;
+      /** 该地点下全部是示例数据——地图上用浅色画，和用户自己的记录区分开。 */
+      allSeed: boolean;
       preview: Array<{
         id: string;
         name: string;
@@ -71,6 +74,8 @@ export interface MapPin {
       }>;
     }
   >;
+  /** 该钉子下全部是示例数据。只要有一条是用户自己拍的，就不算示例。 */
+  allSeed: boolean;
   memoryCount: number;
   itemIds: string[];
   coverItemId: string;
@@ -166,6 +171,7 @@ export function buildMapPins(input: MapPinsRequest): MapPin[] {
           itemIds: locationOrdered.map((item) => item.id),
           coverItemId: latest.id,
           latestDate: latest.date,
+          allSeed: locationOrdered.every((item) => item.isSeed),
           preview: locationOrdered.slice(0, 3).map((item) => ({
             id: item.id,
             name: item.name,
@@ -192,6 +198,7 @@ export function buildMapPins(input: MapPinsRequest): MapPin[] {
           geometry: region.geometry,
         } : null,
         locations,
+        allSeed: ordered.every((item) => item.isSeed),
         memoryCount: ordered.length,
         itemIds: ordered.map((item) => item.id),
         coverItemId: anchor.id,

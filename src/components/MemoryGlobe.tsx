@@ -20,6 +20,7 @@ export interface MemoryGlobeLocation {
   coverItemId: string;
   coverPhoto: string;
   latestDate: string;
+  allSeed: boolean;
   preview: Array<{ id: string; name: string; date: string; note: string }>;
 }
 
@@ -28,6 +29,7 @@ export interface MemoryGlobePin {
   location: { id: string; name: string; country: string; lat: number; lng: number };
   region: { id: string; name: string; country: string; center: [number, number]; geometry: Geometry } | null;
   locations: MemoryGlobeLocation[];
+  allSeed: boolean;
   memoryCount: number;
   coverPhoto: string;
   latestDate: string;
@@ -131,12 +133,13 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
         context!.beginPath();
         path({ type: "Feature", properties: {}, geometry: pin.region.geometry } as never);
         context!.shadowColor = color;
-        context!.shadowBlur = 9;
-        context!.fillStyle = `${color}d4`;
+        // 示例数据画得更淡，让用户自己的记录一眼跳出来
+        context!.shadowBlur = pin.allSeed ? 3 : 9;
+        context!.fillStyle = `${color}${pin.allSeed ? "4d" : "d4"}`;
         context!.fill();
         context!.shadowBlur = 0;
-        context!.strokeStyle = color;
-        context!.lineWidth = 1.15;
+        context!.strokeStyle = pin.allSeed ? `${color}80` : color;
+        context!.lineWidth = pin.allSeed ? 0.8 : 1.15;
         context!.stroke();
       });
 
@@ -159,21 +162,29 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
           const base = projection([location.lng, location.lat]);
           if (!base) return;
           const color = palette[(pinIndex + locationIndex) % palette.length];
+          const isSeedPin = location.allSeed;
           const markerHeight = 12 + Math.min(location.itemIds.length - 1, 2) * 2;
           const centerX = base[0];
           const centerY = base[1] - markerHeight;
-          context!.strokeStyle = "rgba(40,137,125,.78)";
+          context!.strokeStyle = isSeedPin
+            ? "rgba(40,137,125,.34)"
+            : "rgba(40,137,125,.78)";
           context!.lineWidth = 0.9;
           context!.beginPath();
           context!.moveTo(base[0], base[1]);
           context!.lineTo(centerX, centerY);
           context!.stroke();
           context!.shadowColor = color;
-          context!.shadowBlur = 10 + Math.sin(timestamp / 520 + pinIndex + locationIndex) * 1.5;
-          context!.fillStyle = color;
-          context!.beginPath(); context!.arc(centerX, centerY, 3.4, 0, Math.PI * 2); context!.fill();
+          // 示例钉子不做呼吸光晕，视觉上退到背景里
+          context!.shadowBlur = isSeedPin
+            ? 0
+            : 10 + Math.sin(timestamp / 520 + pinIndex + locationIndex) * 1.5;
+          context!.fillStyle = isSeedPin ? `${color}66` : color;
+          context!.beginPath(); context!.arc(centerX, centerY, isSeedPin ? 2.9 : 3.4, 0, Math.PI * 2); context!.fill();
           context!.shadowBlur = 0;
-          context!.fillStyle = "rgba(255,253,247,.94)";
+          context!.fillStyle = isSeedPin
+            ? "rgba(255,253,247,.7)"
+            : "rgba(255,253,247,.94)";
           context!.beginPath(); context!.arc(centerX, centerY, 1.05, 0, Math.PI * 2); context!.fill();
           hitTargets.push({ pin, location, x: centerX, y: centerY });
           if (Math.hypot(pointerX - centerX, pointerY - centerY) < 15) {
@@ -258,6 +269,14 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
     <div ref={wrapRef} style={{ position: "relative", width: "100%", height: "clamp(360px, 74vw, 610px)", overflow: "hidden", borderRadius: 24, border: "1px solid rgba(44,130,120,.18)", background: "#f7f5ed" }}>
       <canvas ref={canvasRef} style={{ display: "block", cursor: "grab", touchAction: "none" }} />
       <div style={{ position: "absolute", left: 18, top: 16, color: "#568078", fontSize: 12, letterSpacing: ".14em" }}>拖动旋转 · 悬停大头针</div>
+      {pins.some((pin) => pin.allSeed) ? (
+        <div
+          style={{ position: "absolute", left: 18, bottom: 14, display: "flex", alignItems: "center", gap: 6, color: "#7d9a93", fontSize: 11 }}
+        >
+          <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#40aaa1", opacity: 0.4 }} />
+          浅色 = 示例数据
+        </div>
+      ) : null}
       {hover ? (
         <button
           type="button"
