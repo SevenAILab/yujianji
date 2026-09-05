@@ -26,10 +26,11 @@ import {
 } from "@/lib/av";
 import { detectCountryFromPosition } from "@/lib/country";
 import { compressImage } from "@/lib/image";
+import { readImageCapturedDate } from "@/lib/image-date";
 import { readImageLocation } from "@/lib/image-location";
 import { getPosition, type Position, type PositionFailure } from "@/lib/geo";
 import { toHistoryEntry } from "@/lib/history";
-import { CATEGORY_OPTIONS, type Category, type Item, type LocationSource, type PlaceSource, type RecognizedAi } from "@/lib/types";
+import { CATEGORY_OPTIONS, type Category, type DateSource, type Item, type LocationSource, type PlaceSource, type RecognizedAi } from "@/lib/types";
 import { avResponseSchema, recognizeResultSchema } from "@/lib/schema";
 import styles from "./encounter.module.css";
 
@@ -102,6 +103,8 @@ export default function EncounterPage() {
   const router = useRouter();
   const [preview, setPreview] = useState("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [capturedAt, setCapturedAt] = useState(() => new Date().toISOString());
+  const [dateSource, setDateSource] = useState<DateSource>("imported");
   const [avDraft, setAvDraft] = useState<AvDraft | null>(null);
   const [textMode, setTextMode] = useState(false);
   const [userNote, setUserNote] = useState("");
@@ -243,7 +246,13 @@ export default function EncounterPage() {
     }
     setVideoFile(null);
     try {
-      setPreview(await compressImage(file));
+      const [compressed, captured] = await Promise.all([
+        compressImage(file),
+        readImageCapturedDate(file),
+      ]);
+      setPreview(compressed);
+      setCapturedAt(captured.date);
+      setDateSource(captured.source);
       if (source === "album") {
         setGeocodeLoading(true);
         const photoPosition = await readImageLocation(file);
@@ -352,8 +361,8 @@ export default function EncounterPage() {
         lng: location.position.lng,
         locationSource: location.source,
         placeSource: placeSourceFor(location.source),
-        date: now,
-        dateSource: "imported",
+        date: capturedAt,
+        dateSource,
         userNote: userNote.trim(),
         ai: {
           cognition: result.cognition,
@@ -438,6 +447,18 @@ export default function EncounterPage() {
           file.lastModified,
           place,
           extracted.truncated,
+          location
+            ? {
+                place: place.trim() || "位置已记录",
+                country:
+                  country ||
+                  detectCountryFromPosition(location.position.lat, location.position.lng) ||
+                  "UNK",
+                lat: location.position.lat,
+                lng: location.position.lng,
+                source: location.source,
+              }
+            : null,
         ),
       );
     } catch (caught) {
@@ -478,8 +499,8 @@ export default function EncounterPage() {
         lng: location.position.lng,
         locationSource: location.source,
         placeSource: placeSourceFor(location.source),
-        dateSource: "imported",
-        date: now,
+        dateSource,
+        date: capturedAt,
         userNote: userNote.trim(),
         ai: null,
         isSeed: false,

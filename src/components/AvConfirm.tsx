@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { db } from "@/lib/db";
 import type { AvDraft } from "@/lib/av-draft";
-import { COUNTRY_OPTIONS, countryName } from "@/lib/iso";
 import type { Item, RecognizedAi } from "@/lib/types";
 
 type EditableSegment = AvDraft["segments"][number] & {
@@ -30,11 +29,11 @@ export function AvConfirm({
       saveAsFirst: false,
     })),
   );
-  const [place, setPlace] = useState(draft.initialPlace);
-  const [country, setCountry] = useState(draft.initialCountry);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const selectedCount = segments.filter((segment) => segment.selected).length;
+  const place = draft.initialPlace || draft.coordinate?.place || "位置已记录";
+  const country = draft.initialCountry || draft.coordinate?.country || "UNK";
   const relatedById = useMemo(
     () => new Map(history.map((item) => [item.id, item])),
     [history],
@@ -60,23 +59,11 @@ export function AvConfirm({
       setError("至少保留一张卡片，或者返回重新选择视频。");
       return;
     }
-    if (!place.trim() || !country) {
-      setError("保存前请确认共同地点和国家。");
-      return;
-    }
     if (chosen.some((segment) => !segment.name.trim())) {
       setError("请为每张要保存的卡片填写名称。");
       return;
     }
 
-    const coordinateMatches =
-      draft.coordinate &&
-      draft.coordinate.place === place.trim() &&
-      draft.coordinate.country === country;
-    const placeSource =
-      place.trim() === draft.initialPlace
-        ? draft.initialPlaceSource
-        : ("manual" as const);
     const now = new Date().toISOString();
     const records: Item[] = chosen.map((segment) => {
       const verdict = segment.saveAsFirst ? "first" : segment.verdict;
@@ -110,14 +97,12 @@ export function AvConfirm({
         nameEn: segment.nameEn,
         category: segment.category,
         photo: draft.frames[segment.frameIndex].dataUrl,
-        place: place.trim(),
+        place,
         country,
-        lat: coordinateMatches ? draft.coordinate?.lat ?? null : null,
-        lng: coordinateMatches ? draft.coordinate?.lng ?? null : null,
-        locationSource: coordinateMatches
-          ? draft.coordinate?.source ?? "manual"
-          : "manual",
-        placeSource,
+        lat: draft.coordinate?.lat ?? null,
+        lng: draft.coordinate?.lng ?? null,
+        locationSource: draft.coordinate?.source ?? "manual",
+        placeSource: draft.initialPlaceSource,
         date: draft.capturedAt,
         dateSource: draft.dateSource,
         userNote: "",
@@ -173,48 +158,19 @@ export function AvConfirm({
         </header>
 
         <section className="form-card surface">
-          <p className="eyebrow">共同地点</p>
+          <p className="eyebrow">自动记录</p>
           {draft.truncated ? (
             <div className="status-note warning" role="status">
               <CircleAlert size={15} />
               <span>这段视频较长，只处理了前 60 秒；原视频不会保存。</span>
             </div>
           ) : null}
-          <div className="field-row">
-            <div className="field">
-              <label htmlFor="av-place">地点</label>
-              <input
-                id="av-place"
-                value={place}
-                onChange={(event) => setPlace(event.target.value)}
-                maxLength={120}
-                placeholder="比如：浙江 · 莫干山"
-              />
-            </div>
-            <div className="field">
-              <label htmlFor="av-country">国家</label>
-              <select
-                id="av-country"
-                value={country}
-                onChange={(event) => setCountry(event.target.value)}
-              >
-                <option value="">请选择</option>
-                <option value="UNK">位置未定</option>
-                {COUNTRY_OPTIONS.map(([value, label]) => (
-                  <option value={value} key={value}>{label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div className="status-note" style={{ marginTop: 12 }}>
+          <div className="status-note">
             <MapPin size={15} />
             <span>
-              {draft.initialPlaceSource === "voice"
-                ? "地点文字来自你在视频里说的话，请确认后保存。"
-                : "视频没有 GPS，地点暂沿用最近一条藏品，请确认。"}
               {draft.coordinate
-                ? ` 与“${draft.coordinate.place}”一致时会沿用其已确认坐标（${countryName(draft.coordinate.country)}）。`
-                : " 当前没有可信坐标，保存后不会在地图上显示虚假的 pin。"}
+                ? `已自动记录 ${place}，保存后会同步到地图与旅程。`
+                : "当前没有可用坐标，这次记录不会生成错误的地图位置。"}
             </span>
           </div>
         </section>

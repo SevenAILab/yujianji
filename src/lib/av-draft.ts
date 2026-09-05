@@ -61,6 +61,7 @@ export function createAvDraft(
   fileLastModified: number,
   placeFallback = "",
   truncated = false,
+  detectedLocation: AvCoordinate | null = null,
 ): AvDraft {
   const previous = [...history].sort((a, b) => b.date.localeCompare(a.date))[0];
   const placeHint = result.placeHint?.trim() ?? "";
@@ -76,7 +77,7 @@ export function createAvDraft(
           previous.locationSource !== "manual"
         ? previous
         : undefined;
-  const coordinate =
+  const coordinate = detectedLocation ?? (
     matched?.lat !== null &&
     matched?.lat !== undefined &&
     matched.lng !== null &&
@@ -88,7 +89,8 @@ export function createAvDraft(
           lng: matched.lng,
           source: "previous" as const,
         }
-      : null;
+      : null
+  );
   const capturedAt =
     Number.isFinite(fileLastModified) && fileLastModified > 0
       ? new Date(fileLastModified).toISOString()
@@ -100,17 +102,23 @@ export function createAvDraft(
       ...segment,
       occurrenceId: nanoid(),
     })),
-    initialPlace: placeHint || fallbackPlace || previous?.place || "",
-    initialPlaceSource: placeHint
-      ? "voice"
-      : fallbackPlace
-        ? previous && normalizedPlace(fallbackPlace) === normalizedPlace(previous.place)
-          ? "previous"
-          : "manual"
-        : previous
-          ? "previous"
-          : "manual",
-    initialCountry: matched?.country === "UNK" ? "" : matched?.country ?? "",
+    initialPlace: detectedLocation?.place || placeHint || fallbackPlace || previous?.place || "",
+    initialPlaceSource: detectedLocation
+      ? detectedLocation.source
+      : placeHint
+        ? "voice"
+        : fallbackPlace
+          ? previous && normalizedPlace(fallbackPlace) === normalizedPlace(previous.place)
+            ? "previous"
+            : "manual"
+          : previous
+            ? "previous"
+            : "manual",
+    initialCountry: detectedLocation
+      ? detectedLocation.country
+      : matched?.country === "UNK"
+        ? ""
+        : matched?.country ?? "",
     coordinate,
     capturedAt,
     dateSource:
