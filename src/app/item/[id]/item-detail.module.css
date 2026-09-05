@@ -71,6 +71,66 @@
   font-size: 11px;
 }
 
+.missingLocationButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 26px;
+  padding: 2px 8px;
+  border: 1px dashed rgba(35, 133, 123, .36);
+  border-radius: 999px;
+  background: rgba(225, 238, 232, .74);
+  color: #23857b;
+  font: inherit;
+  cursor: pointer;
+}
+
+.locationEditor {
+  display: flex;
+  gap: 8px;
+  margin-top: 11px;
+}
+
+.locationEditor input {
+  min-width: 0;
+  flex: 1;
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid #d5e4de;
+  border-radius: 13px;
+  outline: none;
+  background: rgba(255, 255, 255, .72);
+  color: #175e5d;
+  font: inherit;
+}
+
+.locationEditor input:focus {
+  border-color: #83bdb4;
+  box-shadow: 0 0 0 3px rgba(131, 189, 180, .16);
+}
+
+.locationEditor button {
+  min-width: 64px;
+  border: 0;
+  border-radius: 13px;
+  background: #83bdb4;
+  color: #075e60;
+  font-family: var(--serif);
+  cursor: pointer;
+}
+
+.locationEditor button:disabled {
+  opacity: .62;
+  cursor: wait;
+}
+
+.locationError {
+  margin: 7px 2px 0;
+  color: #a7604d;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
 .itemShell :global(.badge) {
   border-radius: 999px;
   background: #e1eee8;

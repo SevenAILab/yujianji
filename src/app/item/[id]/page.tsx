@@ -45,6 +45,10 @@ export default function ItemPage() {
   const [savedAnswer, setSavedAnswer] = useState(false);
   const [actionError, setActionError] = useState("");
   const [redeveloping, setRedeveloping] = useState(false);
+  const [editingLocation, setEditingLocation] = useState(false);
+  const [manualPlace, setManualPlace] = useState("");
+  const [savingLocation, setSavingLocation] = useState(false);
+  const [locationError, setLocationError] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -105,6 +109,59 @@ export default function ItemPage() {
       router.push("/");
     } catch {
       setActionError("删除暂时没有完成，请重试。");
+    }
+  }
+
+  async function saveLocation() {
+    const enteredPlace = manualPlace.trim();
+    if (savingLocation) return;
+    if (enteredPlace.length < 2) {
+      setLocationError("请至少输入两个字的城市或地点名称。");
+      return;
+    }
+    setSavingLocation(true);
+    setLocationError("");
+    try {
+      const response = await fetch("/api/geocode", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ place: enteredPlace }),
+      });
+      const result = (await response.json()) as {
+        found?: boolean;
+        lat?: number;
+        lng?: number;
+        country?: string;
+        code?: string;
+      };
+      if (!response.ok) {
+        throw new Error(
+          result.code === "GEOCODER_UNAVAILABLE"
+            ? "地点服务暂时不可用，请稍后再试。"
+            : "地点暂时无法解析，请稍后再试。",
+        );
+      }
+      if (
+        !result.found ||
+        typeof result.lat !== "number" ||
+        typeof result.lng !== "number"
+      ) {
+        throw new Error("没有找到这个地点，请补充城市、省份或国家后再试。");
+      }
+      await db.items.update(currentItem.id, {
+        place: enteredPlace,
+        country: result.country || "UNK",
+        lat: result.lat,
+        lng: result.lng,
+        locationSource: "manual",
+        placeSource: "manual",
+      });
+      setEditingLocation(false);
+      setManualPlace("");
+    } catch (error) {
+      setLocationError(error instanceof Error ? error.message : "地点暂时没有保存成功，请重试。");
+    } finally {
+      setSavingLocation(false);
     }
   }
 
@@ -176,10 +233,43 @@ export default function ItemPage() {
           <div>
             <h1>{currentItem.name}</h1>
             <div className="detail-meta">
-              <span><MapPin size={13} /> {currentItem.place}</span>
+              {currentItem.lat === null || currentItem.lng === null ? (
+                <button
+                  className={styles.missingLocationButton}
+                  onClick={() => {
+                    setEditingLocation((value) => !value);
+                    setLocationError("");
+                  }}
+                  aria-label="补充地点"
+                >
+                  <MapPin size={13} /> ?
+                </button>
+              ) : (
+                <span><MapPin size={13} /> {currentItem.place}</span>
+              )}
               <span>{formatDate(currentItem.date)}</span>
               <span>{CATEGORY_LABELS[currentItem.category]}</span>
             </div>
+            {editingLocation ? (
+              <div className={styles.locationEditor}>
+                <input
+                  value={manualPlace}
+                  onChange={(event) => setManualPlace(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") void saveLocation();
+                  }}
+                  placeholder="输入城市或地点，例如：福州"
+                  maxLength={120}
+                  autoFocus
+                />
+                <button onClick={() => void saveLocation()} disabled={savingLocation}>
+                  {savingLocation ? "查找中" : "保存"}
+                </button>
+              </div>
+            ) : null}
+            {editingLocation && locationError ? (
+              <p className={styles.locationError}>{locationError}</p>
+            ) : null}
           </div>
           {currentItem.isSeed ? <span className="badge">示例数据</span> : null}
         </div>
@@ -266,8 +356,8 @@ export default function ItemPage() {
                     ? "地图坐标沿用了同地点的已确认藏品。"
                     : currentItem.locationSource === "default"
                       ? "未获取定位，暂以深圳记录。"
-                      : currentItem.lat === null || currentItem.lng === null
-                        ? "没有可信拍摄坐标，这条记录不会显示地图 pin。"
+                    : currentItem.locationSource === "unavailable" || currentItem.lat === null || currentItem.lng === null
+                        ? "地点还没有补充，因此暂不显示地图 pin。点击上方的问号可手动填写。"
                         : "地点由你手动填写。"}
                 </span>
               </div>

@@ -35,29 +35,27 @@ export function TextEncounter({
       setError("先写下一点此刻想记住的事。");
       return;
     }
-    if (!coordinate) {
-      setError("正在识别当前位置，请稍候再保存。");
-      return;
-    }
     setSaving(true);
     setError("");
     const now = new Date().toISOString();
     const title = note.trim().replace(/\s+/g, " ").slice(0, 22);
-    const placeSource: PlaceSource = coordinate.source === "gps"
-      ? "gps"
-      : coordinate.source === "exif"
-        ? "exif"
-        : coordinate.source;
+    const placeSource: PlaceSource = coordinate
+      ? coordinate.source === "gps"
+        ? "gps"
+        : coordinate.source === "exif"
+          ? "exif"
+          : coordinate.source
+      : "unavailable";
     const item: Item = {
       id: nanoid(),
       name: title || "一段旅行心事",
       category: "other",
       photo: createTextCardDataUrl(note),
-      place: initialPlace.trim() || "位置已记录",
-      country: initialCountry || "UNK",
-      lat: coordinate.lat,
-      lng: coordinate.lng,
-      locationSource: coordinate.source,
+      place: coordinate ? initialPlace.trim() || "当前位置" : "?",
+      country: coordinate ? initialCountry || "UNK" : "UNK",
+      lat: coordinate?.lat ?? null,
+      lng: coordinate?.lng ?? null,
+      locationSource: coordinate?.source ?? "unavailable",
       placeSource,
       date: now,
       dateSource: "imported",
@@ -103,7 +101,7 @@ export function TextEncounter({
             </div>
             <div className={styles.autoLocation}>
               <MapPin size={13} />
-              <span>{coordinate ? `自动记录于 ${initialPlace || "当前位置"}` : "正在识别当前位置…"}</span>
+              <span>{coordinate ? `自动记录于 ${initialPlace || "当前位置"}` : "地点待补充，可在详情页手动填写"}</span>
             </div>
           </section>
 
@@ -111,7 +109,7 @@ export function TextEncounter({
           <button
             className="primary-action"
             onClick={() => void save()}
-            disabled={saving || !coordinate}
+            disabled={saving}
           >
             <Check size={18} />
             {saving ? "正在保存…" : "保存文字记录"}

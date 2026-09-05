@@ -277,7 +277,9 @@ export default function Home() {
   const stats = useMemo(() => {
     const firsts = items.filter((item) => item.ai?.verdict === "first");
     const locations = new Set(
-      items.map((item) => `${item.country}:${item.place.trim()}:${item.lat ?? ""}:${item.lng ?? ""}`),
+      items
+        .filter((item) => item.lat !== null && item.lng !== null)
+        .map((item) => `${item.country}:${item.place.trim()}:${item.lat}:${item.lng}`),
     );
     return {
       discovered: items.length,

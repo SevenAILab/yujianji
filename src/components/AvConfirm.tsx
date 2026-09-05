@@ -32,7 +32,7 @@ export function AvConfirm({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const selectedCount = segments.filter((segment) => segment.selected).length;
-  const place = draft.initialPlace || draft.coordinate?.place || "位置已记录";
+  const place = draft.initialPlace || draft.coordinate?.place || "?";
   const country = draft.initialCountry || draft.coordinate?.country || "UNK";
   const relatedById = useMemo(
     () => new Map(history.map((item) => [item.id, item])),
@@ -101,7 +101,7 @@ export function AvConfirm({
         country,
         lat: draft.coordinate?.lat ?? null,
         lng: draft.coordinate?.lng ?? null,
-        locationSource: draft.coordinate?.source ?? "manual",
+        locationSource: draft.coordinate?.source ?? "unavailable",
         placeSource: draft.initialPlaceSource,
         date: draft.capturedAt,
         dateSource: draft.dateSource,
