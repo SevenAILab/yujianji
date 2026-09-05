@@ -424,6 +424,32 @@ img {
   color: var(--teal-dark);
 }
 
+@media (max-width: 560px) {
+  .bottom-nav {
+    right: auto !important;
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    left: 50% !important;
+    width: min(68vw, 360px) !important;
+    padding: 6px 9px !important;
+    border-width: 1px !important;
+    border-radius: 22px !important;
+    transform: translateX(-50%);
+  }
+
+  .bottom-nav a {
+    min-width: 0 !important;
+    gap: 3px !important;
+    padding: 5px 3px !important;
+    font-size: 11px !important;
+  }
+
+  .bottom-nav a.active svg {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 6px !important;
+  }
+}
+
 .form-stack,
 .content-stack {
   display: grid;
@@ -739,7 +765,11 @@ img {
 }
 
 .file-input {
-  display: none;
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .photo-preview,

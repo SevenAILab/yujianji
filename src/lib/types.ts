@@ -13,7 +13,8 @@ export type LocationSource =
   | "exif"
   | "previous"
   | "default"
-  | "manual";
+  | "manual"
+  | "unavailable";
 
 export type PlaceSource =
   | "voice"
@@ -21,7 +22,8 @@ export type PlaceSource =
   | "manual"
   | "previous"
   | "default"
-  | "gps";
+  | "gps"
+  | "unavailable";
 
 export type DateSource = "exif" | "fileModified" | "imported";
 

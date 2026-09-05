@@ -28,7 +28,7 @@ import { detectCountryFromPosition } from "@/lib/country";
 import { compressImage } from "@/lib/image";
 import { readImageCapturedDate } from "@/lib/image-date";
 import { readImageLocation } from "@/lib/image-location";
-import { getPosition, type Position, type PositionFailure } from "@/lib/geo";
+import { getPosition, type Position } from "@/lib/geo";
 import { toHistoryEntry } from "@/lib/history";
 import { CATEGORY_OPTIONS, type Category, type DateSource, type Item, type LocationSource, type PlaceSource, type RecognizedAi } from "@/lib/types";
 import { avResponseSchema, recognizeResultSchema } from "@/lib/schema";
@@ -40,8 +40,6 @@ type LocationStatus = {
   position: Position;
   countryDetected: boolean;
 };
-
-type LocatedItem = Item & { lat: number; lng: number };
 
 type ReverseGeocodeResponse = {
   place: string;
@@ -64,18 +62,6 @@ function placeSourceFor(source: LocationSource): PlaceSource {
   return source;
 }
 
-/** 只有带坐标的历史条目才能用作位置兜底；其余走深圳默认值。 */
-function hasCoordinates(item: Item): item is LocatedItem {
-  return item.lat !== null && item.lng !== null;
-}
-
-function positionFailureText(failure: PositionFailure | null): string {
-  if (failure === "unsupported") return "这台设备不支持定位。";
-  if (failure === "denied") return "定位权限没有开启。";
-  if (failure === "timeout") return "定位超时了。";
-  return "暂时没有拿到当前位置。";
-}
-
 function errorMessage(code: string): string {
   if (code === "IMAGE_TOO_LARGE") return "图片太大了，请换一张更小的照片。";
   if (code === "MODEL_TIMEOUT") return "模型这次响应有点慢，请重试。";
@@ -96,7 +82,7 @@ function errorMessage(code: string): string {
 }
 
 function isVideoFile(file: File): boolean {
-  return file.type.startsWith("video/") || /\.(mp4|mov|m4v)$/i.test(file.name);
+  return file.type.startsWith("video/") || /\.(mp4|mov|m4v|webm)$/i.test(file.name);
 }
 
 export default function EncounterPage() {
@@ -127,41 +113,15 @@ export default function EncounterPage() {
   useEffect(() => {
     let active = true;
 
-    function applyFallbackLocation(history: Item[]) {
-      const previous = [...history]
-        .sort((a, b) => b.date.localeCompare(a.date))
-        .find(hasCoordinates);
-      if (previous) {
-        setPlace(previous.place);
-        setCountry(previous.country === "UNK" ? "" : previous.country);
-        setLocation({
-          source: "previous",
-          text: "正在尝试获取当前位置；暂按你上一条藏品的位置记录。",
-          position: { lat: previous.lat, lng: previous.lng },
-          countryDetected: false,
-        });
-      } else {
-        setPlace("深圳");
-        setCountry("CHN");
-        setLocation({
-          source: "default",
-          text: "正在尝试获取当前位置；暂以深圳记录。",
-          position: { lat: 22.54, lng: 114.06 },
-          countryDetected: false,
-        });
-      }
-    }
-
     async function loadContext() {
       try {
         await ensureSeeded();
         const history = await db.items.orderBy("date").toArray();
         if (!active) return;
         setItems(history);
-        const previous = [...history]
-          .sort((a, b) => b.date.localeCompare(a.date))
-          .find(hasCoordinates);
-        applyFallbackLocation(history);
+        setPlace("");
+        setCountry("");
+        setLocation(null);
         setLocationLoading(true);
 
         const positionResult = await getPosition();
@@ -191,34 +151,17 @@ export default function EncounterPage() {
             position: positionResult.position,
             countryDetected: Boolean(detectedCountry),
           });
-        } else if (previous) {
-          setLocation({
-            source: "previous",
-            text: `${positionFailureText(positionResult.failure)}已按你上一条藏品的位置记录。`,
-            position: { lat: previous.lat, lng: previous.lng },
-            countryDetected: false,
-          });
         } else {
-          setPlace("深圳");
-          setCountry("CHN");
-          setLocation({
-            source: "default",
-            text: `${positionFailureText(positionResult.failure)}暂以深圳记录；位置来源会明确标注。`,
-            position: { lat: 22.54, lng: 114.06 },
-            countryDetected: false,
-          });
+          setPlace("");
+          setCountry("");
+          setLocation(null);
         }
         setLocationLoading(false);
       } catch {
         if (!active) return;
-        setPlace("深圳");
-        setCountry("CHN");
-        setLocation({
-          source: "default",
-          text: "历史载入失败，暂以深圳记录；位置来源会明确标注。",
-          position: { lat: 22.54, lng: 114.06 },
-          countryDetected: false,
-        });
+        setPlace("");
+        setCountry("");
+        setLocation(null);
         setLocationLoading(false);
         setError("示例历史载入失败，请刷新后重试。");
       }
@@ -299,11 +242,7 @@ export default function EncounterPage() {
       await submitVideo(videoFile);
       return;
     }
-    if (!place.trim()) {
-      setError("正在自动识别地点，请稍候。");
-      return;
-    }
-    if (locationLoading || !location) {
+    if (locationLoading) {
       setError("正在确认位置，请等定位状态完成后再显影。");
       return;
     }
@@ -352,15 +291,16 @@ export default function EncounterPage() {
         nameEn: result.nameEn ?? undefined,
         category: result.category,
         photo: preview,
-        place: place.trim(),
-        country:
-          country ||
-          detectCountryFromPosition(location.position.lat, location.position.lng) ||
-          "UNK",
-        lat: location.position.lat,
-        lng: location.position.lng,
-        locationSource: location.source,
-        placeSource: placeSourceFor(location.source),
+        place: location ? place.trim() || "当前位置" : "?",
+        country: location
+          ? country ||
+            detectCountryFromPosition(location.position.lat, location.position.lng) ||
+            "UNK"
+          : "UNK",
+        lat: location?.position.lat ?? null,
+        lng: location?.position.lng ?? null,
+        locationSource: location?.source ?? "unavailable",
+        placeSource: location ? placeSourceFor(location.source) : "unavailable",
         date: capturedAt,
         dateSource,
         userNote: userNote.trim(),
@@ -449,7 +389,7 @@ export default function EncounterPage() {
           extracted.truncated,
           location
             ? {
-                place: place.trim() || "位置已记录",
+                place: place.trim() || "当前位置",
                 country:
                   country ||
                   detectCountryFromPosition(location.position.lat, location.position.lng) ||
@@ -478,8 +418,8 @@ export default function EncounterPage() {
 
   async function saveManual() {
     if (savingManual) return;
-    if (locationLoading || !location || !preview || !manualName.trim() || !place.trim()) {
-      setError("手动保存至少需要照片、名称和地点。");
+    if (locationLoading || !preview || !manualName.trim()) {
+      setError("手动保存至少需要照片和名称。");
       return;
     }
     setSavingManual(true);
@@ -490,15 +430,16 @@ export default function EncounterPage() {
         name: manualName.trim(),
         category: manualCategory,
         photo: preview,
-        place: place.trim(),
-        country:
-          country ||
-          detectCountryFromPosition(location.position.lat, location.position.lng) ||
-          "UNK",
-        lat: location.position.lat,
-        lng: location.position.lng,
-        locationSource: location.source,
-        placeSource: placeSourceFor(location.source),
+        place: location ? place.trim() || "当前位置" : "?",
+        country: location
+          ? country ||
+            detectCountryFromPosition(location.position.lat, location.position.lng) ||
+            "UNK"
+          : "UNK",
+        lat: location?.position.lat ?? null,
+        lng: location?.position.lng ?? null,
+        locationSource: location?.source ?? "unavailable",
+        placeSource: location ? placeSourceFor(location.source) : "unavailable",
         dateSource,
         date: capturedAt,
         userNote: userNote.trim(),
@@ -599,6 +540,11 @@ export default function EncounterPage() {
                     : `${location.text}${place ? ` · ${place}` : ""}`}
                 </span>
               </div>
+            ) : !locationLoading ? (
+              <div className="status-note warning" style={{ marginTop: 12 }}>
+                <MapPin size={15} />
+                <span>暂未识别地点，保存后可在详情页补充。</span>
+              </div>
             ) : null}
           </section>
 
@@ -641,7 +587,7 @@ export default function EncounterPage() {
           <button
             className="primary-action"
             onClick={() => void submit()}
-            disabled={loading || geocodeLoading || locationLoading || !location}
+            disabled={loading || geocodeLoading || locationLoading}
           >
             <Sparkles size={19} />
             {loading
@@ -656,7 +602,7 @@ export default function EncounterPage() {
             <button
               className="secondary-action"
               onClick={() => void submit()}
-              disabled={loading || geocodeLoading || locationLoading || !location}
+              disabled={loading || geocodeLoading || locationLoading}
             >
               <RotateCcw size={17} />
               重试

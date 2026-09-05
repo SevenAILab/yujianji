@@ -61,7 +61,7 @@ export function createAvDraft(
   fileLastModified: number,
   placeFallback = "",
   truncated = false,
-  detectedLocation: AvCoordinate | null = null,
+  detectedLocation?: AvCoordinate | null,
 ): AvDraft {
   const previous = [...history].sort((a, b) => b.date.localeCompare(a.date))[0];
   const placeHint = result.placeHint?.trim() ?? "";
@@ -77,11 +77,13 @@ export function createAvDraft(
           previous.locationSource !== "manual"
         ? previous
         : undefined;
-  const coordinate = detectedLocation ?? (
-    matched?.lat !== null &&
-    matched?.lat !== undefined &&
-    matched.lng !== null &&
-    matched.lng !== undefined
+  const hasDetectedLocationResult = detectedLocation !== undefined;
+  const coordinate = hasDetectedLocationResult
+    ? detectedLocation ?? null
+    : matched?.lat !== null &&
+        matched?.lat !== undefined &&
+        matched.lng !== null &&
+        matched.lng !== undefined
       ? {
           place: matched.place,
           country: matched.country,
@@ -89,8 +91,7 @@ export function createAvDraft(
           lng: matched.lng,
           source: "previous" as const,
         }
-      : null
-  );
+      : null;
   const capturedAt =
     Number.isFinite(fileLastModified) && fileLastModified > 0
       ? new Date(fileLastModified).toISOString()
@@ -102,9 +103,11 @@ export function createAvDraft(
       ...segment,
       occurrenceId: nanoid(),
     })),
-    initialPlace: detectedLocation?.place || placeHint || fallbackPlace || previous?.place || "",
-    initialPlaceSource: detectedLocation
-      ? detectedLocation.source
+    initialPlace: hasDetectedLocationResult
+      ? detectedLocation?.place || "?"
+      : placeHint || fallbackPlace || previous?.place || "",
+    initialPlaceSource: hasDetectedLocationResult
+      ? detectedLocation?.source ?? "unavailable"
       : placeHint
         ? "voice"
         : fallbackPlace
@@ -114,8 +117,8 @@ export function createAvDraft(
           : previous
             ? "previous"
             : "manual",
-    initialCountry: detectedLocation
-      ? detectedLocation.country
+    initialCountry: hasDetectedLocationResult
+      ? detectedLocation?.country || "UNK"
       : matched?.country === "UNK"
         ? ""
         : matched?.country ?? "",

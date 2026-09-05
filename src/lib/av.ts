@@ -126,17 +126,6 @@ function audioBufferHasSignal(buffer: AudioBuffer, durationSec: number): boolean
   return peak > 0.002 || Math.sqrt(energy / Math.max(1, count)) > 0.0002;
 }
 
-function containsAudioTrackMarker(buffer: ArrayBuffer): boolean {
-  const bytes = new Uint8Array(buffer);
-  const marker = [0x73, 0x6f, 0x75, 0x6e];
-  for (let index = 0; index <= bytes.length - marker.length; index += 1) {
-    if (marker.every((value, offset) => bytes[index + offset] === value)) {
-      return true;
-    }
-  }
-  return false;
-}
-
 function encodeWav(buffer: AudioBuffer): ArrayBuffer {
   const pcm = buffer.getChannelData(0);
   const wav = new ArrayBuffer(44 + pcm.length * 2);
@@ -287,9 +276,6 @@ export async function extractFramesAndAudio(
       "DECODE_TIMEOUT",
       "读取视频声音超时",
     );
-    if (!containsAudioTrackMarker(sourceBuffer)) {
-      throw new AvExtractionError("NO_AUDIO", "这段视频里没有声音");
-    }
     let decoded: AudioBuffer;
     try {
       decoded = await withTimeout(
