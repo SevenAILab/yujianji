@@ -9,6 +9,7 @@ import { db, ensureSeeded } from "@/lib/db";
 import type { GeneratedJourney } from "@/lib/journey-generator";
 import type { JourneyCollageData } from "@/lib/journey-collage";
 import type { Item } from "@/lib/types";
+import "./journeys.css";
 
 export default function JourneysPage() {
   const [seedReady, setSeedReady] = useState(false);
