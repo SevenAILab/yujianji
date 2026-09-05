@@ -9,6 +9,7 @@ import { ItemCard } from "@/components/ItemCard";
 import { db, ensureSeeded } from "@/lib/db";
 import { toHistoryEntry } from "@/lib/history";
 import type { Item } from "@/lib/types";
+import { LOCAL_ONLY } from "@/lib/app-mode";
 
 export default function FirstsPage() {
   const router = useRouter();
@@ -64,6 +65,10 @@ export default function FirstsPage() {
       });
       if (!selected.length) {
         setSummaryError("这段时间还没有可总结的第一次。");
+        return;
+      }
+      if (LOCAL_ONLY) {
+        setSummaryText(`本地旅程统计：这段时间保存了 ${selected.length} 件遇见，记录于 ${new Set(selected.map((item) => item.place)).size} 个地点。此为本机统计，不是 AI 解读。`);
         return;
       }
       const response = await fetch("/api/summary", {
@@ -158,7 +163,7 @@ export default function FirstsPage() {
             {summaryText ? (
               <div className="summary-result">
                 <p>{summaryText}</p>
-                <small>仅根据你选中的遇见生成；文字会在总结期间临时发送给百炼，AI 生成，未经核实。</small>
+                <small>{LOCAL_ONLY ? "仅在本机计算，不发送历史记录。" : "仅根据你选中的遇见生成；文字会在总结期间临时发送给百炼，AI 生成，未经核实。"}</small>
               </div>
             ) : null}
           </section>

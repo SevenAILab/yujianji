@@ -2,6 +2,7 @@
 
 import { Mic, MicOff } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { LOCAL_ONLY } from "@/lib/app-mode";
 import {
   getSpeechRecognition,
   isSpeechRecognitionSupported,
@@ -115,7 +116,7 @@ export function VoiceButton({ value, onChange }: VoiceButtonProps) {
     [],
   );
 
-  const hint = !supported
+  const hint = LOCAL_ONLY ? "离线模式关闭云端语音，请打字" : !supported
     ? "此浏览器不支持语音，请打字"
     : listening
       ? interim || "正在听…再点一次结束"

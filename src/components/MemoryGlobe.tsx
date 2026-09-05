@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { mesh } from "topojson-client";
 import world from "world-atlas/countries-110m.json";
+import { itemHref } from "@/lib/app-mode";
 
 type Geometry =
   | { type: "Polygon"; coordinates: number[][][] }
@@ -259,7 +260,7 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
           type="button"
           onMouseEnter={() => { cardActiveRef.current = true; }}
           onMouseLeave={() => { cardActiveRef.current = false; setHover(null); }}
-          onClick={() => router.push(`/item/${hover.location.preview[0]?.id ?? hover.location.itemIds[0]}`)}
+          onClick={() => router.push(itemHref(hover.location.preview[0]?.id ?? hover.location.itemIds[0]))}
           style={{ position: "absolute", left: Math.min(hover.x + 6, 660), top: Math.max(18, hover.y - 92), width: 218, padding: 8, textAlign: "left", font: "inherit", cursor: "pointer", background: "rgba(255,253,247,.97)", border: "1px solid rgba(57,139,128,.3)", boxShadow: "7px 9px 0 rgba(98,160,139,.11), 0 16px 34px rgba(42,91,84,.13)", transform: "rotate(-1deg)" }}
           aria-label={`打开${hover.location.name}的记录`}
         >

@@ -23,6 +23,7 @@ import { toHistoryEntry } from "@/lib/history";
 import { CATEGORY_OPTIONS, type Category, type Item, type RecognizedAi } from "@/lib/types";
 import { recognizeResultSchema } from "@/lib/schema";
 import { COUNTRY_OPTIONS, countryName } from "@/lib/iso";
+import { itemHref, LOCAL_ONLY } from "@/lib/app-mode";
 
 type LocationStatus = {
   source: "gps" | "previous" | "default" | "manual";
@@ -77,7 +78,7 @@ export default function EncounterPage() {
   const [locationLoading, setLocationLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [showManual, setShowManual] = useState(false);
+  const [showManual, setShowManual] = useState(LOCAL_ONLY);
   const [savingManual, setSavingManual] = useState(false);
   const [geocodeLoading, setGeocodeLoading] = useState(false);
   const isSubmittingRef = useRef(false);
@@ -181,6 +182,7 @@ export default function EncounterPage() {
 
   async function resolvePlaceForSave(): Promise<SaveLocation> {
     if (!location) throw new Error("GEOCODER_UNAVAILABLE");
+    if (LOCAL_ONLY) return { location, country: country || "UNK" };
     const normalizedPlace = place.trim();
     const requestedCountry = countryTouchedRef.current ? country : "";
     const key = `${requestedCountry || "*"}:${normalizedPlace.toLocaleLowerCase()}`;
@@ -222,6 +224,7 @@ export default function EncounterPage() {
   }
 
   async function submit() {
+    if (LOCAL_ONLY) { setShowManual(true); return; }
     if (isSubmittingRef.current) return;
     if (!preview) {
       setError("先选一张照片，再开始显影。");
@@ -304,7 +307,7 @@ export default function EncounterPage() {
       } catch {
         throw new Error("LOCAL_STORAGE_ERROR");
       }
-      router.push(`/item/${item.id}`);
+      router.push(itemHref(item.id));
     } catch (caught) {
       const code = caught instanceof Error ? caught.message : "MODEL_ERROR";
       setError(errorMessage(code));
@@ -344,7 +347,7 @@ export default function EncounterPage() {
         createdAt: now,
       };
       await db.items.put(item);
-      router.push(`/item/${item.id}`);
+      router.push(itemHref(item.id));
     } catch (caught) {
       const code = caught instanceof Error ? caught.message : "";
       setError(
@@ -471,8 +474,9 @@ export default function EncounterPage() {
             ) : null}
           </section>
 
-          {error ? (
-            <div className="error-box">
+          {error || LOCAL_ONLY ? (
+            <div className={error ? "error-box" : "form-card surface"}>
+              {LOCAL_ONLY ? <p className="privacy-note">离线记录：照片不上传。地点名称仅作标签；坐标使用当前定位或已标注的回退位置，不进行在线校准。</p> : null}
               {error}
               {showManual ? (
                 <div className="content-stack" style={{ marginTop: 12 }}>
@@ -507,14 +511,14 @@ export default function EncounterPage() {
             </div>
           ) : null}
 
-          <button
+          {!LOCAL_ONLY ? <button
             className="primary-action"
             onClick={() => void submit()}
             disabled={loading || geocodeLoading || locationLoading || !location}
           >
             <Sparkles size={19} />
             {loading ? "正在显影…" : geocodeLoading ? "正在校准地点…" : locationLoading ? "正在确认位置…" : "显影"}
-          </button>
+          </button> : null}
           {error && !showManual ? (
             <button
               className="secondary-action"
@@ -526,7 +530,7 @@ export default function EncounterPage() {
             </button>
           ) : null}
           <p className="privacy-note">
-            照片、文字和语音只在识别期间临时发送给相应 AI 服务，应用服务端不保存；地点名称会发送给 OpenStreetMap 地点服务用于校准坐标，查询结果会在服务端缓存。地点数据 © OpenStreetMap contributors。
+            {LOCAL_ONLY ? "本地模式：照片、文字、坐标保存在本机。云端 AI、语音识别和在线地点查询已关闭。卸载或清除 App 数据会丢失本地记录。" : "照片、文字和语音只在识别期间临时发送给相应 AI 服务，应用服务端不保存；地点名称会发送给 OpenStreetMap 地点服务用于校准坐标，查询结果会在服务端缓存。地点数据 © OpenStreetMap contributors。"}
           </p>
         </div>
       </div>

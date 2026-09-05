@@ -15,6 +15,7 @@
 
 # next.js
 /.next/
+/.native-build/
 /out/
 
 # production
@@ -40,3 +41,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+android/.gradle/
+android/local.properties
+android/**/build/
+ios/App/Pods/
+ios/**/xcuserdata/
+ios/**/.build/

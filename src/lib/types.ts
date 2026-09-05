@@ -1,4 +1,4 @@
-export type Category =
+﻿export type Category =
   | "animal"
   | "plant"
   | "mineral"
@@ -9,6 +9,56 @@ export type Category =
   | "other";
 
 export type LocationSource = "gps" | "previous" | "default" | "manual";
+export type DeviceSource = "manual" | "bluetooth-heart-rate" | "health-provider";
+
+export interface HealthSnapshot {
+  timestamp: string;
+  heartRate?: number;
+  bloodOxygen?: number;
+  altitude?: number;
+  steps?: number;
+  source: DeviceSource;
+  sampleId?: string;
+  originId?: string;
+  originName?: string;
+  provider?: "health-connect" | "healthkit";
+  endTimestamp?: string;
+}
+
+export interface NutritionEntry {
+  id: string;
+  timestamp: string;
+  meal: string;
+  calories?: number;
+  waterMl?: number;
+}
+
+export interface TrackPoint {
+  timestamp: string;
+  lat: number;
+  lng: number;
+  altitude?: number;
+  heading?: number;
+  speed?: number;
+}
+
+export type TripStatus = "active" | "paused" | "completed";
+
+export interface Trip {
+  id: string;
+  title: string;
+  status: TripStatus;
+  startedAt: string;
+  endedAt?: string;
+  trackPoints: TrackPoint[];
+  healthSnapshots: HealthSnapshot[];
+  nutrition: NutritionEntry[];
+  panorama?: string;
+  distanceMeters: number;
+  elevationGainMeters: number;
+  riskLevel: "low" | "medium" | "high";
+  createdAt: string;
+}
 
 export type LuckConfidence = "low" | "medium" | "high";
 
@@ -45,6 +95,10 @@ export interface Item {
   answer?: string;
   isSeed: boolean;
   createdAt: string;
+  mediaType?: "photo" | "panorama";
+  tripId?: string;
+  healthSnapshot?: HealthSnapshot;
+  trackPoint?: TrackPoint;
 }
 
 export interface HistoryEntry {
@@ -103,7 +157,4 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   other: "其他",
 };
 
-export const CATEGORY_OPTIONS = Object.entries(CATEGORY_LABELS) as [
-  Category,
-  string,
-][];
+export const CATEGORY_OPTIONS = Object.entries(CATEGORY_LABELS) as [Category, string][];

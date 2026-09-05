@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import world from "world-atlas/countries-110m.json";
 import { NUMERIC_TO_ALPHA3 } from "@/lib/iso";
 import type { Item } from "@/lib/types";
+import { itemHref } from "@/lib/app-mode";
 
 const WIDTH = 800;
 const HEIGHT = 430;
@@ -126,7 +127,7 @@ export function WorldMap({
                   aria-label={`打开${group[0].place}的${group.length}件藏品`}
                   onClick={() => {
                     if (group.length === 1) {
-                      router.push(`/item/${group[0].id}`);
+                      router.push(itemHref(group[0].id));
                     } else {
                       setSelectedPin(group);
                     }
@@ -135,7 +136,7 @@ export function WorldMap({
                   tabIndex={0}
                   onKeyDown={(event) => {
                     if (event.key === "Enter") {
-                      if (group.length === 1) router.push(`/item/${group[0].id}`);
+                      if (group.length === 1) router.push(itemHref(group[0].id));
                       else setSelectedPin(group);
                     }
                   }}
@@ -170,7 +171,7 @@ export function WorldMap({
             <button
               className="map-sheet-item"
               key={item.id}
-              onClick={() => router.push(`/item/${item.id}`)}
+              onClick={() => router.push(itemHref(item.id))}
             >
               <img src={item.photo} alt="" />
               <span>
