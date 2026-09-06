@@ -15,6 +15,8 @@ import "./journeys.css";
 type SavedJourney = {
   meta: GeneratedJourney;
   createdAt: string;
+  /** 按年份自动生成的拼贴：默认展示，不入库、不可删。 */
+  isAuto?: boolean;
 };
 
 const JOURNEY_ARCHIVE_KEY = "journey-archive-v1";
@@ -41,6 +43,8 @@ export default function JourneysPage() {
   const [generationError, setGenerationError] = useState("");
   const [activeCountry, setActiveCountry] = useState("ALL");
   const [savedJourneys, setSavedJourneys] = useState<SavedJourney[]>([]);
+  const [autoJourneys, setAutoJourneys] = useState<SavedJourney[]>([]);
+  const [autoLoading, setAutoLoading] = useState(true);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const items = useLiveQuery(
     () => (seedReady ? db.items.orderBy("date").toArray() : Promise.resolve([] as Item[])),
@@ -85,19 +89,97 @@ export default function JourneysPage() {
     };
   }, [items]);
 
+  // 自己创建的排在前面，按年份自动生成的跟在后面，评委一进来就有内容可看。
+  const allJourneys = useMemo(
+    () => [...savedJourneys, ...autoJourneys],
+    [savedJourneys, autoJourneys],
+  );
+
   const countries = useMemo(
-    () => [...new Set(savedJourneys.flatMap((journey) => journey.meta.regions.map((region) => region.country)))],
-    [savedJourneys],
+    () => [...new Set(allJourneys.flatMap((journey) => journey.meta.regions.map((region) => region.country)))],
+    [allJourneys],
   );
 
   const visibleJourneys = useMemo(
     () => activeCountry === "ALL"
-      ? savedJourneys
-      : savedJourneys.filter((journey) => journey.meta.regions.some((region) => region.country === activeCountry)),
-    [activeCountry, savedJourneys],
+      ? allJourneys
+      : allJourneys.filter((journey) => journey.meta.regions.some((region) => region.country === activeCountry)),
+    [activeCountry, allJourneys],
   );
 
   const itemById = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
+
+  // 打开就有内容：按「每一年」自动生成拼贴，不需要用户先手填日期。
+  // 只读展示，不写进 journey-archive，所以不会污染用户自己建的旅程。
+  useEffect(() => {
+    const sourceItems = validJourneyItems(items);
+    if (!sourceItems.length) {
+      setAutoJourneys([]);
+      setAutoLoading(false);
+      return;
+    }
+    let active = true;
+    setAutoLoading(true);
+    const years = [...new Set(sourceItems.map((item) => item.date.slice(0, 4)))]
+      .filter((year) => /^\d{4}$/.test(year))
+      .sort((a, b) => Number(b) - Number(a));
+
+    const payloadFor = (year: string) => ({
+      startDate: `${year}-01-01`,
+      endDate: `${year}-12-31`,
+      items: sourceItems
+        .filter((item) => item.date.slice(0, 4) === year)
+        .map((item) => ({
+          id: item.id,
+          name: item.name,
+          category: item.category,
+          place: item.place,
+          country: item.country,
+          lat: item.lat,
+          lng: item.lng,
+          date: item.date,
+          userNote: item.userNote,
+          memorySentence: item.ai?.memorySentence ?? "",
+          verdict: item.ai?.verdict ?? null,
+          cognition: item.ai?.cognition ?? "",
+        })),
+    });
+
+    void Promise.all(
+      years.map(async (year): Promise<SavedJourney | null> => {
+        try {
+          const response = await fetch("/api/journeys/generate", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(payloadFor(year)),
+          });
+          if (!response.ok) return null;
+          const payload = await response.json() as { journey?: GeneratedJourney };
+          if (!payload.journey) return null;
+          return {
+            meta: {
+              ...payload.journey,
+              id: `auto-${year}`,
+              title: `${year} 年 · ${payload.journey.title}`,
+            },
+            createdAt: `${year}-12-31T00:00:00.000Z`,
+            isAuto: true,
+          };
+        } catch {
+          // 单独某一年失败不影响其它年份，失败的那年就是不出现。
+          return null;
+        }
+      }),
+    ).then((results) => {
+      if (!active) return;
+      setAutoJourneys(results.filter((entry): entry is SavedJourney => entry !== null));
+      setAutoLoading(false);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [items]);
 
   function openCreator() {
     setGenerationError("");
@@ -214,19 +296,29 @@ export default function JourneysPage() {
                     <h2>{journey.meta.title}</h2>
                     <p>{journey.meta.stops.length} 个地点 · {journey.meta.recordCount} 条记录</p>
                   </div>
-                  <button className="journey-delete-button" onClick={() => setPendingDeleteId(journey.meta.id)} aria-label={`删除${journey.meta.title}`} title="删除旅程">
-                    <X size={18} strokeWidth={1.7} />
-                  </button>
+                  {journey.isAuto ? null : (
+                    <button className="journey-delete-button" onClick={() => setPendingDeleteId(journey.meta.id)} aria-label={`删除${journey.meta.title}`} title="删除旅程">
+                      <X size={18} strokeWidth={1.7} />
+                    </button>
+                  )}
                 </header>
                 <JourneyCollageMap journey={collage} />
               </article>
             );
           })}
 
-          {!visibleJourneys.length ? (
+          {!visibleJourneys.length && autoLoading ? (
+            <div className="journey-empty" aria-live="polite">
+              <LoaderCircle className="journey-spin" size={22} />
+              <strong>正在按年份整理你的旅程…</strong>
+              <span>照片、地点和路线会自动拼成一张旅行手帐。</span>
+            </div>
+          ) : null}
+
+          {!visibleJourneys.length && !autoLoading ? (
             <button className="journey-empty" onClick={openCreator}>
               <CalendarDays size={22} strokeWidth={1.6} />
-              <strong>{savedJourneys.length ? "这里还没有对应的旅程" : "创建你的第一张旅程拼贴"}</strong>
+              <strong>{allJourneys.length ? "这里还没有对应的旅程" : "创建你的第一张旅程拼贴"}</strong>
               <span>选择一段时间，照片、地点和路线会自动拼成一张旅行手帐。</span>
             </button>
           ) : null}
