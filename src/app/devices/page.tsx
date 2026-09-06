@@ -4,6 +4,7 @@ import {
   Camera,
   ChevronRight,
   CircleHelp,
+  Download,
   FolderOpen,
   ImagePlus,
   Plus,
@@ -16,6 +17,16 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppNav } from "@/components/AppNav";
 import { setPendingEncounterFile } from "@/lib/encounter-transfer";
+import {
+  DEFAULT_OSC_BASE_URL,
+  isSecureContextForOsc,
+  normalizeOscBaseUrl,
+  oscGetState,
+  oscListFiles,
+  oscTakePicture,
+  oscWaitForCapture,
+  type OscFileEntry,
+} from "@/lib/osc";
 import styles from "./devices.module.css";
 
 type DemoDevice = {
@@ -41,6 +52,10 @@ export default function DevicesPage() {
   const [device] = useState<DemoDevice | null>(X6_DEMO);
   const [autoSync, setAutoSync] = useState(true);
   const [notice, setNotice] = useState("");
+  const [oscBaseUrl, setOscBaseUrl] = useState(DEFAULT_OSC_BASE_URL);
+  const [oscBusy, setOscBusy] = useState(false);
+  const [oscStatus, setOscStatus] = useState("");
+  const [latestFiles, setLatestFiles] = useState<OscFileEntry[]>([]);
 
   function showNotice(message = "设备连接功能正在准备中") {
     setNotice(message);
@@ -51,6 +66,76 @@ export default function DevicesPage() {
     if (!file) return;
     setPendingEncounterFile(file, "insta360");
     router.push("/encounter?source=insta360");
+  }
+
+  function oscError(error: unknown) {
+    if (isSecureContextForOsc()) {
+      return "HTTPS 页面会被浏览器拦截 HTTP 相机请求，请改用局域网 HTTP 地址或原生壳。";
+    }
+    return error instanceof Error ? error.message : "OSC 请求失败";
+  }
+
+  async function handleOscState() {
+    setOscBusy(true);
+    setOscStatus("");
+    try {
+      const state = await oscGetState(oscBaseUrl);
+      setOscStatus(`已连接：${state.fingerprint || state.state || "相机在线"}`);
+    } catch (error) {
+      setOscStatus(oscError(error));
+    } finally {
+      setOscBusy(false);
+    }
+  }
+
+  async function handleOscCapture() {
+    setOscBusy(true);
+    setOscStatus("已发送拍照指令，等待完成…");
+    try {
+      await oscTakePicture(oscBaseUrl);
+      const state = await oscWaitForCapture(oscBaseUrl);
+      setOscStatus(state._latestFileUrl ? `拍摄完成：${state._latestFileUrl}` : "拍摄完成");
+    } catch (error) {
+      setOscStatus(oscError(error));
+    } finally {
+      setOscBusy(false);
+    }
+  }
+
+  async function handleOscListFiles() {
+    setOscBusy(true);
+    setOscStatus("");
+    try {
+      const files = await oscListFiles(oscBaseUrl);
+      setLatestFiles(files);
+      setOscStatus(files.length ? `读取到 ${files.length} 个文件` : "相机里暂时没有文件");
+    } catch (error) {
+      setOscStatus(oscError(error));
+    } finally {
+      setOscBusy(false);
+    }
+  }
+
+  async function importLatestOscFile(fileUrl?: string) {
+    if (!fileUrl) {
+      setOscStatus("请先读取文件列表。");
+      return;
+    }
+    setOscBusy(true);
+    setOscStatus("正在从相机拉取文件…");
+    try {
+      const response = await fetch(fileUrl);
+      if (!response.ok) throw new Error(`文件拉取失败：${response.status}`);
+      const blob = await response.blob();
+      const name = fileUrl.split("/").pop() || `x6-${Date.now()}.jpg`;
+      const type = blob.type || (name.endsWith(".mp4") ? "video/mp4" : "image/jpeg");
+      const file = new File([blob], name, { type });
+      setPendingEncounterFile(file, "insta360");
+      router.push("/encounter?source=insta360&osc=1");
+    } catch (error) {
+      setOscStatus(oscError(error));
+      setOscBusy(false);
+    }
   }
 
   return (
@@ -129,6 +214,55 @@ export default function DevicesPage() {
             <span><strong>设备设置</strong><small>相机参数与偏好设置</small></span>
             <ChevronRight size={18} />
           </button>
+        </section>
+
+        <section className={styles.oscPanel} aria-label="OSC WiFi 控制">
+          <div className={styles.oscHeader}>
+            <div>
+              <span className={styles.deviceEyebrow}>OSC CONTROL</span>
+              <h2>WiFi 拍摄控制</h2>
+              <small>手机连接 X6 热点后，直接触发快门、读取状态和最新文件。</small>
+            </div>
+            <Wifi size={20} color="var(--teal)" />
+          </div>
+          <label className={styles.oscField}>
+            <span>相机地址</span>
+            <input
+              value={oscBaseUrl}
+              onChange={(event) => setOscBaseUrl(event.target.value)}
+              placeholder={DEFAULT_OSC_BASE_URL}
+              inputMode="url"
+            />
+          </label>
+          <div className={styles.oscActions}>
+            <button className="secondary-action" onClick={() => void handleOscState()} disabled={oscBusy}>
+              <Wifi size={16} />
+              状态
+            </button>
+            <button className="secondary-action" onClick={() => void handleOscCapture()} disabled={oscBusy}>
+              <Camera size={16} />
+              拍摄
+            </button>
+            <button className="secondary-action" onClick={() => void handleOscListFiles()} disabled={oscBusy}>
+              <RefreshCw size={16} />
+              文件
+            </button>
+          </div>
+          {latestFiles.length ? (
+            <div className={styles.oscFiles}>
+              {latestFiles.slice(0, 3).map((file, index) => (
+                <button
+                  key={file.fileUrl || index}
+                  onClick={() => void importLatestOscFile(file.fileUrl)}
+                  disabled={oscBusy}
+                >
+                  <Download size={14} />
+                  {file.name || `文件 ${index + 1}`}
+                </button>
+              ))}
+            </div>
+          ) : null}
+          {oscStatus ? <p className="share-status">{oscStatus}</p> : null}
         </section>
 
         <button className={styles.connectDevice} onClick={() => showNotice()}>

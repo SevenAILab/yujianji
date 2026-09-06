@@ -127,6 +127,13 @@ npm run seed:ai
 - 文件会以 `insta360` 来源进入 `/encounter`，与相册来源一样读取 EXIF 拍摄时间与定位信息。
 - 识别前先在浏览器本地压缩，原 360 图片不写入 IndexedDB；分享链接只携带低清缩略图。
 
+## Insta360 X6 WiFi OSC 拍摄
+
+- 方案 A：浏览器通过 OSC（Open Spherical Camera）协议直接访问相机热点，默认地址为 `http://192.168.42.1`。
+- `/devices` 已提供「状态」「拍摄」「文件」按钮，分别调用 `camera.getState`、`camera.takePicture` 和 `camera.listFiles`。
+- 拍摄后轮询相机状态，读取到最新文件后可一键拉取并进入 `/encounter` 显影。
+- 浏览器限制：HTTPS 页面访问相机 HTTP 地址可能被浏览器拦截；请优先使用局域网 HTTP 地址或原生壳运行。
+- 主要命令封装在 `src/lib/osc.ts`，后续可扩展实时预览、视频控制和相机参数设置。
 ## GO Ultra 视频记录
 
 当前版本不是网页直连影石相机。实际链路是：GO Ultra 录制并在 Insta360 App 中导出到手机相册，再从遇见集的「拍摄」或「从相册选」导入。浏览器会在本机抽取画面帧与 16kHz 单声道音频，原视频不会上传、不会写入 IndexedDB。
