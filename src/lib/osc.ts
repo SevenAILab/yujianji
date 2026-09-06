@@ -1,4 +1,4 @@
-﻿import { Capacitor, registerPlugin } from "@capacitor/core";
+import { Capacitor, registerPlugin } from "@capacitor/core";
 
 export const DEFAULT_OSC_BASE_URL = "http://192.168.42.1";
 
@@ -38,7 +38,7 @@ export interface OscNativeBridgePlugin {
 
 let oscBridge: OscNativeBridgePlugin | null = null;
 
-function getOscNativeBridge(): OscNativeBridgePlugin | null {
+export function getOscNativeBridge(): OscNativeBridgePlugin | null {
   if (typeof window === "undefined") return null;
   if (!Capacitor.isNativePlatform()) return null;
   if (!oscBridge) {

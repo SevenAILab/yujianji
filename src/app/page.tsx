@@ -20,10 +20,37 @@ import { setPendingEncounterFile } from "@/lib/encounter-transfer";
 import { hydrateMapPins } from "@/lib/local-map-pins";
 import { usePageZoomLock } from "@/lib/use-page-zoom-lock";
 import type { Item } from "@/lib/types";
+import { cameraError, captureInsta360, useInsta360 } from "@/lib/insta360";
 import styles from "./home.module.css";
 
 export default function Home() {
   const router = useRouter();
+  const insta360 = useInsta360();
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [cameraBusy, setCameraBusy] = useState(false);
+  const cameraLock = useRef(false);
+  const cameraPageActive = useRef(true);
+  useEffect(() => {
+    cameraPageActive.current = true;
+    return () => { cameraPageActive.current = false; };
+  }, []);
+  async function shootInsta360() {
+    if (cameraLock.current) return;
+    cameraLock.current = true;
+    setCameraBusy(true);
+    try {
+      const file = await captureInsta360((message) => { if (cameraPageActive.current) setToast(message); });
+      if (!cameraPageActive.current) return;
+      await setPendingEncounterFile(file, "insta360");
+      setPickerOpen(false);
+      router.push("/encounter?source=insta360");
+    } catch (error) { if (cameraPageActive.current) setToast(cameraError(error)); }
+    finally { cameraLock.current = false; if (cameraPageActive.current) setCameraBusy(false); }
+  }
+  function openCamera() {
+    if (insta360) setPickerOpen(true);
+    else openFilePicker(photoInputRef.current);
+  }
   usePageZoomLock();
   const [seedReady, setSeedReady] = useState(false);
   const [mapResetToken, setMapResetToken] = useState(0);
@@ -140,19 +167,21 @@ export default function Home() {
     // 因为 click 会落在 down/up 的共同祖先上，与拖动距离无关）。
     // pointerup 处理函数本身就在用户手势上下文里，直接 .click() 在 iOS Safari 上可用。
     if (target) {
-      // 拖到位：安卓 / 桌面走程序化打开，指定拍摄或相册。
       event.currentTarget.htmlFor = "";
       openedByDragRef.current = true;
-      openFilePicker(
-        target === "camera" ? photoInputRef.current : albumInputRef.current,
-      );
+      if (target === "camera") openCamera();
+      else openFilePicker(albumInputRef.current);
       return;
     }
-    // 轻点：不做任何程序化调用，把 label 指向文件输入，
-    // 让浏览器用原生 click 去激活它——iOS 会弹出自己的
-    // 「照片图库 / 拍照或录像 / 选取文件」面板，那是 iOS 唯一稳定认的路径。
-    event.currentTarget.htmlFor = "home-album-input";
-    openedByDragRef.current = false;
+    // Keep the system picker for an ordinary tap; a connected camera adds a choice.
+    if (insta360) {
+      event.currentTarget.htmlFor = "";
+      openedByDragRef.current = true;
+      setPickerOpen(true);
+    } else {
+      event.currentTarget.htmlFor = "home-album-input";
+      openedByDragRef.current = false;
+    }
   }
 
   function cancelCaptureDrag() {
@@ -261,7 +290,7 @@ export default function Home() {
             <div className={`${styles.captureSliderRail} ${captureDragging ? styles.active : ""}`} ref={captureSliderRef}>
               <span className={styles.captureSliderLine} />
               <div className={styles.captureSliderLabels}>
-                <label ref={cameraLabelRef} htmlFor="home-camera-input">
+                <label ref={cameraLabelRef} htmlFor="home-camera-input" onClick={(event) => { if (insta360) { event.preventDefault(); setPickerOpen(true); } }}>
                   <Camera size={18} strokeWidth={1.7} />拍摄
                 </label>
                 <label ref={albumLabelRef} htmlFor="home-album-input">
@@ -294,7 +323,7 @@ export default function Home() {
                   window.setTimeout(() => setSliderTarget(null), 0);
                 }}
                 onKeyDown={(event) => {
-                  if (event.key === "ArrowLeft") openFilePicker(photoInputRef.current);
+                  if (event.key === "ArrowLeft") openCamera();
                   if (event.key === "ArrowRight") openFilePicker(albumInputRef.current);
                 }}
               >
@@ -336,6 +365,32 @@ export default function Home() {
           <div className={styles.insight}><InsightLine items={items} /></div>
         </section>
       </div>
+
+      {pickerOpen ? (
+        <div
+          className="picker-sheet-backdrop"
+          role="presentation"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setPickerOpen(false);
+          }}
+        >
+          <section className="picker-sheet" role="dialog" aria-modal="true" aria-label="选择记录方式">
+            <h2>记下这一刻</h2>
+            {/* 必须是真正的 <label htmlFor>，由用户自己点击。
+                iOS Safari 只认这条路径，程序化 .click() 会被吞。 */}
+            <label htmlFor="home-camera-input" onClick={() => setPickerOpen(false)}>
+              <Camera size={18} strokeWidth={1.7} />
+              <span>拍照 / 录像</span>
+            </label>
+            {insta360 && <button className="insta360-capture-option" disabled={cameraBusy} onClick={() => void shootInsta360()}><Camera size={18} strokeWidth={1.7} /><span>{cameraBusy ? "正在拍摄全景…" : "Insta360 · 全景拍照"}</span></button>}
+            <label htmlFor="home-album-input" onClick={() => setPickerOpen(false)}>
+              <ImagePlus size={18} strokeWidth={1.7} />
+              <span>从相册选择</span>
+            </label>
+            <button className="picker-sheet-cancel" onClick={() => setPickerOpen(false)}>取消</button>
+          </section>
+        </div>
+      ) : null}
 
       <AppNav />
       {toast ? <div className="toast">{toast}</div> : null}

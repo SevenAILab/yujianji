@@ -1477,3 +1477,67 @@ img {
   font: inherit;
   cursor: pointer;
 }
+
+/* Only shown when an Insta360 camera is connected; otherwise use the system picker. */
+.picker-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(24, 59, 67, .34);
+}
+
+.picker-sheet {
+  width: 100%;
+  max-width: 420px;
+  padding: 18px 16px 14px;
+  border-radius: 22px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.picker-sheet h2 {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.picker-sheet label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 15px 16px;
+  border-radius: 15px;
+  margin-bottom: 8px;
+  background: var(--sky);
+  color: var(--teal-dark);
+  font-size: 15px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.picker-sheet label:active { background: var(--mint); }
+
+.picker-sheet-cancel {
+  width: 100%;
+  padding: 14px;
+  border: 0;
+  border-radius: 15px;
+  margin-top: 4px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.picker-sheet .insta360-capture-option { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 44px; padding: 12px 16px; border: 1px solid var(--line); border-radius: 14px; background: #e1eee8; color: var(--teal-dark); font: inherit; text-align: left; cursor: pointer; }
+.picker-sheet .insta360-capture-option:disabled { opacity: .55; cursor: wait; }

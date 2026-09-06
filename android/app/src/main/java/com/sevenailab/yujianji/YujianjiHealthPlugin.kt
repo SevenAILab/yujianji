@@ -43,11 +43,21 @@ class YujianjiHealthPlugin : Plugin() {
 
     @PluginMethod
     fun status(call: PluginCall) {
-        val result = JSObject()
-        result.put("available", available())
-        result.put("provider", "health-connect")
-        result.put("reason", "需要 Android 9+ 且 Health Connect 已安装或可用；不支持的华为系统需另接厂商 SDK")
-        call.resolve(result)
+        scope.launch {
+            try {
+                val isAvailable = available()
+                val response = JSObject()
+                response.put("available", isAvailable)
+                response.put("provider", "health-connect")
+                if (isAvailable) {
+                    val granted = HealthConnectClient.getOrCreate(context).permissionController.getGrantedPermissions()
+                    response.put("granted", JSArray(metrics.filterKeys { it in granted }.values.toList()))
+                } else {
+                    response.put("reason", "需要 Android 9+ 且 Health Connect 已安装或可用")
+                }
+                call.resolve(response)
+            } catch (error: Exception) { call.reject("无法确认健康权限", "PERMISSION_ERROR", error) }
+        }
     }
 
     @PluginMethod

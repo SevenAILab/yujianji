@@ -8,6 +8,7 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(YujianjiHealthPlugin.class);
         registerPlugin(YujianjiOscPlugin.class);
+        registerPlugin(YujianjiCameraPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }

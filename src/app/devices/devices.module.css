@@ -176,7 +176,7 @@
 
 .deviceStats {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   margin-top: 16px;
 }
@@ -439,3 +439,54 @@
   border-radius: 8px;
   background: #d9e7e2;
 }
+.hardwareCard {
+  margin-top: 18px;
+  padding: 20px 18px;
+  border: 1px solid rgba(255, 255, 255, .84);
+  border-radius: 25px;
+  background: rgba(250, 249, 243, .96);
+  box-shadow: 0 15px 34px rgba(43, 92, 83, .05);
+  color: #174f51;
+}
+.hardwareHeader { display: flex; justify-content: space-between; gap: 12px; }
+.hardwareHeader h2 { margin: 7px 0; font: 700 19px var(--serif); overflow-wrap: anywhere; }
+.hardwareNote { color: #607d79; font-size: 12px; line-height: 1.7; }
+.hardwareActions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+.hardwareButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: auto;
+  min-height: 34px;
+  padding: 7px 13px;
+  border: 1px solid rgba(42, 118, 110, .16);
+  border-radius: 10px;
+  background: transparent;
+  color: #527873;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+.connectButton { background: #e1eee8; border-color: transparent; color: #216f65; font-weight: 600; }
+.hardwareButton:hover:not(:disabled) { background: #d6e8df; border-color: rgba(42, 118, 110, .25); }
+.hardwareCard button:disabled { opacity: .5; cursor: not-allowed; }
+.hardwareCard button:focus-visible { outline: 2px solid #27897e; outline-offset: 3px; }
+.statusButton { margin-top: 14px; border: 0; background: transparent; color: #176c67; text-decoration: underline; font-size: 12px; }
+.hardwareError { color: #a63f2e; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.healthMetrics { display: grid; gap: 10px; }
+.healthMetrics > div { display: grid; gap: 6px; padding: 12px; border-radius: 14px; background: #e1eee8; }
+.healthMetrics span { font-size: 12px; }
+.healthMetrics strong { font-size: 20px; }
+.healthMetrics small { color: #607d79; font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; }
+.liveHeartRate { font-size: 32px; margin: 12px 0; color: #2a6b67; }
+.liveHeartRate small { font-size: 12px; }
+.panoramaCount { display: flex; align-items: center; gap: 12px; margin-top: 18px; padding: 14px 16px; background: #e1eee8; border-radius: 14px; color: #2a6b67; }
+.panoramaCount strong { font-size: 28px; font-weight: 600; }
+.panoramaCount span { font-size: 12px; }
+.panoramaCount small { display: block; margin-top: 4px; color: #607d79; font-size: 10px; }
+.storageHelp { padding-bottom: 16px; }
+.storageHelp a { color: #216f65; font-size: 12px; }

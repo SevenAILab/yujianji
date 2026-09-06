@@ -5,9 +5,10 @@
     <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
     <uses-permission android:name="android.permission.health.READ_OXYGEN_SATURATION" />
     <uses-permission android:name="android.permission.health.READ_STEPS" />
-    <queries><package android:name="com.google.android.apps.healthdata" /></queries>
+    <queries><package android:name="com.arashivision.insta360akiko" /><package android:name="com.google.android.apps.healthdata" /></queries>
 
     <application
+        android:networkSecurityConfig="@xml/camera_network_security"
         android:allowBackup="false"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher"

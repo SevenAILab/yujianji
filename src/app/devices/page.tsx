@@ -1,325 +1,66 @@
 "use client";
 
-import {
-  Camera,
-  ChevronRight,
-  CircleHelp,
-  Download,
-  FolderOpen,
-  ImagePlus,
-  Plus,
-  RefreshCw,
-  Settings,
-  Wifi,
-  WifiOff,
-} from "lucide-react";
-import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Camera, ChevronRight, FolderOpen, Plus, Wifi } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useLiveQuery } from "dexie-react-hooks";
 import { AppNav } from "@/components/AppNav";
-import { setPendingEncounterFile } from "@/lib/encounter-transfer";
-import {
-  DEFAULT_OSC_BASE_URL,
-  isSecureContextForOsc,
-  normalizeOscBaseUrl,
-  oscGetState,
-  oscListFiles,
-  oscStartCapture,
-  oscStopCapture,
-  oscTakePicture,
-  oscWaitForCapture,
-  type OscFileEntry,
-} from "@/lib/osc";
+import { db, ensureSeeded } from "@/lib/db";
+import { CAMERA_ADDRESS, cameraError, connectInsta360, disconnectInsta360, openCameraWifiSettings, openInsta360App, useInsta360 } from "@/lib/insta360";
+import { HealthDevices } from "./HealthDevices";
 import styles from "./devices.module.css";
 
-type DemoDevice = {
-  name: string;
-  image?: string;
-  photos: number;
-  videos: number;
-  pending: string;
-  battery: number;
-};
-
-const X6_DEMO: DemoDevice = {
-  name: "Insta360 X6",
-  photos: 0,
-  videos: 0,
-  pending: "WiFi 直连",
-  battery: 0,
-};
-
 export default function DevicesPage() {
-  const router = useRouter();
-  const importInputRef = useRef<HTMLInputElement>(null);
-  const [device] = useState<DemoDevice | null>(X6_DEMO);
-  const [autoSync, setAutoSync] = useState(true);
-  const [notice, setNotice] = useState("");
-  const [oscBaseUrl, setOscBaseUrl] = useState(DEFAULT_OSC_BASE_URL);
-  const [oscBusy, setOscBusy] = useState(false);
-  const [oscStatus, setOscStatus] = useState("");
-  const [latestFiles, setLatestFiles] = useState<OscFileEntry[]>([]);
+  const device = useInsta360();
+  useEffect(() => { void ensureSeeded().catch(() => setError("示例照片加载失败，请刷新重试。")); }, []);
+  const [adding, setAdding] = useState(false);
+  const [address, setAddress] = useState(CAMERA_ADDRESS);
+  const [busy, setBusy] = useState(false);
+  const lock = useRef(false);
+  const [error, setError] = useState("");
+  const [storageOpen, setStorageOpen] = useState(false);
+  const photoCount = useLiveQuery(async () => {
+    try { return await db.items.filter((item) => item.mediaKind === "panorama" && !!item.photo).count(); }
+    catch { return null; }
+  }, []);
 
-  function showNotice(message = "设备连接功能正在准备中") {
-    setNotice(message);
-    window.setTimeout(() => setNotice(""), 2400);
+  async function connect() {
+    if (lock.current) return;
+    lock.current = true;
+    setBusy(true); setError("");
+    try { await connectInsta360(address); setAdding(false); }
+    catch (error) { setError(cameraError(error)); }
+    finally { lock.current = false; setBusy(false); }
   }
 
-  function importInsta360File(file: File | undefined) {
-    if (!file) return;
-    setPendingEncounterFile(file, "insta360");
-    router.push("/encounter?source=insta360");
-  }
-
-  function oscError(error: unknown) {
-    if (isSecureContextForOsc()) {
-      return "HTTPS 页面会被浏览器拦截 HTTP 相机请求，请改用局域网 HTTP 地址或原生壳。";
-    }
-    return error instanceof Error ? error.message : "OSC 请求失败";
-  }
-
-  async function handleOscState() {
-    setOscBusy(true);
-    setOscStatus("");
-    try {
-      const state = await oscGetState(oscBaseUrl);
-      setOscStatus(`已连接：${state.fingerprint || state.state || "相机在线"}`);
-    } catch (error) {
-      setOscStatus(oscError(error));
-    } finally {
-      setOscBusy(false);
-    }
-  }
-
-  async function handleOscCapture() {
-    setOscBusy(true);
-    setOscStatus("已发送拍照指令，等待完成…");
-    try {
-      await oscTakePicture(oscBaseUrl);
-      const state = await oscWaitForCapture(oscBaseUrl);
-      setOscStatus(state._latestFileUrl ? `拍摄完成：${state._latestFileUrl}` : "拍摄完成");
-    } catch (error) {
-      setOscStatus(oscError(error));
-    } finally {
-      setOscBusy(false);
-    }
-  }
-
-  async function handleOscStartCapture() {
-    setOscBusy(true);
-    setOscStatus("正在开始录像…");
-    try {
-      await oscStartCapture(oscBaseUrl);
-      setOscStatus("已开始录像");
-    } catch (error) {
-      setOscStatus(oscError(error));
-    } finally {
-      setOscBusy(false);
-    }
-  }
-
-  async function handleOscStopCapture() {
-    setOscBusy(true);
-    setOscStatus("正在停止录像…");
-    try {
-      await oscStopCapture(oscBaseUrl);
-      setOscStatus("已停止录像");
-    } catch (error) {
-      setOscStatus(oscError(error));
-    } finally {
-      setOscBusy(false);
-    }
-  }
-
-  async function handleOscListFiles() {
-    setOscBusy(true);
-    setOscStatus("");
-    try {
-      const files = await oscListFiles(oscBaseUrl, 6, 160);
-      setLatestFiles(files);
-      setOscStatus(files.length ? `读取到 ${files.length} 个文件` : "相机里暂时没有文件");
-    } catch (error) {
-      setOscStatus(oscError(error));
-    } finally {
-      setOscBusy(false);
-    }
-  }
-
-  async function importLatestOscFile(fileUrl?: string) {
-    if (!fileUrl) {
-      setOscStatus("请先读取文件列表。");
-      return;
-    }
-    setOscBusy(true);
-    setOscStatus("正在从相机拉取文件…");
-    try {
-      const response = await fetch(fileUrl);
-      if (!response.ok) throw new Error(`文件拉取失败：${response.status}`);
-      const blob = await response.blob();
-      const name = fileUrl.split("/").pop() || `x6-${Date.now()}.jpg`;
-      const type = blob.type || (name.endsWith(".mp4") ? "video/mp4" : "image/jpeg");
-      const file = new File([blob], name, { type });
-      setPendingEncounterFile(file, "insta360");
-      router.push("/encounter?source=insta360&osc=1");
-    } catch (error) {
-      setOscStatus(oscError(error));
-      setOscBusy(false);
-    }
-  }
-
-  return (
-    <main className={`app-shell ${styles.deviceShell}`}>
-      <div className={`phone-page ${styles.devicePage}`}>
-        <header className={styles.deviceHeader}>
-          <div>
-            <h1>设备集</h1>
-            <p>让旅途的影像，自动成为永恒的收藏</p>
+  return <main className={`app-shell ${styles.deviceShell}`}>
+    <div className={`phone-page ${styles.devicePage}`}>
+      <header className={styles.deviceHeader}><div><h1>设备集</h1><p>连接健康数据，收藏旅途影像</p></div></header>
+      <section className={styles.deviceCard} aria-label="Insta360 设备">
+        <div className={styles.deviceSummary}>
+          <div className={styles.cameraIllustration} aria-hidden="true"><Camera size={46} strokeWidth={1.25} /><span /></div>
+          <div><span className={styles.deviceEyebrow}>INSTA360 · 360°</span><h2>{device?.name || "添加你的全景相机"}</h2>
+            <p className={device ? styles.connectedStatus : undefined}>{device && <span />}{device ? "已连接 · Wi-Fi" : "尚未连接"}</p>
+            <small>{device ? "首页拍摄中已加入 Insta360 相机" : "连接相机后，在首页发起全景拍摄"}</small>
           </div>
-          <button className={styles.helpButton} onClick={() => showNotice("设备使用说明正在准备中")} aria-label="设备帮助">
-            <CircleHelp size={24} strokeWidth={1.7} />
-          </button>
-        </header>
-
-        <section className={styles.deviceCard} aria-label="当前设备状态">
-          <div className={styles.deviceSummary}>
-            {device ? (
-              device.image ? (
-                <img className={styles.devicePhoto} src={device.image} alt={device.name} />
-              ) : (
-                <div className={styles.cameraIllustration} aria-hidden="true">
-                  <Camera size={46} strokeWidth={1.25} />
-                  <span />
-                </div>
-              )
-            ) : (
-              <div className={styles.cameraIllustration} aria-hidden="true">
-                <Camera size={46} strokeWidth={1.25} />
-                <span />
-              </div>
-            )}
-            {device ? (
-              <div>
-                <span className={styles.deviceEyebrow}>INSTA360 X6 · 360°</span>
-                <h2>{device.name}</h2>
-                <p className={styles.connectedStatus}><span /> WiFi 热点直连已就绪 <em><Wifi size={13} /> 相册导入</em></p>
-                <small>手机连接 X6 热点后，网页直接控制快门与录像</small>
-              </div>
-            ) : (
-              <div>
-                <span className={styles.deviceEyebrow}>YOUR CAMERA</span>
-                <h2>尚未连接设备</h2>
-                <p><WifiOff size={14} /> 等待第一次连接</p>
-                <small>支持 GoPro、DJI、Insta360 等设备</small>
-              </div>
-            )}
-          </div>
-          <div className={styles.deviceStats}>
-            <span><strong>{device?.photos || "—"}</strong><small>360 照片</small></span>
-            <span><strong>{device?.videos || "—"}</strong><small>360 视频</small></span>
-            <span><strong>{device?.pending ?? "—"}</strong><small>待同步</small></span>
-          </div>
-        </section>
-
-        <section className={styles.deviceSettings} aria-label="设备设置预览">
-          <div className={styles.settingsRow}>
-            <span className={styles.settingsIcon}><RefreshCw size={17} /></span>
-            <span><strong>自动同步</strong><small>连接 Wi-Fi 后自动同步影像</small></span>
-            <button className={`${styles.switch} ${autoSync ? styles.on : ""}`} onClick={() => setAutoSync((value) => !value)} aria-pressed={autoSync} aria-label="自动同步">
-              <span />
-            </button>
-          </div>
-          <button className={styles.settingsRow} onClick={() => importInputRef.current?.click()}>
-            <span className={styles.settingsIcon}><ImagePlus size={17} /></span>
-            <span><strong>导入 360 照片</strong><small>从 Insta360 App 导出到手机相册后，点击选择</small></span>
-            <ChevronRight size={18} />
-          </button>
-          <button className={styles.settingsRow} onClick={() => showNotice()}>
-            <span className={styles.settingsIcon}><FolderOpen size={17} /></span>
-            <span><strong>存储管理</strong><small>{device ? "查看设备与同步空间" : "连接设备后管理同步空间"}</small></span>
-            <ChevronRight size={18} />
-          </button>
-          <button className={styles.settingsRow} onClick={() => showNotice()}>
-            <span className={styles.settingsIcon}><Settings size={17} /></span>
-            <span><strong>设备设置</strong><small>相机参数与偏好设置</small></span>
-            <ChevronRight size={18} />
-          </button>
-        </section>
-
-        <section className={styles.oscPanel} aria-label="OSC WiFi 控制">
-          <div className={styles.oscHeader}>
-            <div>
-              <span className={styles.deviceEyebrow}>OSC CONTROL</span>
-              <h2>WiFi 拍摄控制</h2>
-              <small>OSC 不支持实时预览；可触发快门、录像，并在拍摄后拉取最新文件预览。</small>
-            </div>
-            <Wifi size={20} color="var(--teal)" />
-          </div>
-          <label className={styles.oscField}>
-            <span>相机地址</span>
-            <input
-              value={oscBaseUrl}
-              onChange={(event) => setOscBaseUrl(event.target.value)}
-              placeholder={DEFAULT_OSC_BASE_URL}
-              inputMode="url"
-            />
-          </label>
-          <div className={styles.oscActions}>
-            <button className="secondary-action" onClick={() => void handleOscState()} disabled={oscBusy}>
-              <Wifi size={16} />
-              状态
-            </button>
-            <button className="secondary-action" onClick={() => void handleOscCapture()} disabled={oscBusy}>
-              <Camera size={16} />
-              拍摄
-            </button>
-            <button className="secondary-action" onClick={() => void handleOscStartCapture()} disabled={oscBusy}>
-              <Camera size={16} />
-              录像
-            </button>
-            <button className="secondary-action" onClick={() => void handleOscStopCapture()} disabled={oscBusy}>
-              <RefreshCw size={16} />
-              停止
-            </button>
-            <button className="secondary-action" onClick={() => void handleOscListFiles()} disabled={oscBusy}>
-              <RefreshCw size={16} />
-              文件
-            </button>
-          </div>
-          {latestFiles.length ? (
-            <div className={styles.oscFiles}>
-              {latestFiles.slice(0, 3).map((file, index) => (
-                <button
-                  key={file.fileUrl || index}
-                  onClick={() => void importLatestOscFile(file.fileUrl)}
-                  disabled={oscBusy}
-                >
-                  <Download size={14} />
-                  {file.name || `文件 ${index + 1}`}
-                </button>
-              ))}
-            </div>
-          ) : null}
-          {oscStatus ? <p className="share-status">{oscStatus}</p> : null}
-        </section>
-
-        <button className={styles.connectDevice} onClick={() => showNotice()}>
-          <span><Plus size={19} strokeWidth={1.8} /></span>
-          <strong>连接新设备</strong>
-          <small>连上 X6 WiFi 热点后，网页直接控制相机</small>
-        </button>
-      </div>
-      <input
-        ref={importInputRef}
-        type="file"
-        accept="image/*,video/*"
-        hidden
-        onChange={(event) => {
-          const file = event.target.files?.[0];
-          importInsta360File(file);
-          event.target.value = "";
-        }}
-      />
-      <AppNav />
-      {notice ? <div className="toast">{notice}</div> : null}
-    </main>
-  );
+        </div>
+        <div className={styles.panoramaCount}><strong>{photoCount ?? "—"}</strong><span>张全景照片<small>本应用中的全景照片 · 含示例</small></span></div>
+        {photoCount === null && <p className={styles.hardwareError} role="alert">暂时无法读取本地照片数量，请刷新重试。</p>}
+        {device && <div className={styles.hardwareActions}><button className={styles.hardwareButton} disabled={busy} onClick={() => void connect()}>检查连接</button><button className={styles.hardwareButton} disabled={busy} onClick={disconnectInsta360}>断开设备</button></div>}
+      </section>
+      {!device && <button className={styles.connectDevice} onClick={() => { setAdding(true); setError(""); }}><span><Plus size={19} /></span><strong>添加新设备</strong><small>连接 Insta360 相机 Wi-Fi</small></button>}
+      {adding && <section className={styles.hardwareCard} aria-label="添加 Insta360" aria-busy={busy}>
+        <div className={styles.hardwareHeader}><h2>连接相机</h2><Wifi size={22} /></div>
+        <p className={styles.hardwareNote}>打开相机 Wi-Fi，在手机系统的 Wi-Fi 设置中选择相机热点。连接后返回这里，点击「检查并连接」。</p>
+        <p className={styles.hardwareNote}>网页不能自动切换 Wi-Fi；请允许原生 App 访问本地网络。</p>
+        <label className={styles.oscField}><span>相机地址</span><input value={address} disabled={busy} onChange={(event) => setAddress(event.target.value)} inputMode="url" /></label>
+        <div className={styles.hardwareActions}><button className={styles.hardwareButton} disabled={busy} onClick={() => void openCameraWifiSettings().catch((error) => setError(cameraError(error)))}>打开 Wi-Fi 设置</button><button className={`${styles.hardwareButton} ${styles.connectButton}`} disabled={busy} onClick={() => void connect()}>{busy ? "正在连接…" : "检查并连接"}</button><button className={styles.hardwareButton} disabled={busy} onClick={() => setAdding(false)}>取消</button></div>
+      </section>}
+      {error && <p className={styles.hardwareError} role="alert">{error}</p>}
+      <section className={styles.deviceSettings} aria-label="相机管理">
+        <button className={styles.settingsRow} onClick={() => { setStorageOpen(true); void openInsta360App().catch((error) => setError(cameraError(error))); }}><span className={styles.settingsIcon}><FolderOpen size={17} /></span><span><strong>存储管理</strong><small>在 Insta360 App 中管理相机存储</small></span><ChevronRight size={18} /></button>
+        {storageOpen && <div className={styles.storageHelp}><p className={styles.hardwareNote}>请打开 Insta360 App，连接相机后进入相册管理。当前尚无经过验证的存储页直达链接。</p><a href="https://www.insta360.com/download/insta360-app" target="_blank" rel="noreferrer">获取 Insta360 App</a></div>}
+      </section>
+      <HealthDevices />
+    </div><AppNav />
+  </main>;
 }

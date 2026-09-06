@@ -29,7 +29,7 @@ export type NativeHealthSample = z.infer<typeof nativeSampleSchema>;
 export type HealthMetric = z.infer<typeof metricSchema>;
 
 export interface HealthBridgePlugin {
-  status(): Promise<{ available: boolean; provider: "health-connect" | "healthkit"; reason?: string }>;
+  status(): Promise<{ available: boolean; provider: "health-connect" | "healthkit"; reason?: string; granted?: HealthMetric[] | null }>;
   requestAccess(): Promise<{ requested: boolean; granted: HealthMetric[] | null }>;
   readSamples(options: { from: string; to: string }): Promise<{ samples: NativeHealthSample[]; truncated: boolean }>;
 }

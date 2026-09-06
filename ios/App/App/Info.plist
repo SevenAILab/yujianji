@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>连接你选择的 Insta360 相机，控制拍照并下载全景照片。</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>仅在使用时获取位置、海拔与行程轨迹，并保存在本机。</string>
     <key>NSCameraUsageDescription</key>
