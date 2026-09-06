@@ -134,11 +134,13 @@ export default function Home() {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
     const target = completeCaptureDrag(completedDrag);
-    event.currentTarget.htmlFor = target === "camera"
-      ? "home-camera-input"
-      : target === "album"
-        ? "home-album-input"
-        : "";
+    // 触屏上，一旦拖动超过浏览器的 slop 阈值，pointerup 之后就不会再补发 click，
+    // 所以靠 <label htmlFor> 去触发 file input 在手机上必然失效（鼠标端却能用，
+    // 因为 click 会落在 down/up 的共同祖先上，与拖动距离无关）。
+    // pointerup 处理函数本身就在用户手势上下文里，直接 .click() 在 iOS Safari 上可用。
+    event.currentTarget.htmlFor = "";
+    if (target === "camera") openFilePicker(photoInputRef.current);
+    else if (target === "album") openFilePicker(albumInputRef.current);
   }
 
   function cancelCaptureDrag() {
@@ -274,10 +276,9 @@ export default function Home() {
                 onPointerUp={finishCaptureDrag}
                 onPointerCancel={cancelCaptureDrag}
                 onClick={(event) => {
-                  if (!captureTargetRef.current) {
-                    event.preventDefault();
-                    return;
-                  }
+                  // 选择器统一由 finishCaptureDrag 打开，click 一律不再触发 label，
+                  // 否则鼠标端会开两次。
+                  event.preventDefault();
                   window.setTimeout(() => setSliderTarget(null), 0);
                 }}
                 onKeyDown={(event) => {
