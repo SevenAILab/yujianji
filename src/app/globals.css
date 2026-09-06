@@ -492,17 +492,19 @@ img {
 
 .voice-field {
   position: relative;
+  /* 给下面那行绝对定位的提示文字预留空间 */
+  margin-bottom: 22px;
 }
 
 .voice-field textarea {
   padding-right: 54px;
 }
 
+/* 用 display:contents 让麦克风按钮和提示文字直接成为 .voice-field 的子元素。
+   否则 .voice-field 的高度会把下面这行提示文字也算进去，
+   按钮的 bottom:10px 就落到了提示文字那一行上，而不是输入框里面。 */
 .voice-control {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 7px;
+  display: contents;
 }
 
 .voice-button {
@@ -534,7 +536,14 @@ img {
   opacity: 1;
 }
 
+/* 提示文字脱离文档流：这样 .voice-field 的高度就等于输入框本身，
+   麦克风按钮的 bottom:10px 才会落在输入框里面，而不是落到提示行上。 */
 .voice-hint {
+  position: absolute;
+  left: 2px;
+  right: 0;
+  top: 100%;
+  margin-top: 6px;
   padding-left: 2px;
   color: #8ca3a3;
   font-size: 11px;

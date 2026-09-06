@@ -27,21 +27,44 @@ export function VoiceButton({ value, onChange }: VoiceButtonProps) {
     setSupported(isSpeechRecognitionSupported());
   }, []);
 
+  function detach(recognition: NonNullable<ReturnType<typeof getSpeechRecognition>>) {
+    recognition.onresult = null;
+    recognition.onend = null;
+    recognition.onerror = null;
+  }
+
   function stop() {
     const recognition = recognitionRef.current;
     recognitionRef.current = null;
     if (recognition) {
-      recognition.onresult = null;
-      recognition.onend = null;
+      // 关键：不能在 stop() 之前摘掉 onresult。
+      // stop() 的语义是「停止收音，但把已缓冲的音频处理完，
+      // 并派发最后一次 isFinal 结果」——最后一句话正是靠它落地的。
+      // 之前提前摘掉 handler，说完立刻点停止就会丢掉最后一段，
+      // 而说完停顿一下（浏览器已自行 finalize 过）就没事，
+      // 这就是「有时行有时不行」的来源。
       recognition.onerror = null;
+      recognition.onend = () => {
+        detach(recognition);
+        setListening(false);
+        setInterim("");
+      };
       try {
         recognition.stop();
       } catch {
-        recognition.abort?.();
+        detach(recognition);
+        try {
+          recognition.abort?.();
+        } catch {
+          // 浏览器可能已经自己结束了识别。
+        }
+        setListening(false);
+        setInterim("");
       }
+    } else {
+      setListening(false);
+      setInterim("");
     }
-    setListening(false);
-    setInterim("");
   }
 
   function start() {
@@ -60,9 +83,11 @@ export function VoiceButton({ value, onChange }: VoiceButtonProps) {
     recognition.onresult = (event) => {
       const result = readSpeechResults(event);
       finalTranscriptRef.current += result.finalText;
-      const nextValue = [baseValueRef.current, finalTranscriptRef.current.trim()]
-        .filter(Boolean)
-        .join(" ");
+      // 连 interim 一起写进输入框：边说边出字，而且万一浏览器
+      // 最后没补发 final，已经显示出来的那段也不会凭空消失。
+      // 下一次 onresult 会用更完整的文本整体覆盖，不会重复累加。
+      const spoken = `${finalTranscriptRef.current}${result.interimText}`.trim();
+      const nextValue = [baseValueRef.current, spoken].filter(Boolean).join(" ");
       if (nextValue) {
         onChange(nextValue.slice(0, 300));
         if (nextValue.length > 300) setMessage("已达到 300 字上限");
