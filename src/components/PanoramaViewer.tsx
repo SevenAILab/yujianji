@@ -1,7 +1,9 @@
 "use client";
 
 import { ArrowLeft, ArrowUpRight, Minus, Rotate3D } from "lucide-react";
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from "react";
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { usePageZoomLock } from "@/lib/use-page-zoom-lock";
+import { panoramaZoom } from "@/lib/viewer-gestures";
 import styles from "./PanoramaViewer.module.css";
 
 type PanoramaViewerProps = {
@@ -13,7 +15,7 @@ type PanoramaViewerProps = {
 
 type ViewMode = "immersive" | "sphere";
 
-const MIN_SPHERE_SCALE = 0.23;
+
 
 const vertexShaderSource = `
   attribute vec2 a_position;
@@ -33,6 +35,7 @@ const fragmentShaderSource = `
   uniform float u_pitch;
   uniform float u_mode;
   uniform float u_sphere_scale;
+  uniform float u_zoom;
   uniform float u_ready;
 
   const float PI = 3.141592653589793;
@@ -71,20 +74,21 @@ const fragmentShaderSource = `
     vec2 point = vec2(v_position.x * aspect, v_position.y);
 
     if (u_mode < 0.5) {
-      float tangent = tan(0.62);
+      float tangent = tan(0.62) / max(u_zoom, 1.0);
       vec3 ray = normalize(vec3(point.x * tangent, point.y * tangent, 1.0));
       vec3 direction = rotate_view(ray);
       gl_FragColor = texture2D(u_texture, panorama_uv(direction));
       return;
     }
 
+    float sphere_radius = u_sphere_scale * min(aspect, 1.0);
     float distance_to_center = length(point);
-    if (distance_to_center > u_sphere_scale) {
+    if (distance_to_center > sphere_radius) {
       gl_FragColor = vec4(0.969, 0.961, 0.925, 1.0);
       return;
     }
 
-    vec2 sphere_point = point / u_sphere_scale;
+    vec2 sphere_point = point / sphere_radius;
     float sphere_z = sqrt(max(0.0, 1.0 - dot(sphere_point, sphere_point)));
     vec3 normal = normalize(vec3(sphere_point.x, sphere_point.y, sphere_z));
     vec3 direction = rotate_view(normal);
@@ -112,6 +116,12 @@ function createShader(gl: WebGLRenderingContext, type: number, source: string) {
 }
 
 export function PanoramaViewer({ photo, name, onExit, onOpenDetail }: PanoramaViewerProps) {
+  usePageZoomLock();
+  const viewerRef = useRef<HTMLDivElement>(null);
+  const zoomRef = useRef(1);
+  const exitRef = useRef(onExit);
+  exitRef.current = onExit;
+  const exitedRef = useRef(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const modeRef = useRef<ViewMode>("immersive");
   const sphereScaleRef = useRef(0.94);
@@ -120,46 +130,48 @@ export function PanoramaViewer({ photo, name, onExit, onOpenDetail }: PanoramaVi
   const pointersRef = useRef(new Map<number, { x: number; y: number }>());
   const dragStartRef = useRef<{ x: number; y: number; yaw: number; pitch: number } | null>(null);
   const pinchStartRef = useRef<{ distance: number; scale: number } | null>(null);
-  const exitReadyRef = useRef(false);
+
   const [mode, setMode] = useState<ViewMode>("immersive");
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
 
-  function switchMode(next: ViewMode) {
-    modeRef.current = next;
-    setMode(next);
-    exitReadyRef.current = false;
-  }
-
-  function beginSphere() {
-    sphereScaleRef.current = 0.94;
-    switchMode("sphere");
-  }
-
-  function handleWheel(event: ReactWheelEvent<HTMLDivElement>) {
-    event.preventDefault();
-    if (event.deltaY > 0) {
-      if (modeRef.current === "immersive") {
-        beginSphere();
-        return;
-      }
-      const next = Math.max(MIN_SPHERE_SCALE, sphereScaleRef.current - Math.min(event.deltaY, 120) * 0.0018);
-      if (next === MIN_SPHERE_SCALE && sphereScaleRef.current === MIN_SPHERE_SCALE) {
-        if (exitReadyRef.current) onExit();
-        else exitReadyRef.current = true;
-      } else {
-        exitReadyRef.current = false;
-      }
-      sphereScaleRef.current = next;
-      return;
-    }
-
-    exitReadyRef.current = false;
-    if (modeRef.current === "sphere") {
-      sphereScaleRef.current = Math.min(1.04, sphereScaleRef.current + Math.min(-event.deltaY, 120) * 0.0018);
-      if (sphereScaleRef.current >= 1.02) switchMode("immersive");
+  function applyZoom(value: number) {
+    const next = panoramaZoom(value);
+    zoomRef.current = next.zoom;
+    sphereScaleRef.current = next.zoom * 0.94;
+    const nextMode = next.zoom < 1 ? "sphere" : "immersive";
+    modeRef.current = nextMode;
+    setMode(nextMode);
+    if (next.exit && !exitedRef.current) {
+      exitedRef.current = true;
+      exitRef.current();
     }
   }
+
+  useEffect(() => {
+    const viewer = viewerRef.current;
+    if (!viewer) return;
+    const overflow = document.body.style.overflow;
+    const rootOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    let wheelZoom = zoomRef.current;
+    let lastWheel = 0;
+    function wheel(event: WheelEvent) {
+      event.preventDefault();
+      if (performance.now() - lastWheel > 250) wheelZoom = zoomRef.current;
+      lastWheel = performance.now();
+      const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? window.innerHeight : 1);
+      wheelZoom = Math.min(3, wheelZoom * Math.exp(-Math.max(-120, Math.min(120, delta)) * 0.005));
+      applyZoom(wheelZoom);
+    }
+    viewer.addEventListener("wheel", wheel, { passive: false });
+    return () => {
+      viewer.removeEventListener("wheel", wheel);
+      document.body.style.overflow = overflow;
+      document.documentElement.style.overflow = rootOverflow;
+    };
+  }, []);
 
   function pointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     pointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
@@ -176,7 +188,7 @@ export function PanoramaViewer({ photo, name, onExit, onOpenDetail }: PanoramaVi
       if (first && second) {
         pinchStartRef.current = {
           distance: Math.hypot(second.x - first.x, second.y - first.y),
-          scale: sphereScaleRef.current,
+          scale: zoomRef.current,
         };
       }
       dragStartRef.current = null;
@@ -192,33 +204,14 @@ export function PanoramaViewer({ photo, name, onExit, onOpenDetail }: PanoramaVi
       if (!first || !second || !pinch?.distance) return;
       const distance = Math.hypot(second.x - first.x, second.y - first.y);
       const ratio = distance / pinch.distance;
-      if (modeRef.current === "immersive" && ratio < 0.86) {
-        beginSphere();
-        pinchStartRef.current = { distance, scale: sphereScaleRef.current };
-        return;
-      }
-      if (modeRef.current === "sphere") {
-        const next = Math.max(MIN_SPHERE_SCALE, Math.min(1.04, pinch.scale * ratio));
-        if (
-          next === MIN_SPHERE_SCALE &&
-          sphereScaleRef.current === MIN_SPHERE_SCALE &&
-          exitReadyRef.current &&
-          ratio < 0.92
-        ) {
-          onExit();
-          return;
-        }
-        if (next > MIN_SPHERE_SCALE) exitReadyRef.current = false;
-        sphereScaleRef.current = next;
-        if (next >= 1.02) switchMode("immersive");
-      }
+      applyZoom(pinch.scale * ratio);
       return;
     }
 
     const drag = dragStartRef.current;
     if (!drag) return;
-    yawRef.current = drag.yaw - (event.clientX - drag.x) * 0.0045;
-    pitchRef.current = Math.max(-1.15, Math.min(1.15, drag.pitch + (event.clientY - drag.y) * 0.0035));
+    yawRef.current = drag.yaw - (event.clientX - drag.x) * 0.0045 / Math.max(1, zoomRef.current);
+    pitchRef.current = Math.max(-1.15, Math.min(1.15, drag.pitch + (event.clientY - drag.y) * 0.0035 / Math.max(1, zoomRef.current)));
   }
 
   function pointerUp(event: ReactPointerEvent<HTMLDivElement>) {
@@ -227,12 +220,8 @@ export function PanoramaViewer({ photo, name, onExit, onOpenDetail }: PanoramaVi
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
     if (pointersRef.current.size < 2) pinchStartRef.current = null;
-    if (pointersRef.current.size === 0) {
-      dragStartRef.current = null;
-      if (modeRef.current === "sphere" && sphereScaleRef.current === MIN_SPHERE_SCALE) {
-        exitReadyRef.current = true;
-      }
-    }
+    const remaining = [...pointersRef.current.values()][0];
+    dragStartRef.current = remaining ? { ...remaining, yaw: yawRef.current, pitch: pitchRef.current } : null;
   }
 
   useEffect(() => {
@@ -294,6 +283,7 @@ export function PanoramaViewer({ photo, name, onExit, onOpenDetail }: PanoramaVi
       const pitch = gl.getUniformLocation(program, "u_pitch");
       const viewMode = gl.getUniformLocation(program, "u_mode");
       const sphereScale = gl.getUniformLocation(program, "u_sphere_scale");
+      const viewZoom = gl.getUniformLocation(program, "u_zoom");
       const textureReady = gl.getUniformLocation(program, "u_ready");
 
       function render() {
@@ -315,6 +305,7 @@ export function PanoramaViewer({ photo, name, onExit, onOpenDetail }: PanoramaVi
         gl.uniform1f(pitch, pitchRef.current);
         gl.uniform1f(viewMode, modeRef.current === "immersive" ? 0 : 1);
         gl.uniform1f(sphereScale, sphereScaleRef.current);
+        gl.uniform1f(viewZoom, zoomRef.current);
         gl.uniform1f(textureReady, imageReady ? 1 : 0);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
         frame = requestAnimationFrame(render);
@@ -337,8 +328,8 @@ export function PanoramaViewer({ photo, name, onExit, onOpenDetail }: PanoramaVi
 
   return (
     <div
+      ref={viewerRef}
       className={styles.viewer}
-      onWheel={handleWheel}
       onPointerDown={pointerDown}
       onPointerMove={pointerMove}
       onPointerUp={pointerUp}
@@ -358,9 +349,9 @@ export function PanoramaViewer({ photo, name, onExit, onOpenDetail }: PanoramaVi
       {error ? <div className={styles.error}>{error}</div> : null}
       <div className={styles.guide}>
         {mode === "immersive" ? (
-          <><Rotate3D size={15} /> 拖动环顾 · 向外缩小</>
+          <><Rotate3D size={15} /> 拖动环顾 · 双指缩放照片</>
         ) : (
-          <><Minus size={15} /> 缩小照片球 · 再缩一次返回地球</>
+          <><Minus size={15} /> 继续缩小照片球 · 缩到最小返回地球</>
         )}
       </div>
     </div>

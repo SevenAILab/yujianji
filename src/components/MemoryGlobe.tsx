@@ -1,5 +1,7 @@
 "use client";
 
+import { globeRotationStep, PREVIEW_PAUSE_MS } from "@/lib/viewer-gestures";
+
 import { geoDistance, geoOrthographic, geoPath } from "d3-geo";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -117,6 +119,7 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
     let longitude = -105, latitude = -10, lastX = 0, lastY = 0, pressX = 0, pressY = 0, velocity = 0;
     let dragging = false, pointerX = -999, pointerY = -999, frame = 0;
     let previous = performance.now(), hoverId = "", hoverVisibleUntil = 0, candidateId = "", moved = false;
+    let rotationPausedUntil = 0;
     let zoom = 1, pinchStartDistance = 0, pinchStartZoom = 1;
     const activePointers = new Map<number, { x: number; y: number }>();
     let hitTargets: Array<NonNullable<Hover>> = [];
@@ -154,7 +157,7 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
     function draw(timestamp: number) {
       const elapsed = timestamp - previous;
       previous = timestamp;
-      if (!dragging && activePointers.size < 2) longitude += elapsed * 0.006 + velocity;
+      if (!dragging && activePointers.size === 0) longitude += globeRotationStep(elapsed, zoom, velocity, timestamp < rotationPausedUntil);
       velocity *= 0.94;
       radius = baseRadius * zoom;
       configureProjection();
@@ -288,7 +291,8 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
         candidateId = nextId;
         if (nearest) {
           hoverId = nextId;
-          hoverVisibleUntil = timestamp + 3_000;
+          hoverVisibleUntil = timestamp + PREVIEW_PAUSE_MS;
+          if (nearest.item.mediaKind === "panorama") { rotationPausedUntil = hoverVisibleUntil; velocity = 0; }
           showHover(nearest);
         }
       }
@@ -304,12 +308,13 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
       pointerX = event.clientX - bounds.left; pointerY = event.clientY - bounds.top;
       const target = hitTargets
         .map((candidate) => ({ candidate, distance: Math.hypot(pointerX - candidate.x, pointerY - candidate.y) }))
-        .filter(({ distance }) => distance < 15)
+        .filter(({ distance }) => distance < (event.pointerType === "mouse" ? 15 : 28))
         .sort((a, b) => a.distance - b.distance)[0]?.candidate;
       if (event.pointerType !== "mouse" && target) {
         hoverId = `${target.pin.id}:${target.location.id}:${target.item.id}`;
         candidateId = hoverId;
-        hoverVisibleUntil = performance.now() + 3_000;
+        hoverVisibleUntil = performance.now() + PREVIEW_PAUSE_MS;
+        if (target.item.mediaKind === "panorama") { rotationPausedUntil = hoverVisibleUntil; velocity = 0; }
         showHover(target);
       }
       activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
@@ -359,8 +364,8 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
       if (!dragging) return;
       if (Math.hypot(event.clientX - pressX, event.clientY - pressY) > 5) moved = true;
       const dx = event.clientX - lastX, dy = event.clientY - lastY;
-      longitude += dx * 0.32; latitude = Math.max(-65, Math.min(65, latitude - dy * 0.22));
-      velocity = dx * 0.025; lastX = event.clientX; lastY = event.clientY;
+      longitude += dx * 0.32 / Math.max(1, zoom); latitude = Math.max(-65, Math.min(65, latitude - dy * 0.22 / Math.max(1, zoom)));
+      velocity = dx * 0.025 / Math.max(1, zoom); lastX = event.clientX; lastY = event.clientY;
     }
     function pointerUp(event: PointerEvent) {
       activePointers.delete(event.pointerId);
