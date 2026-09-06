@@ -1,11 +1,10 @@
 "use client";
 
-import { Download, Image as ImageIcon, Link2, Share2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Image as ImageIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import type { Item } from "@/lib/types";
 import { CATEGORY_LABELS } from "@/lib/types";
 import { formatDate } from "@/lib/format";
-import { buildSharePayload, buildShareUrl } from "@/lib/share";
 
 const CARD_WIDTH = 1080;
 const CARD_HEIGHT = 1920;
@@ -136,12 +135,6 @@ export function ShareCard({ item }: { item: Item }) {
   const [previewUrl, setPreviewUrl] = useState("");
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
-  const [linking, setLinking] = useState(false);
-  const [linkStatus, setLinkStatus] = useState("");
-  const fileName = useMemo(
-    () => `yujianji-${item.id.slice(0, 18)}.png`,
-    [item.id],
-  );
 
   useEffect(() => {
     return () => {
@@ -157,85 +150,11 @@ export function ShareCard({ item }: { item: Item }) {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
       setBlob(nextBlob);
       setPreviewUrl(URL.createObjectURL(nextBlob));
-      setStatus("分享图已生成，可保存到相册");
+      setStatus("长按上面的图片，保存到相册");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "分享图生成失败");
     } finally {
       setBusy(false);
-    }
-  }
-
-  function download() {
-    if (!blob) return;
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = fileName;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1500);
-    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-      setStatus("如果没有自动保存，请点开预览后长按图片保存到相册");
-    }
-  }
-
-  async function share() {
-    if (!blob) return;
-    if (!navigator.share) {
-      download();
-      return;
-    }
-    const file = new File([blob], fileName, { type: "image/png" });
-    try {
-      if (!navigator.canShare || !navigator.canShare({ files: [file] })) {
-        download();
-        return;
-      }
-      await navigator.share({ title: item.name, files: [file] });
-    } catch {
-      setStatus("已取消分享，仍可以下载图片");
-    }
-  }
-
-  async function getShareUrl() {
-    const payload = await buildSharePayload(item);
-    return buildShareUrl(payload);
-  }
-
-  async function copyLink() {
-    setLinking(true);
-    setLinkStatus("");
-    try {
-      const url = await getShareUrl();
-      await navigator.clipboard.writeText(url);
-      setLinkStatus("网页分享链接已复制，可发给朋友");
-    } catch {
-      setLinkStatus("浏览器未允许自动复制，请改用系统分享");
-    } finally {
-      setLinking(false);
-    }
-  }
-
-  async function shareLink() {
-    setLinking(true);
-    setLinkStatus("");
-    try {
-      const url = await getShareUrl();
-      if (!navigator.share) {
-        await copyLink();
-        return;
-      }
-      await navigator.share({
-        title: item.name,
-        text: item.ai?.memorySentence ?? "一起看我的遇见",
-        url,
-      });
-      setLinkStatus("已打开系统分享");
-    } catch {
-      setLinkStatus("已取消分享，链接仍可复制");
-    } finally {
-      setLinking(false);
     }
   }
 
@@ -255,34 +174,13 @@ export function ShareCard({ item }: { item: Item }) {
       ) : (
         <p className="share-copy">把这件遇见做成一张 1080 × 1920 的长图，存进相册或发给朋友。</p>
       )}
-      <div className="action-row share-actions">
+      <div className="share-actions single">
         <button className="secondary-action" onClick={() => void generate()} disabled={busy}>
           <ImageIcon size={16} />
           {busy ? "正在生成…" : blob ? "重新生成" : "生成分享图"}
         </button>
-        {blob ? (
-          <>
-            <button className="secondary-action" onClick={download}>
-              <Download size={16} />
-              保存
-            </button>
-            <button className="secondary-action" onClick={() => void share()}>
-              <Share2 size={16} />
-              分享
-            </button>
-          </>
-        ) : null}
-        <button className="secondary-action" onClick={() => void copyLink()} disabled={linking}>
-          <Link2 size={16} />
-          复制网页
-        </button>
-        <button className="secondary-action" onClick={() => void shareLink()} disabled={linking}>
-          <Share2 size={16} />
-          分享链接
-        </button>
       </div>
       {status ? <p className="share-status">{status}</p> : null}
-      {linkStatus ? <p className="share-status">{linkStatus}</p> : null}
     </section>
   );
 }

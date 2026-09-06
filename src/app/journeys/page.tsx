@@ -279,8 +279,9 @@ export default function JourneysPage() {
             <h1>我的旅程</h1>
             <p>用时间，串起所有的遇见</p>
           </div>
-          <button className="journey-calendar" onClick={openCreator} aria-label="创建旅程" title="创建旅程">
-            <CalendarDays size={25} strokeWidth={1.8} />
+          <button className="journey-calendar" onClick={openCreator} title="创建一段旅程">
+            <CalendarDays size={16} strokeWidth={1.8} />
+            创建一段旅程
           </button>
         </header>
 

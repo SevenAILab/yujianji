@@ -297,17 +297,21 @@
   letter-spacing: .04em;
 }
 
+/* 圆形日历图标看不出是干什么的，改成带文字的入口。 */
 .journey-calendar {
-  display: grid;
-  width: 56px;
-  height: 56px;
-  flex: 0 0 56px;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  padding: 10px 14px;
   margin-top: 1px;
   border: 1px solid rgba(178, 205, 198, .62);
-  border-radius: 50%;
+  border-radius: 999px;
   background: rgba(255, 255, 255, .78);
   color: #16766e;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
   box-shadow: 0 10px 25px rgba(43, 92, 83, .07);
   backdrop-filter: blur(12px);
   transition: transform 160ms ease, background 160ms ease;
@@ -648,7 +652,8 @@
 
 @media (max-width: 430px) {
   .journey-page { padding: 48px 20px 24px; }
-  .journey-calendar { width: 52px; height: 52px; flex-basis: 52px; }
+  /* 已从圆形图标改成文字入口，窄屏只收一点内边距，不再锁死成正方形。 */
+  .journey-calendar { padding: 9px 12px; font-size: 12px; }
   .journey-filters { margin-top: 29px; }
   .journey-filters button { min-width: 74px; min-height: 40px; padding: 0 15px; font-size: 13px; }
 }
