@@ -182,6 +182,7 @@ export function buildSeedUserText(
 export function buildEncounterAvUserText(
   history: HistoryEntry[],
   frameTimes: number[],
+  hasAudio = true,
 ): string {
   return `历史记录（每行格式为 id | name | category | place | month | note；只能引用其中真实存在的 id 和 name）：
 <history>
@@ -190,9 +191,16 @@ ${buildHistoryContext(history) || "（暂无历史）"}
 
 共 ${frameTimes.length} 帧，依次编号为 ${frameTimes
     .map((time, index) => `#${index}=第${time.toFixed(1)}秒`)
-    .join("、")}。音频是同一段视频的声音。
+    .join("、")}。${
+    hasAudio
+      ? "音频是同一段视频的声音。\n\n请先把语音与对应画面对齐，再严格按 JSON 契约返回。"
+      : `这一次没有音频，你只能看到画面。因此：
+- 每一条的 heard 必须是空字符串 ""，绝不允许编造用户说过的话。
+- placeHint 必须是 null，绝不允许根据画面猜地点。
+- question 改为围绕画面里确实看得见的东西，问他当时的动作或处境。
 
-请先把语音与对应画面对齐，再严格按 JSON 契约返回。`;
+请严格按 JSON 契约返回。`
+  }`;
 }
 
 export const INSIGHT_SYSTEM_PROMPT = `${PERSONA_PROMPT}

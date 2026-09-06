@@ -14,7 +14,8 @@ interface CallVisionOptions {
 interface CallOmniOptions {
   frames: string[];
   frameTimes: number[];
-  audioDataUrl: string;
+  /** 为 null 时只送画面帧：浏览器解不出音轨，或模型不吃 input_audio。 */
+  audioDataUrl: string | null;
   systemPrompt: string;
   userText: string;
   model?: string;
@@ -174,23 +175,34 @@ export async function callOmni({
       type: "image_url",
       image_url: { url, detail: "high" },
     })),
-    {
-      type: "input_audio",
-      input_audio: { data: audioDataUrl, format: "wav" },
-    },
   ];
 
-  const stream = (await client.chat.completions.create({
+  // 没有音轨就不要放 input_audio 这一块：
+  // 很多视觉模型（比如 gpt-4o）根本不接受这种内容块，带上去整条请求会被拒。
+  if (audioDataUrl) {
+    content.push({
+      type: "input_audio",
+      input_audio: { data: audioDataUrl, format: "wav" },
+    });
+  }
+
+  const request: Record<string, unknown> = {
     model,
     messages: [
       { role: "system", content: systemPrompt },
       { role: "user", content },
     ],
-    modalities: ["text"],
     temperature: 0.2,
     max_tokens: 2400,
     stream: true,
-  } as never)) as unknown as AsyncIterable<{
+  };
+  // modalities 是 omni / audio 类模型才认的参数。
+  // 纯视觉模型（gpt-4o 等）带上它可能整条请求被拒，所以只在真的送了音频时才加。
+  if (audioDataUrl) request.modalities = ["text"];
+
+  const stream = (await client.chat.completions.create(
+    request as never,
+  )) as unknown as AsyncIterable<{
     choices?: Array<{ delta?: { content?: unknown } }>;
   }>;
 

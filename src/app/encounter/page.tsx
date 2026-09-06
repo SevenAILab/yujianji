@@ -367,7 +367,13 @@ export default function EncounterPage() {
 
     try {
       const extracted = await extractFramesAndAudio(file);
-      setLoadingStage("正在听你说，也在看画面");
+      // 浏览器解不出 MP4 里的音轨是常态（decodeAudioData 只保证纯音频文件），
+      // 这时降级成纯画面识别，但要让用户知道声音没被用上，别以为它听见了。
+      setLoadingStage(
+        extracted.audioDataUrl
+          ? "正在听你说，也在看画面"
+          : "这段视频的声音读不出来，正在只看画面",
+      );
       const requestBody = {
         frames: extracted.frames,
         audioDataUrl: extracted.audioDataUrl,

@@ -60,7 +60,7 @@ export async function POST(request: Request) {
   const history = normalizedHistory.entries;
   if (
     frames.some((frame) => !isJpegDataUrl(frame.dataUrl)) ||
-    !isWavDataUrl(audioDataUrl)
+    (audioDataUrl !== null && !isWavDataUrl(audioDataUrl))
   ) {
     return errorResponse(400, "INVALID_REQUEST", "只支持 JPEG 帧和 WAV 音频");
   }
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
     (total, frame) => total + dataUrlByteLength(frame.dataUrl),
     0,
   );
-  const audioBytes = dataUrlByteLength(audioDataUrl);
+  const audioBytes = audioDataUrl ? dataUrlByteLength(audioDataUrl) : 0;
   if (frameBytes > MAX_FRAME_BYTES) {
     return errorResponse(413, "FRAMES_TOO_LARGE", "抽取的画面帧仍然太大");
   }
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
   }
 
   const frameTimes = frames.map((frame) => frame.atSec);
-  const userText = buildEncounterAvUserText(history, frameTimes);
+  const userText = buildEncounterAvUserText(history, frameTimes, Boolean(audioDataUrl));
   const deadline = Date.now() + 55_000;
 
   async function callWithBudget(extraText = userText) {

@@ -205,7 +205,8 @@ export async function extractFramesAndAudio(
   opts: { maxSeconds?: number } = {},
 ): Promise<{
   frames: AvFrame[];
-  audioDataUrl: string;
+  /** 浏览器解不出音轨时为 null：此时只送画面帧。 */
+  audioDataUrl: string | null;
   durationSec: number;
   truncated: boolean;
 }> {
@@ -270,6 +271,41 @@ export async function extractFramesAndAudio(
       });
     }
 
+    // decodeAudioData 只保证能解「纯音频文件」。喂给它一个 MP4 容器，
+    // 绝大多数浏览器都会抛错——这跟视频是谁导出的、什么编码无关。
+    // 所以音轨从这里开始一律当成「有最好，没有也能走」：
+    // 拿不到就只送画面帧，绝不因此让整段视频上传失败。
+    const audio = await extractAudioOrNull(
+      file,
+      audioContext,
+      effectiveDuration.durationSec,
+    );
+
+    return {
+      frames,
+      audioDataUrl: audio,
+      durationSec,
+      truncated: effectiveDuration.truncated,
+    };
+  } finally {
+    video.pause();
+    video.removeAttribute("src");
+    video.load();
+    URL.revokeObjectURL(objectUrl);
+    void audioContext.close();
+  }
+}
+
+/**
+ * 尽力取出 16kHz 单声道 WAV；任何一步失败都返回 null，由调用方降级成纯画面。
+ * 只有「视频本身没声音」这种情况也走 null——用户照样能得到识别结果。
+ */
+async function extractAudioOrNull(
+  file: File,
+  audioContext: AudioContext,
+  maxDurationSec: number,
+): Promise<string | null> {
+  try {
     const sourceBuffer = await withTimeout(
       file.arrayBuffer(),
       12_000,
@@ -284,23 +320,12 @@ export async function extractFramesAndAudio(
         "DECODE_TIMEOUT",
         "解码视频声音超时",
       );
-    } catch (error) {
-      if (error instanceof AvExtractionError) throw error;
-      throw new AvExtractionError(
-        "UNSUPPORTED_CODEC",
-        "浏览器无法解码这段视频的声音",
-      );
+    } catch {
+      return null;
     }
-    const decodedDuration = Math.min(
-      effectiveDuration.durationSec,
-      decoded.duration,
-    );
-    if (!decoded.numberOfChannels || decodedDuration <= 0.05) {
-      throw new AvExtractionError("NO_AUDIO", "这段视频里没有可识别的声音");
-    }
-    if (!audioBufferHasSignal(decoded, decodedDuration)) {
-      throw new AvExtractionError("NO_AUDIO", "这段视频里没有可识别的声音");
-    }
+    const decodedDuration = Math.min(maxDurationSec, decoded.duration);
+    if (!decoded.numberOfChannels || decodedDuration <= 0.05) return null;
+    if (!audioBufferHasSignal(decoded, decodedDuration)) return null;
 
     const offline = new OfflineAudioContext(
       1,
@@ -318,20 +343,9 @@ export async function extractFramesAndAudio(
       "处理视频声音超时",
     );
     const wav = encodeWav(rendered);
-    if (wav.byteLength > 1_950_000) {
-      throw new AvExtractionError("AUDIO_TOO_LARGE", "视频声音压缩后仍然太大");
-    }
-    return {
-      frames,
-      audioDataUrl: await blobToDataUrl(new Blob([wav], { type: "audio/wav" })),
-      durationSec,
-      truncated: effectiveDuration.truncated,
-    };
-  } finally {
-    video.pause();
-    video.removeAttribute("src");
-    video.load();
-    URL.revokeObjectURL(objectUrl);
-    void audioContext.close();
+    if (wav.byteLength > 1_950_000) return null;
+    return blobToDataUrl(new Blob([wav], { type: "audio/wav" }));
+  } catch {
+    return null;
   }
 }

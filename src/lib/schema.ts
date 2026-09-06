@@ -198,7 +198,8 @@ const avFrameSchema = z.object({
 
 export const encounterAvRequestSchema = z.object({
   frames: z.array(avFrameSchema).min(1).max(6),
-  audioDataUrl: z.string().min(1).max(2_700_000),
+  // 浏览器解不出音轨时送 null，只用画面帧识别。
+  audioDataUrl: z.string().min(1).max(2_700_000).nullable(),
   history: z.array(historyEntrySchema),
   placeFallback: z.string().max(120).nullable().optional(),
 }).strict();
