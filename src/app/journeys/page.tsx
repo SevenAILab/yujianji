@@ -172,7 +172,15 @@ export default function JourneysPage() {
       }),
     ).then((results) => {
       if (!active) return;
-      setAutoJourneys(results.filter((entry): entry is SavedJourney => entry !== null));
+      // 只有一个落点的年份（2017/2018/2025 各一条记录，2026 三条全在深圳同一处）
+      // 拼出来是一张没有路径的空图，不如不出。照片本身不动，
+      // 地图、藏品、全景演示里都还在。
+      setAutoJourneys(
+        results.filter(
+          (entry): entry is SavedJourney =>
+            entry !== null && entry.meta.stops.length >= 2,
+        ),
+      );
       setAutoLoading(false);
     });
 
