@@ -48,3 +48,7 @@ android/**/build/
 ios/App/Pods/
 ios/**/xcuserdata/
 ios/**/.build/
+
+# local briefing / nested workspace
+/project_brief.docx
+/yujianji/

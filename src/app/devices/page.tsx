@@ -134,7 +134,7 @@ export default function DevicesPage() {
     setOscBusy(true);
     setOscStatus("");
     try {
-      const files = await oscListFiles(oscBaseUrl);
+      const files = await oscListFiles(oscBaseUrl, 6, 160);
       setLatestFiles(files);
       setOscStatus(files.length ? `读取到 ${files.length} 个文件` : "相机里暂时没有文件");
     } catch (error) {
@@ -249,7 +249,7 @@ export default function DevicesPage() {
             <div>
               <span className={styles.deviceEyebrow}>OSC CONTROL</span>
               <h2>WiFi 拍摄控制</h2>
-              <small>手机连接 X6 热点后，直接触发快门、读取状态和最新文件。</small>
+              <small>OSC 不支持实时预览；可触发快门、录像，并在拍摄后拉取最新文件预览。</small>
             </div>
             <Wifi size={20} color="var(--teal)" />
           </div>

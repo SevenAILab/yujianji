@@ -97,5 +97,6 @@ public class YujianjiHealthPlugin: CAPPlugin, CAPBridgedPlugin {
 class HealthBridgeViewController: CAPBridgeViewController {
     override func capacitorDidLoad() {
         bridge?.registerPluginInstance(YujianjiHealthPlugin())
+        bridge?.registerPluginInstance(YujianjiOscPlugin())
     }
 }

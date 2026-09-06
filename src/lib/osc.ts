@@ -1,3 +1,5 @@
+﻿import { Capacitor, registerPlugin } from "@capacitor/core";
+
 export const DEFAULT_OSC_BASE_URL = "http://192.168.42.1";
 
 export interface OscCommandResponse {
@@ -26,6 +28,25 @@ export interface OscFileEntry {
   thumbnail?: string;
 }
 
+export interface OscNativeBridgePlugin {
+  execute(options: {
+    url: string;
+    body: string;
+    timeoutMs?: number;
+  }): Promise<{ status: number; body: string; ok: boolean }>;
+}
+
+let oscBridge: OscNativeBridgePlugin | null = null;
+
+function getOscNativeBridge(): OscNativeBridgePlugin | null {
+  if (typeof window === "undefined") return null;
+  if (!Capacitor.isNativePlatform()) return null;
+  if (!oscBridge) {
+    oscBridge = registerPlugin<OscNativeBridgePlugin>("YujianjiOsc");
+  }
+  return oscBridge;
+}
+
 export function normalizeOscBaseUrl(value: string): string {
   const trimmed = value.trim().replace(/\/+$/, "");
   if (!trimmed) return DEFAULT_OSC_BASE_URL;
@@ -37,27 +58,45 @@ export function isSecureContextForOsc(): boolean {
   return typeof window !== "undefined" && window.location.protocol === "https:";
 }
 
-async function oscPost(
-  baseUrl: string,
-  name: string,
-  parameters: Record<string, unknown> = {},
-): Promise<OscCommandResponse> {
-  const response = await fetch(`${normalizeOscBaseUrl(baseUrl)}/osc/commands/execute`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({ name, parameters }),
-  });
-
-  const payload = (await response.json().catch(() => ({}))) as OscCommandResponse;
-  if (!response.ok) {
-    throw new Error(payload.error?.message || `OSC 请求失败：${response.status}`);
+function parseOscPayload(body: string, status: number): OscCommandResponse {
+  let payload: OscCommandResponse = {};
+  try {
+    payload = body ? (JSON.parse(body) as OscCommandResponse) : {};
+  } catch {
+    payload = {};
+  }
+  if (status < 200 || status > 299) {
+    throw new Error(payload.error?.message || `OSC 请求失败：${status}`);
   }
   if (payload.error) {
     throw new Error(payload.error.message || "OSC 命令执行失败");
   }
   return payload;
+}
+
+async function oscPost(
+  baseUrl: string,
+  name: string,
+  parameters: Record<string, unknown> = {},
+): Promise<OscCommandResponse> {
+  const url = `${normalizeOscBaseUrl(baseUrl)}/osc/commands/execute`;
+  const body = JSON.stringify({ name, parameters });
+  const nativeBridge = getOscNativeBridge();
+
+  if (nativeBridge) {
+    const result = await nativeBridge.execute({ url, body, timeoutMs: 20_000 });
+    return parseOscPayload(result.body, result.status);
+  }
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body,
+  });
+  const text = await response.text();
+  return parseOscPayload(text, response.status);
 }
 
 export async function oscGetState(baseUrl: string): Promise<OscCommandResponse> {
@@ -66,6 +105,14 @@ export async function oscGetState(baseUrl: string): Promise<OscCommandResponse> 
 
 export async function oscTakePicture(baseUrl: string): Promise<OscCommandResponse> {
   return oscPost(baseUrl, "camera.takePicture");
+}
+
+export async function oscStartCapture(baseUrl: string): Promise<OscCommandResponse> {
+  return oscPost(baseUrl, "camera.startCapture");
+}
+
+export async function oscStopCapture(baseUrl: string): Promise<OscCommandResponse> {
+  return oscPost(baseUrl, "camera.stopCapture");
 }
 
 export async function oscListFiles(
@@ -93,11 +140,4 @@ export async function oscWaitForCapture(
     await new Promise((resolve) => window.setTimeout(resolve, 1200));
   }
   throw new Error("等待相机拍摄完成超时，请在设备页查看最新文件。");
-}
-export async function oscStartCapture(baseUrl: string): Promise<OscCommandResponse> {
-  return oscPost(baseUrl, "camera.startCapture");
-}
-
-export async function oscStopCapture(baseUrl: string): Promise<OscCommandResponse> {
-  return oscPost(baseUrl, "camera.stopCapture");
 }

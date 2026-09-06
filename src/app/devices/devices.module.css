@@ -431,3 +431,11 @@
   font-size: 11px;
   text-align: left;
 }
+.oscFiles img {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #d9e7e2;
+}
