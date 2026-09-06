@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+﻿import OpenAI from "openai";
 
 interface CallVisionOptions {
   imageDataUrl?: string;
@@ -39,6 +39,54 @@ function getClient(timeoutMs = 55_000): OpenAI {
   });
 }
 
+function getVisionModels(primaryModel: string): string[] {
+  const fallbacks = (process.env.VISION_FALLBACK_MODELS ?? "")
+    .split(",")
+    .map((model) => model.trim())
+    .filter(Boolean);
+  return Array.from(new Set([primaryModel, ...fallbacks]));
+}
+
+function isRateLimitError(error: unknown): boolean {
+  const status = (error as { status?: unknown })?.status;
+  if (status === 429) return true;
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+  return message.includes("429") || message.includes("too many requests");
+}
+
+async function requestVision(
+  client: OpenAI,
+  model: string,
+  userContent: Array<Record<string, unknown>>,
+  systemPrompt: string,
+  enableThinking: boolean,
+  jsonMode: boolean,
+): Promise<string> {
+  const request: Record<string, unknown> = {
+    model,
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userContent },
+    ],
+    temperature: 0.2,
+    max_tokens: 900,
+  };
+
+  if (enableThinking) {
+    request.enable_thinking = true;
+  }
+  if (jsonMode) {
+    request.response_format = { type: "json_object" };
+  }
+
+  const response = await client.chat.completions.create(request as never);
+  const content = response.choices[0]?.message?.content;
+  if (typeof content !== "string" || !content.trim()) {
+    throw new Error("模型返回为空");
+  }
+  return content;
+}
+
 export async function callVision({
   imageDataUrl,
   systemPrompt,
@@ -50,7 +98,6 @@ export async function callVision({
   timeoutMs = 55_000,
 }: CallVisionOptions): Promise<string> {
   const startedAt = Date.now();
-  const client = getClient(timeoutMs);
   const userContent = imageDataUrl
     ? [
         { type: "text" as const, text: userText },
@@ -61,47 +108,50 @@ export async function callVision({
       ]
     : [{ type: "text" as const, text: userText }];
 
-  const request: Record<string, unknown> = {
-    model,
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userContent },
-    ],
-    temperature: 0.2,
-    max_tokens: 900,
-    enable_thinking: enableThinking,
-  };
+  const models = getVisionModels(model);
+  let lastError: unknown = null;
 
-  if (jsonMode) {
-    request.response_format = { type: "json_object" };
+  for (const candidate of models) {
+    const candidateTimeout =
+      candidate === model ? timeoutMs : Math.min(timeoutMs, 20_000);
+    const client = getClient(candidateTimeout);
+    try {
+      const content = await requestVision(
+        client,
+        candidate,
+        userContent,
+        systemPrompt,
+        enableThinking,
+        jsonMode,
+      );
+      console.info(
+        JSON.stringify({
+          event: "vision_complete",
+          model: candidate,
+          durationMs: Date.now() - startedAt,
+          responseLength: content.length,
+        }),
+      );
+      return content;
+    } catch (error) {
+      lastError = error;
+      if (!isRateLimitError(error)) {
+        throw error;
+      }
+      console.info(
+        JSON.stringify({
+          event: "vision_rate_limited_fallback",
+          failedModel: candidate,
+        }),
+      );
+    }
   }
 
-  const response = await client.chat.completions.create(
-    request as never,
+  throw new Error(
+    lastError instanceof Error
+      ? `模型服务限流，已尝试 ${models.length} 个模型：${lastError.message}`
+      : "模型服务限流，请稍后再试",
   );
-  const content = response.choices[0]?.message?.content;
-
-  if (typeof content !== "string" || !content.trim()) {
-    throw new Error("模型返回为空");
-  }
-
-  const message = response.choices[0]?.message as
-    | { reasoning_content?: unknown }
-    | undefined;
-  console.info(
-    JSON.stringify({
-      event: "vision_complete",
-      model,
-      durationMs: Date.now() - startedAt,
-      responseLength: content.length,
-      reasoningPresent: Boolean(
-        typeof message?.reasoning_content === "string" &&
-          message.reasoning_content.trim(),
-      ),
-    }),
-  );
-
-  return content;
 }
 
 export async function callOmni({

@@ -23,6 +23,8 @@ import {
   normalizeOscBaseUrl,
   oscGetState,
   oscListFiles,
+  oscStartCapture,
+  oscStopCapture,
   oscTakePicture,
   oscWaitForCapture,
   type OscFileEntry,
@@ -42,7 +44,7 @@ const X6_DEMO: DemoDevice = {
   name: "Insta360 X6",
   photos: 0,
   videos: 0,
-  pending: "手机中继",
+  pending: "WiFi 直连",
   battery: 0,
 };
 
@@ -95,6 +97,32 @@ export default function DevicesPage() {
       await oscTakePicture(oscBaseUrl);
       const state = await oscWaitForCapture(oscBaseUrl);
       setOscStatus(state._latestFileUrl ? `拍摄完成：${state._latestFileUrl}` : "拍摄完成");
+    } catch (error) {
+      setOscStatus(oscError(error));
+    } finally {
+      setOscBusy(false);
+    }
+  }
+
+  async function handleOscStartCapture() {
+    setOscBusy(true);
+    setOscStatus("正在开始录像…");
+    try {
+      await oscStartCapture(oscBaseUrl);
+      setOscStatus("已开始录像");
+    } catch (error) {
+      setOscStatus(oscError(error));
+    } finally {
+      setOscBusy(false);
+    }
+  }
+
+  async function handleOscStopCapture() {
+    setOscBusy(true);
+    setOscStatus("正在停止录像…");
+    try {
+      await oscStopCapture(oscBaseUrl);
+      setOscStatus("已停止录像");
     } catch (error) {
       setOscStatus(oscError(error));
     } finally {
@@ -172,8 +200,8 @@ export default function DevicesPage() {
               <div>
                 <span className={styles.deviceEyebrow}>INSTA360 X6 · 360°</span>
                 <h2>{device.name}</h2>
-                <p className={styles.connectedStatus}><span /> 手机中继已就绪 <em><Wifi size={13} /> 相册导入</em></p>
-                <small>通过 Insta360 App 导出 360 照片，手机作为中继站导入遇见集</small>
+                <p className={styles.connectedStatus}><span /> WiFi 热点直连已就绪 <em><Wifi size={13} /> 相册导入</em></p>
+                <small>手机连接 X6 热点后，网页直接控制快门与录像</small>
               </div>
             ) : (
               <div>
@@ -243,6 +271,14 @@ export default function DevicesPage() {
               <Camera size={16} />
               拍摄
             </button>
+            <button className="secondary-action" onClick={() => void handleOscStartCapture()} disabled={oscBusy}>
+              <Camera size={16} />
+              录像
+            </button>
+            <button className="secondary-action" onClick={() => void handleOscStopCapture()} disabled={oscBusy}>
+              <RefreshCw size={16} />
+              停止
+            </button>
             <button className="secondary-action" onClick={() => void handleOscListFiles()} disabled={oscBusy}>
               <RefreshCw size={16} />
               文件
@@ -268,7 +304,7 @@ export default function DevicesPage() {
         <button className={styles.connectDevice} onClick={() => showNotice()}>
           <span><Plus size={19} strokeWidth={1.8} /></span>
           <strong>连接新设备</strong>
-          <small>当前使用手机中继，不需要直连相机</small>
+          <small>连上 X6 WiFi 热点后，网页直接控制相机</small>
         </button>
       </div>
       <input

@@ -94,3 +94,10 @@ export async function oscWaitForCapture(
   }
   throw new Error("等待相机拍摄完成超时，请在设备页查看最新文件。");
 }
+export async function oscStartCapture(baseUrl: string): Promise<OscCommandResponse> {
+  return oscPost(baseUrl, "camera.startCapture");
+}
+
+export async function oscStopCapture(baseUrl: string): Promise<OscCommandResponse> {
+  return oscPost(baseUrl, "camera.stopCapture");
+}
