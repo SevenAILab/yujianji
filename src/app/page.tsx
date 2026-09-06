@@ -30,7 +30,7 @@ export default function Home() {
   const [mapPins, setMapPins] = useState<MemoryGlobePin[]>([]);
   const photoInputRef = useRef<HTMLInputElement>(null);
   const albumInputRef = useRef<HTMLInputElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const openedByDragRef = useRef(false);
   const captureSliderRef = useRef<HTMLDivElement>(null);
   const cameraLabelRef = useRef<HTMLLabelElement>(null);
   const albumLabelRef = useRef<HTMLLabelElement>(null);
@@ -57,11 +57,6 @@ export default function Home() {
     await setPendingEncounterFile(file, source);
     router.push("/encounter");
   }
-
-  // iOS Safari 对「程序调用 input.click()」的用户手势判定比安卓严格得多，
-  // 拖动松手后那一次 .click() 常常被吞掉。所以点一下加号必须给一条
-  // 完全不依赖程序化点击的路径：弹出选择面板，让用户自己点真正的 <label>。
-  const [pickerOpen, setPickerOpen] = useState(false);
 
   function openFilePicker(input: HTMLInputElement | null) {
     if (!input) return;
@@ -144,10 +139,20 @@ export default function Home() {
     // 所以靠 <label htmlFor> 去触发 file input 在手机上必然失效（鼠标端却能用，
     // 因为 click 会落在 down/up 的共同祖先上，与拖动距离无关）。
     // pointerup 处理函数本身就在用户手势上下文里，直接 .click() 在 iOS Safari 上可用。
-    event.currentTarget.htmlFor = "";
-    if (target === "camera") openFilePicker(photoInputRef.current);
-    else if (target === "album") openFilePicker(albumInputRef.current);
-    else setPickerOpen(true);
+    if (target) {
+      // 拖到位：安卓 / 桌面走程序化打开，指定拍摄或相册。
+      event.currentTarget.htmlFor = "";
+      openedByDragRef.current = true;
+      openFilePicker(
+        target === "camera" ? photoInputRef.current : albumInputRef.current,
+      );
+      return;
+    }
+    // 轻点：不做任何程序化调用，把 label 指向文件输入，
+    // 让浏览器用原生 click 去激活它——iOS 会弹出自己的
+    // 「照片图库 / 拍照或录像 / 选取文件」面板，那是 iOS 唯一稳定认的路径。
+    event.currentTarget.htmlFor = "home-album-input";
+    openedByDragRef.current = false;
   }
 
   function cancelCaptureDrag() {
@@ -283,9 +288,9 @@ export default function Home() {
                 onPointerUp={finishCaptureDrag}
                 onPointerCancel={cancelCaptureDrag}
                 onClick={(event) => {
-                  // 选择器统一由 finishCaptureDrag 打开，click 一律不再触发 label，
-                  // 否则鼠标端会开两次。
-                  event.preventDefault();
+                  // 拖动那条路已经程序化打开过了，拦掉 label 的默认行为，
+                  // 否则鼠标端会连开两次；轻点则必须放行，交给系统面板。
+                  if (openedByDragRef.current) event.preventDefault();
                   window.setTimeout(() => setSliderTarget(null), 0);
                 }}
                 onKeyDown={(event) => {
@@ -314,13 +319,6 @@ export default function Home() {
               accept="image/*,video/*"
               onChange={(event) => handleSelectedFile(event, "album")}
             />
-            <input
-              id="home-file-input"
-              ref={fileInputRef}
-              className="file-input"
-              type="file"
-              onChange={(event) => handleSelectedFile(event, "album")}
-            />
           </div>
 
           <button className={styles.textEncounter} onClick={() => router.push("/encounter?mode=text")}>
@@ -338,35 +336,6 @@ export default function Home() {
           <div className={styles.insight}><InsightLine items={items} /></div>
         </section>
       </div>
-
-      {pickerOpen ? (
-        <div
-          className="picker-sheet-backdrop"
-          role="presentation"
-          onClick={(event) => {
-            if (event.target === event.currentTarget) setPickerOpen(false);
-          }}
-        >
-          <section className="picker-sheet" role="dialog" aria-modal="true" aria-label="选择记录方式">
-            <h2>记下这一刻</h2>
-            {/* 必须是真正的 <label htmlFor>，由用户自己点击。
-                iOS Safari 只认这条路径，程序化 .click() 会被吞。 */}
-            <label htmlFor="home-camera-input" onClick={() => setPickerOpen(false)}>
-              <Camera size={18} strokeWidth={1.7} />
-              <span>拍照 / 录像</span>
-            </label>
-            <label htmlFor="home-album-input" onClick={() => setPickerOpen(false)}>
-              <ImagePlus size={18} strokeWidth={1.7} />
-              <span>从相册选择</span>
-            </label>
-            <label htmlFor="home-file-input" onClick={() => setPickerOpen(false)}>
-              <PenLine size={18} strokeWidth={1.7} />
-              <span>选择文件</span>
-            </label>
-            <button className="picker-sheet-cancel" onClick={() => setPickerOpen(false)}>取消</button>
-          </section>
-        </div>
-      ) : null}
 
       <AppNav />
       {toast ? <div className="toast">{toast}</div> : null}
