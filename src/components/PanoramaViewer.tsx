@@ -298,6 +298,9 @@ export function PanoramaViewer({ photo, name, onExit, onOpenDetail }: PanoramaVi
 
       function render() {
         if (disposed) return;
+        // canvas / gl 在 effect 顶部已判空返回；这里再守一次，
+        // 因为 TS 不把外层 narrowing 带进这个 hoisted function declaration。
+        if (!canvas || !gl) return;
         const bounds = canvas.getBoundingClientRect();
         const ratio = Math.min(window.devicePixelRatio || 1, 2);
         const width = Math.max(1, Math.round(bounds.width * ratio));

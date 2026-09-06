@@ -107,10 +107,19 @@ describe("map pins", () => {
   });
 
   it("hydrates three Shenzhen panorama pin previews with their own images and 360 flags", () => {
+    // shanghai 是给 schema.parse 用的精简 fixture，缺 Item 的必填字段；
+    // 这个用例要传真正的 Item[] 给 hydrateMapPins，所以在这里补齐。
+    const itemFields = {
+      category: "landscape" as const,
+      locationSource: "gps" as const,
+      ai: null,
+      isSeed: false,
+      createdAt: "2026-09-06T14:00:00+08:00",
+    };
     const items = [
-      { ...shanghai, id: "shenzhen-studio", name: "创意空间", photo: "/studio.jpg", mediaKind: "panorama" as const, place: "中国 · 深圳", lat: 22.5431, lng: 114.0579, date: "2026-09-06T21:00:00+08:00" },
-      { ...shanghai, id: "shenzhen-night", name: "夜巷", photo: "/night.jpg", mediaKind: "panorama" as const, place: "中国 · 深圳", lat: 22.5431, lng: 114.0579, date: "2026-09-06T20:30:00+08:00" },
-      { ...shanghai, id: "shenzhen-office", name: "工作室", photo: "/office.jpg", mediaKind: "panorama" as const, place: "中国 · 深圳", lat: 22.5431, lng: 114.0579, date: "2026-09-06T14:55:00+08:00" },
+      { ...shanghai, ...itemFields, id: "shenzhen-studio", name: "创意空间", photo: "/studio.jpg", mediaKind: "panorama" as const, place: "中国 · 深圳", lat: 22.5431, lng: 114.0579, date: "2026-09-06T21:00:00+08:00" },
+      { ...shanghai, ...itemFields, id: "shenzhen-night", name: "夜巷", photo: "/night.jpg", mediaKind: "panorama" as const, place: "中国 · 深圳", lat: 22.5431, lng: 114.0579, date: "2026-09-06T20:30:00+08:00" },
+      { ...shanghai, ...itemFields, id: "shenzhen-office", name: "工作室", photo: "/office.jpg", mediaKind: "panorama" as const, place: "中国 · 深圳", lat: 22.5431, lng: 114.0579, date: "2026-09-06T14:55:00+08:00" },
     ] satisfies Item[];
     const apiPins = buildMapPins(mapPinsRequestSchema.parse({ items }));
     const [pin] = hydrateMapPins(apiPins, items);

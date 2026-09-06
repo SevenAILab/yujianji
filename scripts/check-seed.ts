@@ -37,6 +37,7 @@ if (
 const items = parsed as Array<{
   id: string;
   category: string;
+  mediaKind?: string;
   photo: string;
   place: string;
   date: string;
@@ -55,9 +56,18 @@ const missingPhotos = items.filter((item) => {
   const relative = item.photo.replace(/^\//, "");
   return !fs.existsSync(path.join(root, "public", relative));
 });
-const missingBasis = items.filter((item) => !item.ai?.luck.basis);
+// 全景示例（mediaKind === "panorama"）是 360 查看器的演示素材，不是博物志藏品，
+// 本来就没有 AI 解读（item 页会走「还没有显影」的空状态）。
+// 「luck 必须带 basis」「verdict 必须是 first」这两条只对有解读的条目才有意义。
+const needsReading = (item: (typeof items)[number]) =>
+  item.mediaKind !== "panorama" || item.ai !== null;
+const missingBasis = items.filter(
+  (item) => needsReading(item) && !item.ai?.luck.basis,
+);
 const nonFirst = items.filter(
-  (item) => item.ai?.verdict !== "first" || item.ai.relatedItemId !== null,
+  (item) =>
+    needsReading(item) &&
+    (item.ai?.verdict !== "first" || item.ai.relatedItemId !== null),
 );
 const categoryCounts = items.reduce<Record<string, number>>((counts, item) => ({
   ...counts,
