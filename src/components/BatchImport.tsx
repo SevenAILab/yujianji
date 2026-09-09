@@ -11,6 +11,7 @@ import { recognizeResultSchema } from "@/lib/schema";
 import { toHistoryEntry } from "@/lib/history";
 import type { Item, RecognizedAi } from "@/lib/types";
 import { COUNTRY_OPTIONS } from "@/lib/iso";
+import { apiFetch } from "@/lib/api-client";
 
 type BatchStatus = "pending" | "processing" | "success" | "failed";
 
@@ -89,14 +90,10 @@ export function BatchImport({
     patchEntry(entry.id, { status: "processing", error: undefined });
     try {
       const image = await compressImage(entry.file);
-      const response = await fetch("/api/recognize", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
+      const response = await apiFetch("/api/recognize", {
           image,
           userNote: "",
           history: currentHistory.map(toHistoryEntry),
-        }),
         signal: abortRef.current?.signal,
       });
       const payload = (await response.json()) as unknown;

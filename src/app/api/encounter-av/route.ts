@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { encounterAvRequestSchema } from "@/lib/schema";
 import { dataUrlByteLength } from "@/lib/image";
 import { normalizeHistory } from "@/lib/history";
-import { allowRequest } from "@/lib/rate-limit";
+import { guard } from "@/lib/api-guard";
 import { buildEncounterAvUserText, ENCOUNTER_AV_SYSTEM_PROMPT } from "@/lib/prompt";
 import { callOmni } from "@/lib/llm";
 import { isTimeoutLike } from "@/lib/timeout-error";
@@ -33,9 +33,8 @@ function isWavDataUrl(value: string): boolean {
 }
 
 export async function POST(request: Request) {
-  if (!allowRequest()) {
-    return errorResponse(429, "RATE_LIMITED", "请求太频繁，请稍后再试");
-  }
+  const gate = await guard(request);
+  if (!gate.ok) return gate.response;
 
   let body: unknown;
   try {

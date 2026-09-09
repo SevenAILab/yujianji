@@ -394,7 +394,7 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 4px;
   width: min(calc(100% - 28px), 472px);
   margin: 0 auto;
   padding: 8px;
@@ -406,17 +406,20 @@ img {
 }
 
 .bottom-nav a {
+  /* 四个入口要平分宽度：固定 min-width 会在 472px 的壳里溢出。 */
+  flex: 1 1 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  min-width: 120px;
-  padding: 10px 15px;
+  gap: 6px;
+  min-width: 0;
+  padding: 10px 8px;
   border-radius: 13px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .bottom-nav a.active {

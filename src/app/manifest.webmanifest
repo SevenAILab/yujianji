@@ -1,0 +1,19 @@
+{
+  "name": "遇见集 · 遇见世界，收藏第一次",
+  "short_name": "遇见集",
+  "description": "一个记得你所有第一次的旅行博物志。照片只存在你自己的设备里。",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f7f6",
+  "theme_color": "#2f6f6a",
+  "lang": "zh-CN",
+  "categories": ["travel", "lifestyle", "photo"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

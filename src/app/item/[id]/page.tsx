@@ -21,6 +21,7 @@ import { formatDate, formatMonth } from "@/lib/format";
 import { recognizeResultSchema } from "@/lib/schema";
 import { usePageZoomLock } from "@/lib/use-page-zoom-lock";
 import styles from "./item-detail.module.css";
+import { apiFetch } from "@/lib/api-client";
 
 const ITEM_LOADING = Symbol("item-loading");
 
@@ -103,16 +104,12 @@ export default function ItemPage() {
       setReplyError("");
       const question = currentItem.ai?.question;
       if (!question) return;
-      const response = await fetch("/api/reply", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
+      const response = await apiFetch("/api/reply", {
           itemName: currentItem.name,
           userNote: currentItem.userNote,
           question,
           answer: submittedAnswer,
-        }),
-      });
+        });
       const payload = (await response.json()) as { reply?: string; error?: string };
       if (!response.ok || !payload.reply) {
         throw new Error(payload.error ?? "回应暂时生成不出来，请重试。");
@@ -145,11 +142,7 @@ export default function ItemPage() {
     setSavingLocation(true);
     setLocationError("");
     try {
-      const response = await fetch("/api/geocode", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ place: enteredPlace }),
-      });
+      const response = await apiFetch("/api/geocode", { place: enteredPlace });
       const result = (await response.json()) as {
         found?: boolean;
         lat?: number;
@@ -196,15 +189,11 @@ export default function ItemPage() {
       const history = (await db.items.orderBy("date").toArray())
         .filter((entry) => entry.id !== currentItem.id)
         .map(toHistoryEntry);
-      const response = await fetch("/api/recognize", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
+      const response = await apiFetch("/api/recognize", {
           image: currentItem.photo,
           userNote: currentItem.userNote,
           history,
-        }),
-      });
+        });
       const payload = (await response.json()) as unknown;
       if (!response.ok) {
         const failed = payload as { error?: string };

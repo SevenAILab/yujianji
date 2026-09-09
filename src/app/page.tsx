@@ -15,17 +15,19 @@ import { AppNav } from "@/components/AppNav";
 import { InsightLine } from "@/components/InsightLine";
 import { MapErrorBoundary } from "@/components/MapErrorBoundary";
 import { MemoryGlobe, type MemoryGlobeApiPin, type MemoryGlobePin } from "@/components/MemoryGlobe";
-import { db, ensureSeeded } from "@/lib/db";
+import { db, ensureSeeded, loadDemoData } from "@/lib/db";
 import { setPendingEncounterFile } from "@/lib/encounter-transfer";
 import { hydrateMapPins } from "@/lib/local-map-pins";
 import { usePageZoomLock } from "@/lib/use-page-zoom-lock";
 import type { Item } from "@/lib/types";
 import styles from "./home.module.css";
+import { apiFetch } from "@/lib/api-client";
 
 export default function Home() {
   const router = useRouter();
   usePageZoomLock();
   const [seedReady, setSeedReady] = useState(false);
+  const [loadingDemo, setLoadingDemo] = useState(false);
   const [mapResetToken, setMapResetToken] = useState(0);
   const [mapPins, setMapPins] = useState<MemoryGlobePin[]>([]);
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -169,12 +171,8 @@ export default function Home() {
       return;
     }
     let active = true;
-    fetch("/api/map-pins", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
+    apiFetch("/api/map-pins", {
         items: items.map(({ photo: _photo, ai: _ai, ...item }) => item),
-      }),
     })
       .then(async (response) => {
         if (!response.ok) throw new Error("map pins failed");
@@ -202,7 +200,7 @@ export default function Home() {
         }
       })
       .catch(() => {
-        if (active) setToast("示例历史加载失败，请刷新重试。");
+        // 示例刷新失败不打扰用户：个人记录不受影响。
       })
       .finally(() => {
         if (active) setSeedReady(true);
@@ -326,14 +324,39 @@ export default function Home() {
             没有照片？只写字也可以记住这一刻
           </button>
 
-          <div className={styles.stats} aria-label="遇见统计">
-            <div><strong>{stats.discovered}</strong><span>已遇见</span></div>
-            <div><strong>{stats.firsts}</strong><span>第一次</span></div>
-            <div><strong>{stats.countries}</strong><span>国家</span></div>
-            <div><strong>{stats.locations}</strong><span>地点</span></div>
-          </div>
+          {seedReady && items.length === 0 ? (
+            <div className={styles.onboarding}>
+              <p>
+                这张地图现在是空的。
+                <br />
+                拍下今天看到的任何一样东西 —— 一片叶子、一杯咖啡、一只路过的猫。
+              </p>
+              <button
+                className={styles.demoLink}
+                disabled={loadingDemo}
+                onClick={() => {
+                  setLoadingDemo(true);
+                  void loadDemoData()
+                    .then((count) => setToast(`已载入 ${count} 条示例，可以在「我的」页移除。`))
+                    .catch(() => setToast("示例加载失败，请检查网络后重试。"))
+                    .finally(() => setLoadingDemo(false));
+                }}
+              >
+                {loadingDemo ? "正在载入…" : "还是先看看别人的遇见集"}
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className={styles.stats} aria-label="遇见统计">
+                <div><strong>{stats.discovered}</strong><span>已遇见</span></div>
+                <div><strong>{stats.firsts}</strong><span>第一次</span></div>
+                <div><strong>{stats.countries}</strong><span>国家</span></div>
+                <div><strong>{stats.locations}</strong><span>地点</span></div>
+              </div>
 
-          <div className={styles.insight}><InsightLine items={items} /></div>
+              <div className={styles.insight}><InsightLine items={items} /></div>
+            </>
+          )}
         </section>
       </div>
 

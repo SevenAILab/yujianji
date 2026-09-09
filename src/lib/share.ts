@@ -72,6 +72,18 @@ export async function buildSharePayload(item: Item): Promise<SharePayload> {
   };
 }
 
+/**
+ * 分享链接里的内容全部来自 URL，也就是来自任何人。
+ * 图片必须是我们自己生成的那种 JPEG/PNG data URL —— 别的一律丢弃，
+ * 免得把 `javascript:` 之类的东西直接塞进 <img src>。
+ */
+export function isSafeImageDataUrl(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    /^data:image\/(?:jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(value)
+  );
+}
+
 export function encodeSharePayload(payload: SharePayload): string {
   return encodeURIComponent(JSON.stringify(payload));
 }
@@ -90,6 +102,8 @@ export function decodeSharePayload(encoded: string): SharePayload | null {
     ) {
       return null;
     }
+    // 不是合法图片就把它清空：整条记录的文字仍然可读，只是不显示图。
+    if (!isSafeImageDataUrl(parsed.photo)) parsed.photo = "";
     return parsed;
   } catch {
     return null;

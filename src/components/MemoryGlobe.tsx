@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { mesh } from "topojson-client";
 import world from "world-atlas/countries-110m.json";
 import styles from "./MemoryGlobe.module.css";
+import { panoramaHref } from "@/lib/app-mode";
 
 type Geometry =
   | { type: "Polygon"; coordinates: number[][][] }
@@ -99,7 +100,7 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
   }
 
   function activateTarget(target: NonNullable<Hover>) {
-    if (target.item.mediaKind === "panorama") router.push(`/panorama/${target.item.id}`);
+    if (target.item.mediaKind === "panorama") router.push(panoramaHref(target.item.id));
   }
 
   function setBubbleElement(node: HTMLElement | null) {

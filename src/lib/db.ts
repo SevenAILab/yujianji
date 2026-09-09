@@ -34,46 +34,67 @@ class YujianjiDatabase extends Dexie {
 }
 
 export const db = new YujianjiDatabase();
-let seedPromise: Promise<boolean> | null = null;
 
-export async function ensureSeeded(): Promise<boolean> {
-  if (!seedPromise) {
-    const pending = (async () => {
-      const response = await fetch("/seed-data.json", { cache: "no-store" });
-      if (!response.ok) throw new Error("示例历史加载失败");
-      const parsed = itemSchema.array().safeParse(await response.json());
-      if (!parsed.success) throw new Error("示例历史格式不正确");
-      const items = parsed.data as Item[];
-      const seedIds = items.map((item) => item.id);
-      const storedIds = await db.meta.get("seeded-ids");
-      const legacyMarker = await db.meta.get("seeded");
-      const existing = await db.items.bulkGet(seedIds);
-      const legacyExistingIds = seedIds.filter((_, index) => Boolean(existing[index]));
-      const seededIds = new Set<string>(
-        typeof storedIds?.value === "string"
-          ? (JSON.parse(storedIds.value) as string[])
-          : legacyMarker?.value === true
-            ? legacyExistingIds
-            : [],
-      );
-      const missing = items.filter(
-        (item, index) => !existing[index] && !seededIds.has(item.id),
-      );
-      // Demo panoramas are refreshable fixtures: keep their optimized texture
-      // path in sync even when an earlier version is already in IndexedDB.
-      const refreshablePanoramas = items.filter((item) => item.mediaKind === "panorama");
-      const upserts = new Map(
-        [...missing, ...refreshablePanoramas].map((item) => [item.id, item]),
-      );
-      if (upserts.size) await db.items.bulkPut([...upserts.values()]);
-      await db.meta.put({ key: "seeded-ids", value: JSON.stringify([...new Set([...seededIds, ...seedIds])]) });
-      return missing.length > 0;
-    })();
-    seedPromise = pending;
-  }
+const DEMO_FLAG_KEY = "demo-loaded";
+
+async function fetchSeedItems(): Promise<Item[]> {
+  const response = await fetch("/seed-data.json", { cache: "no-store" });
+  if (!response.ok) throw new Error("示例内容加载失败");
+  const parsed = itemSchema.array().safeParse(await response.json());
+  if (!parsed.success) throw new Error("示例内容格式不正确");
+  return parsed.data as Item[];
+}
+
+/**
+ * 示例数据现在是「用户主动打开的展厅」，不是默认灌进个人库的东西。
+ *
+ * 以前 ensureSeeded() 无条件写入 25 条，新用户第一次打开看到的是别人的地图，
+ * 自己的第一条记录淹没在里面。现在默认不灌，首页空状态直接引导去拍第一张。
+ */
+export async function hasDemoData(): Promise<boolean> {
   try {
-    return await seedPromise;
-  } finally {
-    seedPromise = null;
+    const flag = await db.meta.get(DEMO_FLAG_KEY);
+    if (flag?.value === true) return true;
+    // 黑客松期间的老用户库里已经有 seed，认下来，好让他们能移除。
+    const existing = await db.items.where("id").notEqual("").count();
+    if (existing === 0) return false;
+    const anySeed = await db.items.filter((item) => item.isSeed).first();
+    return Boolean(anySeed);
+  } catch {
+    return false;
+  }
+}
+
+export async function loadDemoData(): Promise<number> {
+  const items = await fetchSeedItems();
+  await db.items.bulkPut(items);
+  await db.meta.put({ key: DEMO_FLAG_KEY, value: true });
+  return items.length;
+}
+
+export async function removeDemoData(): Promise<number> {
+  const seeds = await db.items.filter((item) => item.isSeed).toArray();
+  await db.items.bulkDelete(seeds.map((item) => item.id));
+  await db.meta.put({ key: DEMO_FLAG_KEY, value: false });
+  return seeds.length;
+}
+
+/**
+ * 保留这个名字是为了不动十几个调用点：现在它只负责把已加载的示例保持最新
+ * （全景示例的贴图路径会变），不再凭空往用户库里灌东西。
+ */
+export async function ensureSeeded(): Promise<boolean> {
+  if (!(await hasDemoData())) return false;
+  try {
+    const items = await fetchSeedItems();
+    const existing = await db.items.bulkGet(items.map((item) => item.id));
+    const missingOrRefreshable = items.filter(
+      (item, index) => !existing[index] || item.mediaKind === "panorama",
+    );
+    if (missingOrRefreshable.length) await db.items.bulkPut(missingOrRefreshable);
+    return missingOrRefreshable.length > 0;
+  } catch {
+    // 示例刷新失败不该拦住任何页面。
+    return false;
   }
 }

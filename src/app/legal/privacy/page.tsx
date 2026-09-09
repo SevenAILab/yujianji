@@ -1,0 +1,162 @@
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import styles from "../legal.module.css";
+import { PRIVACY_UPDATED_AT } from "@/lib/consent";
+
+export const metadata = {
+  title: "隐私政策 · 遇见集",
+  description: "遇见集如何处理你的照片、位置和记录。",
+};
+
+export default function PrivacyPage() {
+  return (
+    <main className="app-shell">
+      <div className={styles.page}>
+        <Link className={styles.back} href="/me">
+          <ArrowLeft size={15} />
+          返回
+        </Link>
+        <article className={styles.doc}>
+          <h1>隐私政策</h1>
+          <p className={styles.updated}>更新于 {PRIVACY_UPDATED_AT}</p>
+
+          <p className={styles.draft}>
+            本版本为公开测试版政策。正式商业运营前，本文将由法律专业人士复核并可能调整；
+            届时会通过版本变更重新征求你的同意。
+          </p>
+
+          <div className={styles.callout}>
+            一句话版本：<strong>你的照片和记录只保存在你自己的设备浏览器里。</strong>
+            我们没有账号系统，没有用户数据库，服务端不保存你的任何照片或记录。
+            识别时照片会临时发送给模型服务商处理，处理完即丢弃。
+          </div>
+
+          <h2>一、我们处理哪些信息</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>信息</th>
+                <th>存在哪里</th>
+                <th>为什么需要</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>你拍摄或选择的照片、视频</td>
+                <td><strong>只在你设备的浏览器存储（IndexedDB）中</strong></td>
+                <td>生成遇见记录、在地图和详情页展示</td>
+              </tr>
+              <tr>
+                <td>照片里的 EXIF 信息（拍摄时间、GPS 坐标）</td>
+                <td>在你的设备本机读取，随记录一起留在本机</td>
+                <td>自动填写时间和地点，减少手动输入</td>
+              </tr>
+              <tr>
+                <td>实时定位（你授权时）</td>
+                <td>本机</td>
+                <td>判断所在国家/地区，在地图上落点</td>
+              </tr>
+              <tr>
+                <td>你输入的原话、语音转写文字</td>
+                <td>本机</td>
+                <td>作为 AI 理解和追问的依据</td>
+              </tr>
+              <tr>
+                <td>AI 生成的解读、追问、回应</td>
+                <td>本机</td>
+                <td>构成你的遇见记录</td>
+              </tr>
+              <tr>
+                <td>健康数据（心率、血氧、步数，仅原生 App 且你授权时）</td>
+                <td>本机</td>
+                <td>作为旅行状态参考</td>
+              </tr>
+              <tr>
+                <td>设备标识（随机字符串）</td>
+                <td>本机 + 我们的限流服务</td>
+                <td>限制单设备用量、防止有人刷爆模型额度</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>二、哪些数据会离开你的设备</h2>
+          <p>只有下面三种情况，且都不会在我们的服务端留存：</p>
+          <ul>
+            <li>
+              <strong>识别时的照片或视频帧</strong>：会通过我们的服务端转发给模型服务商
+              （当前为阿里云百炼）进行识别。我们的服务端<strong>不写入磁盘、不建立数据库记录</strong>，
+              转发完即释放。模型服务商如何处理，适用其自身的隐私条款。
+            </li>
+            <li>
+              <strong>结构化的记录摘要</strong>（名称、类别、地点文字、日期）：
+              在做「初见 / 重逢」判断、旅程总结时会随请求发送。<strong>不含照片。</strong>
+            </li>
+            <li>
+              <strong>你填写的地点名称</strong>：在你主动校准坐标时，会发送给公开地点服务
+              （OpenStreetMap Nominatim）换取经纬度。
+            </li>
+          </ul>
+          <p>
+            视频文件本身<strong>永远不会离开你的设备</strong>：抽帧和音频提取都在你的浏览器里完成，
+            只有抽出的少量画面帧和一段压缩音频会被发送。
+          </p>
+
+          <h2>三、我们不做什么</h2>
+          <ul>
+            <li>不保存你的照片、视频或记录到我们的服务器</li>
+            <li>不要求注册，不收集手机号、邮箱、身份证件等身份信息</li>
+            <li>不做用户画像，不用于广告，不向第三方出售或共享你的数据</li>
+            <li>不接入第三方统计或广告 SDK</li>
+            <li>不读取你的通讯录、短信、通话记录或相册中未被你主动选择的照片</li>
+          </ul>
+
+          <h2>四、你的控制权</h2>
+          <ul>
+            <li>
+              <strong>随时导出</strong>：在「我的」页可以导出包含全部记录和原图的 JSON 文件。
+            </li>
+            <li>
+              <strong>随时删除</strong>：在「我的」页可一键删除本机全部数据。
+              因为我们服务端本就没有你的记录副本，删除即彻底删除。
+            </li>
+            <li>
+              <strong>撤回授权</strong>：可在浏览器或系统设置中关闭定位、相机权限，
+              产品会降级为手动填写，不会失效。
+            </li>
+          </ul>
+
+          <h2>五、数据会不会丢</h2>
+          <p>
+            会。浏览器存储在以下情况可能被清空：你手动清理浏览数据、
+            设备存储空间不足、或者（在 iOS Safari 上）长时间不打开本站。
+            这是「数据只存本机」的代价，我们不回避它。
+          </p>
+          <p>
+            请在「我的」页开启<strong>持久化存储</strong>、把遇见集<strong>加到主屏幕</strong>，
+            并<strong>定期导出备份</strong>。这三件事能显著降低丢失概率。
+          </p>
+
+          <h2>六、AI 生成内容</h2>
+          <p>
+            产品中的识别结果、知识介绍、趣闻、「幸运」判断和追问均由 AI 生成，
+            <strong>可能不准确，未经人工核实</strong>。页面已对相关内容标注提示。
+            请不要将其作为物种鉴定、医疗、安全或法律方面的依据。
+          </p>
+
+          <h2>七、未成年人</h2>
+          <p>
+            本产品不面向 14 周岁以下儿童。若你是未成年人，请在监护人指导下使用。
+            如监护人发现相关信息被处理并希望删除，可直接在「我的」页删除全部数据，
+            或通过下方方式联系我们。
+          </p>
+
+          <h2>八、变更与联系</h2>
+          <p>
+            政策变更时会更新本页日期，并在应用内重新征求你的同意。
+            有任何疑问或投诉，可通过<Link href="/feedback">反馈页面</Link>联系我们。
+          </p>
+        </article>
+      </div>
+    </main>
+  );
+}

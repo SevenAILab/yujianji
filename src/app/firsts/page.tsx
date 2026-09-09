@@ -10,6 +10,7 @@ import { db, ensureSeeded } from "@/lib/db";
 import { toHistoryEntry } from "@/lib/history";
 import type { Item } from "@/lib/types";
 import { LOCAL_ONLY } from "@/lib/app-mode";
+import { apiFetch } from "@/lib/api-client";
 
 export default function FirstsPage() {
   const router = useRouter();
@@ -86,12 +87,8 @@ export default function FirstsPage() {
         setSummaryText(`本地旅程统计：这段时间保存了 ${selected.length} 件遇见，记录于 ${new Set(selected.map((item) => item.place)).size} 个地点。此为本机统计，不是 AI 解读。`);
         return;
       }
-      const response = await fetch("/api/summary", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
+      const response = await apiFetch("/api/summary", {
           history: selected.map(toHistoryEntry),
-        }),
       });
       const payload = (await response.json()) as { summary?: string; error?: string };
       if (!response.ok || !payload.summary) {

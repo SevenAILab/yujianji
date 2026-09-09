@@ -15,7 +15,9 @@
 - 在记录详情页继续追问 AI，查看个人旅行博物志；
 - 在世界地图查看足迹，按时间范围生成旅程总结；
 - 在 `/journeys` 按区域串联记录，生成旅程拼贴与成长轨迹；
-- 数据保存在浏览器 IndexedDB，本地生成竖版分享卡，并可生成带缩略图的网页分享链接。
+- 数据保存在浏览器 IndexedDB，本地生成竖版分享卡，并可生成带缩略图的网页分享链接；
+- 在「我的」页开启持久化存储、查看空间用量、导出/导入备份（含原图）、一键删除全部数据；
+- 首启显式同意 + 用户协议 / 隐私政策；反馈与举报入口。
 
 影石 X6 的接入方式不是直连相机，而是手机中继：用户在 Insta360 App 中把 360 照片导出到手机相册，再在遇见集的设备页或新建遇见页导入。路线轨迹、旅程拼贴和分享闭环已具备基础页面，后续重点是设备兼容与真实用户验证。
 
@@ -44,17 +46,21 @@ cp .env.example .env.local
 npm run dev
 ```
 
-在 `.env.local` 中配置百炼 API：
+环境变量见 `.env.example`，逐项都有注释。最少需要 `DASHSCOPE_API_KEY`。
 
-```dotenv
-DASHSCOPE_API_KEY=你的百炼APIKey
-DASHSCOPE_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
-VISION_MODEL=qwen3-vl-plus
-GEOCODING_BASE_URL=https://nominatim.openstreetmap.org
-GEOCODING_USER_AGENT=yujianji/0.1 (+https://github.com/SevenAILab/yujianji)
-OMNI_MODEL=qwen3.5-omni-plus
-LLM_THINKING=false
-LLM_JSON_MODE=true
+### 用量护栏
+
+五个花钱接口（`recognize` / `encounter-av` / `reply` / `insight` / `summary`）都必须带
+`X-Device-Id` 请求头，由 `src/lib/device-id.ts` 在客户端生成并双写 localStorage + IndexedDB。
+服务端 `src/lib/api-guard.ts` 依次检查：全站日预算 → 全站小时配额 → 单设备小时/日配额。
+
+限流后端优先用 Upstash Redis（跨实例真限流）；没配凭据时退回单实例内存，
+并在日志里打一条 `kv_memory_fallback`。**Vercel 这类多实例部署务必配上 Redis，
+否则限流只在单个实例内生效。** 限流后端不可用时一律拒绝（503），不静默放行。
+
+```bash
+# 线上跑的什么模型、限流后端是什么、今天用了多少，一条命令就能看
+curl -s https://<域名>/api/health | python3 -m json.tool
 ```
 
 地点校准默认通过服务端代理调用 Nominatim，只在用户保存记录时查询一次，并进行缓存和限速。公开服务最多允许每秒一次请求，正式扩大用户量前应通过 `GEOCODING_BASE_URL` 切换到自建或商业服务。地点数据来自 OpenStreetMap contributors，使用时需遵守 ODbL 和 [Nominatim Usage Policy](https://operations.osmfoundation.org/policies/nominatim/)。
@@ -69,7 +75,10 @@ npm run ping
 
 ## Seed 内容
 
-当前仓库包含 25 条用于演示的 seed 记录，覆盖莫干山粉色叶子、青海玄武岩、七姐妹白崖，以及物件、食物和动物照片。seed 只使用无人脸、无私人可识别信息的风景、植物、动物、食物或物件照片；正式路演前仍应逐张复核公开素材与地点文案。
+> **示例数据现在是可选的。** 新用户打开时地图是空的，首页空状态提供「还是先看看别人的遇见集」
+> 按钮按需载入；「我的」页可随时移除。示例不会进入备份文件。
+
+当前仓库包含用于演示的 seed 记录，覆盖莫干山粉色叶子、青海玄武岩、七姐妹白崖，以及物件、食物和动物照片。seed 只使用无人脸、无私人可识别信息的风景、植物、动物、食物或物件照片；正式路演前仍应逐张复核公开素材与地点文案。
 
 ```bash
 npm run seed:check
@@ -109,6 +118,9 @@ npm run seed:ai
 - `/journeys` 按区域串联遇见记录，生成旅程拼贴和成长轨迹
 - `/devices` 影石 X6 手机中继导入、自动同步入口和存储管理入口
 - `/firsts` 只统计 `ai.verdict === "first"` 的记录，并支持按日期调用旅程总结
+- `/me` 我的：统计、本机存储状态、备份导出/导入、示例内容开关、删除全部数据
+- `/legal/privacy` `/legal/terms` 隐私政策与用户协议
+- `/feedback` 反馈与举报（不需要先同意协议即可访问）
 
 地图使用本地 `world-atlas` 国家几何和 `src/data/admin1-regions.json` 的 Admin-1 几何，不使用地图瓦片或在线地图服务。首页的地图由 `MemoryGlobe` 绘制，地图异常由错误边界隔离，列表与藏品详情仍可访问。`/api/map-pins` 是独立的地图聚合能力。
 

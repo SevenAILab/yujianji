@@ -5,7 +5,7 @@ import { buildRecognitionUserText, RECOGNIZE_SYSTEM_PROMPT } from "@/lib/prompt"
 import { callVision } from "@/lib/llm";
 import { dataUrlByteLength } from "@/lib/image";
 import { parseRecognizeResult, RecognizeParseError } from "@/lib/recognize";
-import { allowRequest } from "@/lib/rate-limit";
+import { guard } from "@/lib/api-guard";
 import { isTimeoutLike } from "@/lib/timeout-error";
 
 export const runtime = "nodejs";
@@ -27,9 +27,8 @@ function isAllowedImageDataUrl(value: string): boolean {
 }
 
 export async function POST(request: Request) {
-  if (!allowRequest()) {
-    return errorResponse(429, "RATE_LIMITED", "请求太频繁，请稍后再试");
-  }
+  const gate = await guard(request);
+  if (!gate.ok) return gate.response;
 
   let body: unknown;
   try {
