@@ -92,27 +92,41 @@ export async function POST(request: Request) {
     try {
       return NextResponse.json(parseRecognizeResult(raw, historyEntries));
     } catch (error) {
-      if (
-        error instanceof RecognizeParseError &&
-        error.code === "INVALID_RELATED_ITEM"
-      ) {
-        const retryRaw = await callWithBudget(`${userText}
+      if (!(error instanceof RecognizeParseError)) throw error;
 
-上一次输出的关联 id 不合法。请重新检查历史记录，只能使用其中真实出现的 id；如果无法确认，请判定为 first。`,
+      // 两类错误都是「模型引用了不存在的过去」，纠正一次通常就好。
+      const correction =
+        error.code === "INVALID_RELATED_ITEM"
+          ? `${userText}
+
+上一次输出的关联 id 不合法。请重新检查历史记录，只能使用其中真实出现的 id；如果无法确认，请判定为 first。`
+          : error.code === "FABRICATED_HISTORY"
+            ? `${userText}
+
+上一次输出编造了用户的过往（${error.message}）。历史记录是空的，用户没有任何过去的记录。
+请重写 luck.text、luck.basis 和 memorySentence：不许出现「上次 / 之前 / 去年 / 你记录里」这类说法，
+不许出现任何具体年月日，就把它当作用户的第一条记录来写。`
+            : null;
+
+      if (!correction) throw error;
+
+      console.info(
+        JSON.stringify({ event: "recognize_retry", reason: error.code }),
+      );
+      const retryRaw = await callWithBudget(correction);
+      try {
+        return NextResponse.json(parseRecognizeResult(retryRaw, historyEntries));
+      } catch (retryError) {
+        const code =
+          retryError instanceof RecognizeParseError ? retryError.code : "MODEL_ERROR";
+        return errorResponse(
+          502,
+          code,
+          code === "FABRICATED_HISTORY"
+            ? "这次的解读引用了不存在的历史记录，已拦下，请重试"
+            : "模型返回了无效的历史关联，请重试",
         );
-        try {
-          return NextResponse.json(
-            parseRecognizeResult(retryRaw, historyEntries),
-          );
-        } catch {
-          return errorResponse(
-            502,
-            "INVALID_RELATED_ITEM",
-            "模型返回了无效的历史关联，请重试",
-          );
-        }
       }
-      throw error;
     }
   } catch (error) {
     if (error instanceof RecognizeParseError) {
