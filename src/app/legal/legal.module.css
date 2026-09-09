@@ -1,0 +1,107 @@
+.page {
+  width: min(100%, 620px);
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 14px;
+  color: var(--teal-dark);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.doc h1 {
+  margin: 0 0 6px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 25px;
+  font-weight: 750;
+}
+
+.updated {
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.doc h2 {
+  margin: 26px 0 9px;
+  color: var(--teal-dark);
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.doc p,
+.doc li {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.78;
+}
+
+.doc p {
+  margin: 0 0 11px;
+}
+
+.doc ul {
+  margin: 0 0 11px;
+  padding-left: 20px;
+}
+
+.doc li {
+  margin-bottom: 6px;
+}
+
+.doc strong {
+  color: var(--teal-dark);
+  font-weight: 800;
+}
+
+.doc table {
+  width: 100%;
+  margin: 0 0 14px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.doc th,
+.doc td {
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.6;
+}
+
+.doc th {
+  background: var(--mint);
+  color: var(--teal-dark);
+  font-weight: 800;
+}
+
+.callout {
+  margin: 0 0 18px;
+  padding: 14px 15px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--mint);
+  color: var(--teal-dark);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.draft {
+  margin: 0 0 18px;
+  padding: 13px 15px;
+  border: 1px solid #e8d5b8;
+  border-radius: 15px;
+  background: #fdf6ec;
+  color: var(--warning);
+  font-size: 12px;
+  line-height: 1.65;
+}

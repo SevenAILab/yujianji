@@ -1,0 +1,181 @@
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 16px 0 14px;
+}
+
+.stats > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 8px;
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.stats strong {
+  color: var(--teal-dark);
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 750;
+  line-height: 1;
+}
+
+.stats span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.card {
+  margin-bottom: 14px;
+  padding: 17px;
+  border: 1px solid var(--line);
+  border-radius: 19px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.card h2 {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 750;
+}
+
+.hint {
+  margin: 0 0 13px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.hint strong {
+  color: var(--teal-dark);
+}
+
+.rows {
+  margin: 0 0 13px;
+}
+
+.rows > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.rows > div:last-child {
+  border-bottom: 0;
+}
+
+.rows dt {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.rows dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.suggest {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 13px 14px;
+  border: 1px solid #e8d5b8;
+  border-radius: 15px;
+  background: #fdf6ec;
+  color: var(--warning);
+}
+
+.suggest p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.suggest strong {
+  font-weight: 800;
+}
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-bottom: 14px;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--mint);
+  color: var(--teal-dark);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.links a {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 2px;
+  border-bottom: 1px solid var(--line);
+  color: var(--teal-dark);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.links a:last-of-type {
+  border-bottom: 0;
+}
+
+.version {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.danger {
+  border-color: #efd9d1;
+  background: #fffaf8;
+}
+
+.dangerButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 50px;
+  border: 0;
+  border-radius: 15px;
+  background: #a34f3e;
+  color: #fff;
+  font-weight: 800;
+}
+
+/* 卡片里的次要按钮统一撑满，跟主按钮对齐；inline-flex 默认宽度会显得歪。 */
+.card :global(.secondary-action) {
+  width: 100%;
+}

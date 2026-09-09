@@ -33,6 +33,7 @@ import { toHistoryEntry } from "@/lib/history";
 import { CATEGORY_OPTIONS, type Category, type DateSource, type Item, type LocationSource, type MediaKind, type PlaceSource, type RecognizedAi } from "@/lib/types";
 import { avResponseSchema, recognizeResultSchema } from "@/lib/schema";
 import styles from "./encounter.module.css";
+import { apiFetch } from "@/lib/api-client";
 
 type LocationStatus = {
   source: LocationSource;
@@ -48,11 +49,7 @@ type ReverseGeocodeResponse = {
 };
 
 async function identifyPosition(position: Position): Promise<ReverseGeocodeResponse> {
-  const response = await fetch("/api/reverse-geocode", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(position),
-  });
+  const response = await apiFetch("/api/reverse-geocode", position);
   if (!response.ok) throw new Error("GEOCODER_UNAVAILABLE");
   return response.json() as Promise<ReverseGeocodeResponse>;
 }
@@ -113,16 +110,24 @@ export default function EncounterPage() {
 
   useEffect(() => {
     if (!loading || !preview || videoFile) return;
-    const stages = [
-      [4_000, "在翻你之前的记录…"],
+    // 「在翻你之前的 N 条记录」是这个产品和普通识图应用的唯一区别，
+    // 等待的这几秒是唯一能把它说出口的地方 —— 所以这里要带真实条数。
+    const historyCount = items.length;
+    const stages: Array<readonly [number, string]> = [
+      [
+        4_000,
+        historyCount > 0
+          ? `在翻你之前的 ${historyCount} 条记录…`
+          : "在看它和什么有关…",
+      ],
       [9_000, "在想该问你点什么…"],
       [15_000, "快好了，它有点话多…"],
-    ] as const;
+    ];
     const timers = stages.map(([delay, stage]) =>
       window.setTimeout(() => setLoadingStage(stage), delay),
     );
     return () => timers.forEach((timer) => window.clearTimeout(timer));
-  }, [loading, preview, videoFile]);
+  }, [loading, preview, videoFile, items.length]);
 
   useEffect(() => {
     let active = true;
@@ -276,14 +281,10 @@ export default function EncounterPage() {
     setShowManual(false);
 
     try {
-      const response = await fetch("/api/recognize", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
+      const response = await apiFetch("/api/recognize", {
           image: preview,
           userNote,
           history: items.map(toHistoryEntry),
-        }),
       });
       const payload = (await response.json()) as unknown;
       if (!response.ok) {
@@ -386,11 +387,7 @@ export default function EncounterPage() {
           "视频拆包后的请求仍然太大",
         );
       }
-      const response = await fetch("/api/encounter-av", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(requestBody),
-      });
+      const response = await apiFetch("/api/encounter-av", requestBody);
       const payload = (await response.json()) as unknown;
       if (!response.ok) {
         const failed = payload as { code?: string };

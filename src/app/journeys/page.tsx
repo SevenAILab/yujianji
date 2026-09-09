@@ -11,6 +11,7 @@ import type { JourneyCollageData } from "@/lib/journey-collage";
 import type { GeneratedJourney } from "@/lib/journey-generator";
 import type { Item } from "@/lib/types";
 import "./journeys.css";
+import { apiFetch } from "@/lib/api-client";
 
 type SavedJourney = {
   meta: GeneratedJourney;
@@ -148,11 +149,7 @@ export default function JourneysPage() {
     void Promise.all(
       years.map(async (year): Promise<SavedJourney | null> => {
         try {
-          const response = await fetch("/api/journeys/generate", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify(payloadFor(year)),
-          });
+          const response = await apiFetch("/api/journeys/generate", payloadFor(year));
           if (!response.ok) return null;
           const payload = await response.json() as { journey?: GeneratedJourney };
           if (!payload.journey) return null;
@@ -218,10 +215,7 @@ export default function JourneysPage() {
     setGenerationError("");
     try {
       const sourceItems = validJourneyItems(items);
-      const response = await fetch("/api/journeys/generate", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
+      const response = await apiFetch("/api/journeys/generate", {
           startDate,
           endDate,
           items: sourceItems.map((item) => ({
@@ -238,7 +232,6 @@ export default function JourneysPage() {
             verdict: item.ai?.verdict ?? null,
             cognition: item.ai?.cognition ?? "",
           })),
-        }),
       });
       const payload = await response.json() as { journey?: GeneratedJourney; error?: string };
       if (!response.ok || !payload.journey) {

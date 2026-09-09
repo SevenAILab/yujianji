@@ -365,3 +365,31 @@
   .captureSlider { padding: 0; }
   .wordmark { font-size: 32px; }
 }
+
+.onboarding {
+  margin-top: 4px;
+  padding: 18px 16px;
+  border: 1px dashed var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.66);
+  text-align: center;
+}
+
+.onboarding p {
+  margin: 0 0 13px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.8;
+}
+
+.demoLink {
+  border: 0;
+  background: none;
+  color: var(--teal);
+  font-size: 13px;
+  font-weight: 750;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

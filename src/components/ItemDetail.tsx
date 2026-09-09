@@ -20,6 +20,7 @@ import type { Item } from "@/lib/types";
 import { formatDate, formatMonth } from "@/lib/format";
 import { recognizeResultSchema } from "@/lib/schema";
 import { LOCAL_ONLY } from "@/lib/app-mode";
+import { apiFetch } from "@/lib/api-client";
 
 export default function ItemDetail({ id }: { id: string }) {
   const router = useRouter();
@@ -108,15 +109,11 @@ export default function ItemDetail({ id }: { id: string }) {
       const history = (await db.items.orderBy("date").toArray())
         .filter((entry) => entry.id !== currentItem.id)
         .map(toHistoryEntry);
-      const response = await fetch("/api/recognize", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
+      const response = await apiFetch("/api/recognize", {
           image: currentItem.photo,
           userNote: currentItem.userNote,
           history,
-        }),
-      });
+        });
       const payload = (await response.json()) as unknown;
       if (!response.ok) {
         const failed = payload as { error?: string };

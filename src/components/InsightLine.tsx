@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { db } from "@/lib/db";
 import { INSIGHT_MIN_ITEMS, pickInsightFact } from "@/lib/insight";
 import type { Item } from "@/lib/types";
+import { apiFetch } from "@/lib/api-client";
 
 const TODAY_META_KEY = "insight-today";
 const RECENT_META_KEY = "insight-recent-keys";
@@ -85,11 +86,7 @@ export function InsightLine({ items }: { items: Item[] }) {
       // 降级基线：事实原文。模型只是让它更好听，不是让它成立。
       let text = fact.fact.replace(/[「」]/g, "");
       try {
-        const response = await fetch("/api/insight", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ fact: fact.fact }),
-        });
+        const response = await apiFetch("/api/insight", { fact: fact.fact });
         if (response.ok) {
           const result = (await response.json()) as { line?: string };
           if (result.line?.trim()) text = result.line.trim();

@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Seed contract
+        run: npm run seed:check
+
+      # 构建必须绿。黑客松那次 Vercel 连续两天构建失败没人发现，
+      # 就是因为没有这一步。
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+      - name: Whitespace check
+        run: git diff --check
+
+      - name: Audit (high severity only)
+        run: npm audit --omit=dev --audit-level=high

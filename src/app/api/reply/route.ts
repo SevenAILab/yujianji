@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { callVision } from "@/lib/llm";
-import { allowRequest } from "@/lib/rate-limit";
+import { guard } from "@/lib/api-guard";
 import { REPLY_SYSTEM_PROMPT } from "@/lib/prompt";
 import { isTimeoutLike } from "@/lib/timeout-error";
 import { parseReplyResult } from "@/lib/reply";
@@ -17,9 +17,8 @@ const requestSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  if (!allowRequest(120, "reply")) {
-    return NextResponse.json({ code: "RATE_LIMITED", error: "请求太频繁，请稍后再试" }, { status: 429 });
-  }
+  const gate = await guard(request);
+  if (!gate.ok) return gate.response;
 
   let body: unknown;
   try {
