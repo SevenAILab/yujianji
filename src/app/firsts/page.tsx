@@ -174,7 +174,7 @@ export default function FirstsPage() {
             {summaryText ? (
               <div className="summary-result">
                 <p>{summaryText}</p>
-                <small>{LOCAL_ONLY ? "仅在本机计算，不发送历史记录。" : "仅根据你选中的遇见生成；文字会在总结期间临时发送给百炼，AI 生成，未经核实。"}</small>
+                <small>{LOCAL_ONLY ? "仅在本机计算，不发送历史记录。" : "仅根据你选中的遇见生成；文字会在总结期间临时发送给大模型服务商，AI 生成，未经核实。"}</small>
               </div>
             ) : null}
           </section>

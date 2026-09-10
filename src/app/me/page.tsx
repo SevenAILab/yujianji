@@ -59,7 +59,12 @@ export default function MePage() {
 
   const mine = useMemo(() => items.filter((item) => !item.isSeed), [items]);
   const stats = useMemo(() => {
-    const countries = new Set(mine.map((item) => item.country).filter(Boolean));
+    // 与首页口径一致：没补地点的记录国家是 UNK，不能算成「1 个国家/地区」。
+    const countries = new Set(
+      mine
+        .map((item) => item.country)
+        .filter((country) => country && country !== "UNK" && country !== "OTHER"),
+    );
     return {
       total: mine.length,
       firsts: mine.filter((item) => item.ai?.verdict === "first").length,

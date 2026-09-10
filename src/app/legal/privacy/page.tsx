@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import styles from "../legal.module.css";
 import { PRIVACY_UPDATED_AT } from "@/lib/consent";
+import { modelProviderLabel } from "@/lib/model-provider";
 
 export const metadata = {
   title: "隐私政策 · 遇见集",
@@ -84,7 +85,7 @@ export default function PrivacyPage() {
           <ul>
             <li>
               <strong>识别时的照片或视频帧</strong>：会通过我们的服务端转发给模型服务商
-              （当前为阿里云百炼）进行识别。我们的服务端<strong>不写入磁盘、不建立数据库记录</strong>，
+              （本站当前为{modelProviderLabel()}）进行识别。我们的服务端<strong>不写入磁盘、不建立数据库记录</strong>，
               转发完即释放。模型服务商如何处理，适用其自身的隐私条款。
             </li>
             <li>

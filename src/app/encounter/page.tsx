@@ -635,7 +635,7 @@ export default function EncounterPage() {
             </button>
           ) : null}
           <p className="privacy-note">
-            照片，或视频中抽取的画面帧和音频，只在识别期间临时发送给百炼模型；原视频与应用服务端都不会保存这些内容。地点名称会发送给 OpenStreetMap 地点服务用于校准坐标，查询结果会在服务端缓存。
+            照片，或视频中抽取的画面帧和音频，只在识别期间临时发送给大模型服务商；原视频与应用服务端都不会保存这些内容。地点名称会发送给 OpenStreetMap 地点服务用于校准坐标，查询结果会在服务端缓存。
           </p>
         </div>
       </div>

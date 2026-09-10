@@ -270,7 +270,7 @@ export default function ItemPage() {
                   onKeyDown={(event) => {
                     if (event.key === "Enter") void saveLocation();
                   }}
-                  placeholder="输入城市或地点，例如：福州"
+                  placeholder="城市和地点之间空一格，如：杭州 西湖"
                   maxLength={120}
                   autoFocus
                 />
