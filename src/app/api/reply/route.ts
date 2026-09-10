@@ -4,7 +4,7 @@ import { callVision } from "@/lib/llm";
 import { guard } from "@/lib/api-guard";
 import { REPLY_SYSTEM_PROMPT } from "@/lib/prompt";
 import { isTimeoutLike } from "@/lib/timeout-error";
-import { parseReplyResult } from "@/lib/reply";
+import { parseReplyResult, ReplyValidationError } from "@/lib/reply";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -45,7 +45,21 @@ export async function POST(request: Request) {
       userText,
       timeoutMs: 25_000,
     });
-    return NextResponse.json({ reply: parseReplyResult(raw) });
+    try {
+      return NextResponse.json({ reply: parseReplyResult(raw) });
+    } catch (error) {
+      if (!(error instanceof ReplyValidationError)) throw error;
+      // 用户认真答了一句，这一次回应不能随便丢。说清楚哪里不合格，再给一次机会。
+      console.info(JSON.stringify({ event: "reply_retry", reason: error.reason }));
+      const retryRaw = await callVision({
+        systemPrompt: REPLY_SYSTEM_PROMPT,
+        userText: `${userText}
+
+上一次的回应不符合要求（${error.message}）。请重写：只返回 {"reply":"…"}，一句话，不超过 40 个汉字，不以问号结尾，全部使用中文。`,
+        timeoutMs: 20_000,
+      });
+      return NextResponse.json({ reply: parseReplyResult(retryRaw) });
+    }
   } catch (error) {
     if (isTimeoutLike(error)) {
       return NextResponse.json({ code: "MODEL_TIMEOUT", error: "回应生成超时，请重试" }, { status: 504 });

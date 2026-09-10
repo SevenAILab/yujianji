@@ -6,6 +6,7 @@ import { callVision } from "@/lib/llm";
 import { dataUrlByteLength } from "@/lib/image";
 import { parseRecognizeResult, RecognizeParseError } from "@/lib/recognize";
 import { guard } from "@/lib/api-guard";
+import { describeRawShape } from "@/lib/json";
 import { isTimeoutLike } from "@/lib/timeout-error";
 
 export const runtime = "nodejs";
@@ -94,7 +95,11 @@ export async function POST(request: Request) {
     } catch (error) {
       if (!(error instanceof RecognizeParseError)) throw error;
 
-      // 两类错误都是「模型引用了不存在的过去」，纠正一次通常就好。
+      console.warn(
+        JSON.stringify({ event: "recognize_parse_failure", code: error.code, ...describeRawShape(raw) }),
+      );
+
+      // 三类可纠正的错误：关联了不存在的 id、编造过往、JSON 格式坏了。纠正一次通常就好。
       const correction =
         error.code === "INVALID_RELATED_ITEM"
           ? `${userText}
@@ -106,7 +111,12 @@ export async function POST(request: Request) {
 上一次输出编造了用户的过往（${error.message}）。历史记录是空的，用户没有任何过去的记录。
 请重写 luck.text、luck.basis 和 memorySentence：不许出现「上次 / 之前 / 去年 / 你记录里」这类说法，
 不许出现任何具体年月日，就把它当作用户的第一条记录来写。`
-            : null;
+            : error.code === "INVALID_MODEL_OUTPUT"
+              ? `${userText}
+
+上一次的输出不是合法 JSON，程序无法解析。请只输出一个 JSON 对象：不要 Markdown 代码块，不要任何解释文字；
+字符串里需要引号时用中文引号「」，不要用英文双引号；字符串里不要换行。`
+              : null;
 
       if (!correction) throw error;
 
@@ -124,7 +134,9 @@ export async function POST(request: Request) {
           code,
           code === "FABRICATED_HISTORY"
             ? "这次的解读引用了不存在的历史记录，已拦下，请重试"
-            : "模型返回了无效的历史关联，请重试",
+            : code === "INVALID_MODEL_OUTPUT"
+              ? "模型这次的输出格式不对，请重试"
+              : "模型返回了无效的历史关联，请重试",
         );
       }
     }

@@ -77,24 +77,49 @@ export async function POST(request: Request) {
   }
 
   const frameTimes = frames.map((frame) => frame.atSec);
-  const userText = buildEncounterAvUserText(history, frameTimes, Boolean(audioDataUrl));
   const deadline = Date.now() + 55_000;
 
-  async function callWithBudget(extraText = userText) {
+  // 不是所有模型都认 input_audio：agnes-2.5-flash 实测带音频直接 502（4 秒就返回），
+  // 而浏览器只要解得出音轨就一定会带 —— 等于真机上几乎所有视频都识别失败。
+  // 带音频被拒时降级成只看画面再试一次：用户说的那句话没被听到，但视频本身还能认出来，
+  // 比整条失败强。提示词会同步切成「无音频」版本，避免模型编出一句「听到」的话。
+  let audioForModel = audioDataUrl;
+  const currentUserText = () =>
+    buildEncounterAvUserText(history, frameTimes, Boolean(audioForModel));
+
+  async function callWithBudget(extraText?: string) {
     const remainingMs = deadline - Date.now();
     if (remainingMs <= 1_000) throw new Error("模型总响应时间已用尽");
     return callOmni({
       frames: frames.map((frame) => frame.dataUrl),
       frameTimes,
-      audioDataUrl,
+      audioDataUrl: audioForModel,
       systemPrompt: ENCOUNTER_AV_SYSTEM_PROMPT,
-      userText: extraText,
+      userText: extraText ?? currentUserText(),
       timeoutMs: remainingMs,
     });
   }
 
+  async function firstCall(): Promise<string> {
+    try {
+      return await callWithBudget();
+    } catch (error) {
+      const status = (error as { status?: unknown })?.status;
+      if (!audioForModel || isTimeoutLike(error) || status === 429) throw error;
+      console.warn(
+        JSON.stringify({
+          event: "omni_audio_rejected_fallback",
+          status: typeof status === "number" ? status : null,
+          errorType: error instanceof Error ? error.constructor.name : "unknown",
+        }),
+      );
+      audioForModel = null;
+      return callWithBudget();
+    }
+  }
+
   try {
-    const raw = await callWithBudget();
+    const raw = await firstCall();
     try {
       return NextResponse.json(parseAvResult(raw, history, frames.length));
     } catch (error) {
@@ -103,7 +128,7 @@ export async function POST(request: Request) {
         error.code === "INVALID_RELATED_ITEM"
       ) {
         const expectations = extractAvReunionExpectations(raw);
-        const retryRaw = await callWithBudget(`${userText}
+        const retryRaw = await callWithBudget(`${currentUserText()}
 
 上一次输出的历史关联不一致。请逐字核对 history 中的 id、name 和 category；必须保留同一对象的 reunion，并修正为真实存在且名称完全一致的历史记录；无法确认具体历史 id 时返回 INVALID_MODEL_OUTPUT，不要改成 first。`);
         const retryResult = parseAvResult(retryRaw, history, frames.length);

@@ -70,7 +70,8 @@ async function requestVision(
       { role: "user", content: userContent },
     ],
     temperature: 0.2,
-    max_tokens: 900,
+    // 900 对 flash 类模型偏紧：它们话多，截断后 JSON 就配不上括号了。
+    max_tokens: 1500,
   };
 
   if (enableThinking) {

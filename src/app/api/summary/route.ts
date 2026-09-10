@@ -79,6 +79,8 @@ export async function POST(request: Request) {
     const raw = await callVision({
       systemPrompt: SUMMARY_SYSTEM_PROMPT,
       userText: buildSummaryUserText(history),
+      // 总结要的是一段正文。全局 LLM_JSON_MODE=true 会逼模型吐 JSON 对象，这里必须关掉。
+      jsonMode: false,
       timeoutMs: 55_000,
     });
     const summary = cleanSummary(raw);
