@@ -26,6 +26,7 @@ import {
   type StorageHealth,
 } from "@/lib/storage-health";
 import { APP_VERSION } from "@/lib/version";
+import { canDownloadFiles, detectBrowser, openInBrowserHint, type BrowserKind } from "@/lib/browser-env";
 import styles from "./me.module.css";
 
 type Busy = "none" | "export" | "import" | "wipe" | "demo";
@@ -39,6 +40,7 @@ export default function MePage() {
   const [error, setError] = useState("");
   const [confirmingWipe, setConfirmingWipe] = useState(false);
   const [demoLoaded, setDemoLoaded] = useState<boolean | null>(null);
+  const [browserKind, setBrowserKind] = useState<BrowserKind>("standard");
   const importRef = useRef<HTMLInputElement>(null);
 
   const refreshHealth = useCallback(async () => {
@@ -50,7 +52,10 @@ export default function MePage() {
   useEffect(() => {
     void refreshHealth();
     void hasDemoData().then(setDemoLoaded).catch(() => setDemoLoaded(false));
+    setBrowserKind(detectBrowser());
   }, [refreshHealth]);
+
+  const downloadable = canDownloadFiles(browserKind);
 
   const mine = useMemo(() => items.filter((item) => !item.isSeed), [items]);
   const stats = useMemo(() => {
@@ -221,10 +226,18 @@ export default function MePage() {
           ) : null}
 
           {health?.persist !== "persisted" ? (
-            <button className="secondary-action" onClick={() => void handlePersist()}>
-              <HardDrive size={17} />
-              开启持久化存储
-            </button>
+            <>
+              {browserKind !== "standard" ? (
+                <p className={styles.hint}>
+                  在{browserKind === "wechat" ? "微信" : "应用内置浏览器"}里通常拿不到持久化存储。
+                  想让记录留得更久，{openInBrowserHint(browserKind)}，再把它添加到主屏幕。
+                </p>
+              ) : null}
+              <button className="secondary-action" onClick={() => void handlePersist()}>
+                <HardDrive size={17} />
+                开启持久化存储
+              </button>
+            </>
           ) : null}
         </section>
 
@@ -235,11 +248,21 @@ export default function MePage() {
             遇见集<strong>从不上传你的照片</strong>。所以换设备时，这个文件是把照片带走的唯一方式——
             它包含全部记录和原图。
           </p>
+          {!downloadable ? (
+            <div className={styles.suggest}>
+              <AlertTriangle size={17} />
+              <p>
+                {browserKind === "wechat" ? "微信" : "这个应用内置的浏览器"}
+                会拦截文件下载，导出在这里点了不会有反应。
+                <strong>{openInBrowserHint(browserKind)}</strong>，再回到这一页导出。
+              </p>
+            </div>
+          ) : null}
           <div className={styles.actions}>
             <button
               className="primary-action"
               onClick={() => void handleExport()}
-              disabled={busy !== "none" || stats.total === 0}
+              disabled={busy !== "none" || stats.total === 0 || !downloadable}
             >
               <Download size={17} />
               {busy === "export" ? "正在打包…" : "导出备份"}

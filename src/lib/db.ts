@@ -54,14 +54,35 @@ async function fetchSeedItems(): Promise<Item[]> {
 export async function hasDemoData(): Promise<boolean> {
   try {
     const flag = await db.meta.get(DEMO_FLAG_KEY);
-    if (flag?.value === true) return true;
-    // 黑客松期间的老用户库里已经有 seed，认下来，好让他们能移除。
-    const existing = await db.items.where("id").notEqual("").count();
-    if (existing === 0) return false;
-    const anySeed = await db.items.filter((item) => item.isSeed).first();
-    return Boolean(anySeed);
+    return flag?.value === true;
   } catch {
     return false;
+  }
+}
+
+/**
+ * 一次性清理：黑客松版本会无条件把 25 条示例灌进每个访客的浏览器。
+ * 那些人再打开时，看到的是别人的地图，而不是自己的空白起点 ——
+ * 对着公众号二维码扫进来的读者尤其糟。
+ *
+ * 只删 isSeed 的记录，用户自己拍的一条都不动。
+ * 只在从没显式载入过示例时执行一次，之后靠 DEMO_FLAG_KEY 记账，不重复扫库。
+ */
+export async function clearLegacySeeds(): Promise<number> {
+  try {
+    const flag = await db.meta.get(DEMO_FLAG_KEY);
+    // 显式载入过（true）或已经清理过（false）都不再处理。
+    if (flag && (flag.value === true || flag.value === false)) return 0;
+
+    const seeds = await db.items.filter((item) => item.isSeed).toArray();
+    if (seeds.length) await db.items.bulkDelete(seeds.map((item) => item.id));
+    await db.meta.put({ key: DEMO_FLAG_KEY, value: false });
+    if (seeds.length) {
+      console.info(JSON.stringify({ event: "legacy_seed_cleared", count: seeds.length }));
+    }
+    return seeds.length;
+  } catch {
+    return 0;
   }
 }
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { grantConsent, isConsentCurrent, readConsent } from "@/lib/consent";
+import { clearLegacySeeds } from "@/lib/db";
 import styles from "./ConsentGate.module.css";
 
 /**
@@ -16,6 +17,12 @@ export function ConsentGate() {
   const pathname = usePathname();
   const [status, setStatus] = useState<"loading" | "needed" | "granted">("loading");
   const [checked, setChecked] = useState(false);
+
+  // 这个组件挂在根布局上，是全站唯一必然执行一次的地方，
+  // 所以顺便承担一次性数据迁移。
+  useEffect(() => {
+    void clearLegacySeeds();
+  }, []);
 
   useEffect(() => {
     let active = true;
