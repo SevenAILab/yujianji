@@ -1,0 +1,241 @@
+{
+  "summary": {
+    "suite": "backfill",
+    "model": "qwen3.5-plus",
+    "cases": 5,
+    "hits": 4,
+    "lowConfidenceWithCandidate": 0,
+    "recalledMemory": 4,
+    "p50Ms": 16578,
+    "costYuan": 0.041877
+  },
+  "results": [
+    {
+      "id": "bf-1",
+      "hit": true,
+      "candidateHit": false,
+      "recalled": true,
+      "target": {
+        "dayKey": "2026-09-23",
+        "place": "伦敦 · 塔桥",
+        "confidence": 0.9
+      },
+      "needsPlacePick": false,
+      "candidates": [],
+      "ms": 12617,
+      "cost": 0.009705,
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 8 行；今天已留 0 条"
+        },
+        {
+          "kind": "tool",
+          "name": "recall_memory",
+          "ms": 0,
+          "summary": "query=会升起来的桥 → 命中 1 条：ma4"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 2099,
+          "inputTokens": 4349,
+          "outputTokens": 28,
+          "summary": "第 1 步：调用 recall_memory；模型结束信号 tool_calls（只记录）",
+          "reason": "有 1 个工具调用 → 执行后继续"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 10477,
+          "inputTokens": 4440,
+          "outputTokens": 529,
+          "summary": "第 2 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 12617,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "bf-2",
+      "hit": false,
+      "candidateHit": false,
+      "recalled": false,
+      "needsPlacePick": false,
+      "candidates": [],
+      "ms": 0,
+      "cost": 0,
+      "steps": [],
+      "error": "AGENT_BUDGET_EXCEEDED: 整轮截止时间到了"
+    },
+    {
+      "id": "bf-3",
+      "hit": true,
+      "candidateHit": false,
+      "recalled": true,
+      "target": {
+        "dayKey": "2026-09-25",
+        "place": "爱丁堡 · 王子街",
+        "confidence": 0.9
+      },
+      "needsPlacePick": false,
+      "candidates": [],
+      "ms": 13432,
+      "cost": 0.009615,
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 5 行；今天已留 0 条"
+        },
+        {
+          "kind": "tool",
+          "name": "recall_memory",
+          "ms": 1,
+          "summary": "query=格子裙 风笛 大叔 → 命中 1 条：ma7"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 2998,
+          "inputTokens": 4375,
+          "outputTokens": 31,
+          "summary": "第 1 步：调用 recall_memory；模型结束信号 tool_calls（只记录）",
+          "reason": "有 1 个工具调用 → 执行后继续"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 10423,
+          "inputTokens": 4470,
+          "outputTokens": 498,
+          "summary": "第 2 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 13432,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "bf-4",
+      "hit": true,
+      "candidateHit": false,
+      "recalled": true,
+      "target": {
+        "dayKey": "2026-09-24",
+        "place": "牛津 · 基督教堂学院",
+        "confidence": 0.95
+      },
+      "needsPlacePick": false,
+      "candidates": [],
+      "ms": 22448,
+      "cost": 0.011767,
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 5 行；今天已留 0 条"
+        },
+        {
+          "kind": "tool",
+          "name": "recall_memory",
+          "ms": 0,
+          "summary": "query=牛津 食堂 → 命中 2 条：ma5、ma6"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 1923,
+          "inputTokens": 4344,
+          "outputTokens": 27,
+          "summary": "第 1 步：调用 recall_memory；模型结束信号 tool_calls（只记录）",
+          "reason": "有 1 个工具调用 → 执行后继续"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 20517,
+          "inputTokens": 4467,
+          "outputTokens": 956,
+          "summary": "第 2 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 22448,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "bf-5",
+      "hit": true,
+      "candidateHit": false,
+      "recalled": true,
+      "target": {
+        "dayKey": "2026-09-22",
+        "place": "伦敦 · 海德公园",
+        "confidence": 0.95
+      },
+      "needsPlacePick": false,
+      "candidates": [],
+      "ms": 16578,
+      "cost": 0.01079,
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 5 行；今天已留 0 条"
+        },
+        {
+          "kind": "tool",
+          "name": "recall_memory",
+          "ms": 0,
+          "summary": "query=湖边 划船 → 命中 1 条：ma1"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 2106,
+          "inputTokens": 4344,
+          "outputTokens": 28,
+          "summary": "第 1 步：调用 recall_memory；模型结束信号 tool_calls（只记录）",
+          "reason": "有 1 个工具调用 → 执行后继续"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 14464,
+          "inputTokens": 4434,
+          "outputTokens": 757,
+          "summary": "第 2 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 16578,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    }
+  ],
+  "ranAt": "2026-09-15T20:22:41.722Z",
+  "wallMs": 45226,
+  "provider": "dashscope"
+}

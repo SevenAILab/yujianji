@@ -1,0 +1,1308 @@
+{
+  "summary": {
+    "suite": "write",
+    "model": "qwen3.5-plus",
+    "cases": 20,
+    "pass": 18,
+    "trapsPass": "4/5",
+    "intercepted": 6,
+    "degraded": 0,
+    "errors": 0,
+    "p50Ms": 7104,
+    "p95Ms": 15523,
+    "costYuan": 0.059077,
+    "failed": [
+      "w-15: 违禁 -，缺关键词 老板，升华 -",
+      "t-01: 违禁 -，缺关键词 排队|排着队，升华 -"
+    ]
+  },
+  "results": [
+    {
+      "id": "w-01",
+      "trap": false,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": false,
+      "degraded": false,
+      "verified": true,
+      "retries": 0,
+      "text": "河边好多人就坐着吃便当，也不玩手机，只看水。我好久没有这样坐着什么都不干了。",
+      "quotes": [
+        {
+          "momentId": "m_w-01",
+          "text": "我好久没有这样坐着什么都不干了"
+        }
+      ],
+      "ms": 7531,
+      "cost": 0.00217,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3829,
+          "inputTokens": 990,
+          "outputTokens": 100,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3682,
+          "inputTokens": 444,
+          "outputTokens": 113,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3685,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    },
+    {
+      "id": "w-02",
+      "trap": false,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": true,
+      "degraded": false,
+      "verified": true,
+      "retries": 1,
+      "text": "这家的拉面汤是透明的，但是味道好浓。",
+      "quotes": [
+        {
+          "momentId": "m_w-02",
+          "text": "这家的拉面汤是透明的，但是味道好浓"
+        }
+      ],
+      "ms": 13159,
+      "cost": 0.004539,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3638,
+          "inputTokens": 973,
+          "outputTokens": 133,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3718,
+          "inputTokens": 425,
+          "outputTokens": 170,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3719,
+          "summary": "独立检查员：0/1 段每句都能对应到原话"
+        },
+        {
+          "kind": "retry",
+          "name": "rewrite",
+          "ms": 0,
+          "summary": "1 段没通过，带着问题重写一次",
+          "reason": "借鉴 Claude Code：检查拦下时带着原因重跑一轮"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 2195,
+          "inputTokens": 1130,
+          "outputTokens": 53,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3597,
+          "inputTokens": 416,
+          "outputTokens": 99,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3600,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    },
+    {
+      "id": "w-03",
+      "trap": false,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": true,
+      "degraded": false,
+      "verified": true,
+      "retries": 1,
+      "text": "第一次在国外自己点菜，手心都出汗了。结果老板还夸我发音好。",
+      "quotes": [
+        {
+          "momentId": "m_w-03",
+          "text": "第一次在国外自己点菜，手心都出汗了，结果老板还夸我发音好"
+        }
+      ],
+      "ms": 11554,
+      "cost": 0.004483,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3170,
+          "inputTokens": 979,
+          "outputTokens": 124,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3448,
+          "inputTokens": 431,
+          "outputTokens": 138,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3450,
+          "summary": "独立检查员：0/1 段每句都能对应到原话"
+        },
+        {
+          "kind": "retry",
+          "name": "rewrite",
+          "ms": 0,
+          "summary": "1 段没通过，带着问题重写一次",
+          "reason": "借鉴 Claude Code：检查拦下时带着原因重跑一轮"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 1948,
+          "inputTokens": 1076,
+          "outputTokens": 60,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 2976,
+          "inputTokens": 430,
+          "outputTokens": 126,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 2978,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    },
+    {
+      "id": "w-04",
+      "trap": false,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": false,
+      "degraded": false,
+      "verified": true,
+      "retries": 0,
+      "text": "朋友说这边很多公司一周只上四天班。听到这话，我有些恍惚。",
+      "quotes": [
+        {
+          "momentId": "m_w-04",
+          "text": "他们一周只上四天班，我听着都有点恍惚"
+        }
+      ],
+      "ms": 7033,
+      "cost": 0.002126,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3504,
+          "inputTokens": 990,
+          "outputTokens": 100,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3526,
+          "inputTokens": 438,
+          "outputTokens": 105,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3527,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    },
+    {
+      "id": "w-05",
+      "trap": false,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": true,
+      "degraded": false,
+      "verified": true,
+      "retries": 1,
+      "text": "这里的海鸥一点都不怕人，直接落在我鞋上。",
+      "quotes": [
+        {
+          "momentId": "m_w-05",
+          "text": "这里的海鸥一点都不怕人，直接落在我鞋上"
+        }
+      ],
+      "ms": 13231,
+      "cost": 0.004054,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3890,
+          "inputTokens": 975,
+          "outputTokens": 121,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3423,
+          "inputTokens": 432,
+          "outputTokens": 103,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3424,
+          "summary": "独立检查员：0/1 段每句都能对应到原话"
+        },
+        {
+          "kind": "retry",
+          "name": "rewrite",
+          "ms": 0,
+          "summary": "1 段没通过，带着问题重写一次",
+          "reason": "借鉴 Claude Code：检查拦下时带着原因重跑一轮"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 2713,
+          "inputTokens": 1089,
+          "outputTokens": 54,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3198,
+          "inputTokens": 418,
+          "outputTokens": 81,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3199,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    },
+    {
+      "id": "w-06",
+      "trap": false,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": false,
+      "degraded": false,
+      "verified": true,
+      "retries": 0,
+      "text": "这里的 brunch 文化实在夸张，周日临近中午，全城似乎都在排队等待 eggs benedict。",
+      "quotes": [],
+      "ms": 15523,
+      "cost": 0.004819,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 2839,
+          "inputTokens": 982,
+          "outputTokens": 120,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 8515,
+          "inputTokens": 434,
+          "outputTokens": 353,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "retry",
+          "name": "invalid_output",
+          "ms": 0,
+          "summary": "输出不合 schema（results.0.unsupported.0: Too big: expected string to have <=200 characters）→ 带错误信息重试一次"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 4164,
+          "inputTokens": 840,
+          "outputTokens": 155,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 12682,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        },
+        {
+          "kind": "guard",
+          "name": "quote_length",
+          "ms": 0,
+          "summary": "金句候选被拦下（LENGTH）"
+        },
+        {
+          "kind": "degrade",
+          "name": "quote_fallback",
+          "ms": 0,
+          "summary": "没有合格的金句"
+        }
+      ]
+    },
+    {
+      "id": "w-07",
+      "trap": false,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": false,
+      "degraded": false,
+      "verified": true,
+      "retries": 0,
+      "text": "这条街的墙上全是涂鸦，每一面都不一样，像一个免费的美术馆。",
+      "quotes": [
+        {
+          "momentId": "m_w-07",
+          "text": "这条街的墙上全是涂鸦，每一面都不一样，像一个免费的美术馆"
+        }
+      ],
+      "ms": 7515,
+      "cost": 0.002201,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3375,
+          "inputTokens": 977,
+          "outputTokens": 100,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 4136,
+          "inputTokens": 424,
+          "outputTokens": 125,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 4138,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    },
+    {
+      "id": "w-08",
+      "trap": false,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": false,
+      "degraded": false,
+      "verified": true,
+      "retries": 0,
+      "text": "眼前的湖水呈现出一种特别的绿色，就像薄荷糖一样。",
+      "quotes": [
+        {
+          "momentId": "m_w-08",
+          "text": "就是，这个湖的颜色，是那种，像薄荷糖一样的绿"
+        }
+      ],
+      "ms": 6973,
+      "cost": 0.002009,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3498,
+          "inputTokens": 979,
+          "outputTokens": 105,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3469,
+          "inputTokens": 422,
+          "outputTokens": 80,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3471,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        },
+        {
+          "kind": "guard",
+          "name": "quote_not_verbatim",
+          "ms": 0,
+          "summary": "金句候选被拦下（NOT_VERBATIM）"
+        },
+        {
+          "kind": "degrade",
+          "name": "quote_fallback",
+          "ms": 0,
+          "summary": "模型给的金句全部不合格，代码从最重要的片段里取了一句原话"
+        }
+      ]
+    },
+    {
+      "id": "w-09",
+      "trap": false,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": true,
+      "degraded": false,
+      "verified": true,
+      "retries": 1,
+      "text": "眼前这台缝纫机，让我想起小时候家里也有一台。那时妈妈总在晚上的灯下踩着它。",
+      "quotes": [
+        {
+          "momentId": "m_w-09",
+          "text": "我小时候家里也有一台这样的缝纫机，我妈晚上就在灯下踩"
+        }
+      ],
+      "ms": 13365,
+      "cost": 0.004342,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3337,
+          "inputTokens": 979,
+          "outputTokens": 116,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3965,
+          "inputTokens": 439,
+          "outputTokens": 126,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3966,
+          "summary": "独立检查员：0/1 段每句都能对应到原话"
+        },
+        {
+          "kind": "retry",
+          "name": "rewrite",
+          "ms": 0,
+          "summary": "1 段没通过，带着问题重写一次",
+          "reason": "借鉴 Claude Code：检查拦下时带着原因重跑一轮"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3380,
+          "inputTokens": 1088,
+          "outputTokens": 63,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 2675,
+          "inputTokens": 431,
+          "outputTokens": 110,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 2676,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    },
+    {
+      "id": "w-10",
+      "trap": false,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": false,
+      "degraded": false,
+      "verified": true,
+      "retries": 0,
+      "text": "这里的人过马路都等绿灯，哪怕一辆车都没有。我不禁在想，自己是不是太习惯赶时间了。",
+      "quotes": [
+        {
+          "momentId": "m_w-10",
+          "text": "他们过马路都等绿灯，哪怕一辆车都没有"
+        }
+      ],
+      "ms": 6643,
+      "cost": 0.002257,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3303,
+          "inputTokens": 987,
+          "outputTokens": 119,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3337,
+          "inputTokens": 442,
+          "outputTokens": 113,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3338,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    },
+    {
+      "id": "w-11",
+      "trap": false,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": false,
+      "degraded": false,
+      "verified": true,
+      "retries": 0,
+      "text": "这座地铁站建于 1863 年，四周的砖墙呈现出深沉的黑色。",
+      "quotes": [
+        {
+          "momentId": "m_w-11",
+          "text": "这里的地铁站是 1863 年的，砖都是黑的"
+        }
+      ],
+      "ms": 6809,
+      "cost": 0.002135,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3571,
+          "inputTokens": 977,
+          "outputTokens": 104,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3235,
+          "inputTokens": 426,
+          "outputTokens": 107,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3236,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    },
+    {
+      "id": "w-12",
+      "trap": false,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": false,
+      "degraded": false,
+      "verified": true,
+      "retries": 0,
+      "text": "冰岛水龙头流出的热水带着硫磺味，洗完澡后，头发上全是鸡蛋的味道。",
+      "quotes": [
+        {
+          "momentId": "m_w-12",
+          "text": "冰岛水龙头出来的热水有硫磺味，洗完澡头发都是鸡蛋味"
+        }
+      ],
+      "ms": 7044,
+      "cost": 0.002245,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3731,
+          "inputTokens": 980,
+          "outputTokens": 125,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3309,
+          "inputTokens": 428,
+          "outputTokens": 108,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3310,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    },
+    {
+      "id": "w-13",
+      "trap": false,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": false,
+      "degraded": false,
+      "verified": true,
+      "retries": 0,
+      "text": "原来沙漠的夜晚如此寒冷，即便裹上三件衣服，身体仍止不住地发抖。",
+      "quotes": [
+        {
+          "momentId": "m_w-13",
+          "text": "原来沙漠晚上这么冷，我穿了三件还在发抖"
+        }
+      ],
+      "ms": 6275,
+      "cost": 0.002281,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 2696,
+          "inputTokens": 974,
+          "outputTokens": 115,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3576,
+          "inputTokens": 425,
+          "outputTokens": 127,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3577,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    },
+    {
+      "id": "w-14",
+      "trap": false,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": false,
+      "degraded": false,
+      "verified": true,
+      "retries": 0,
+      "text": "这里的老人都在公园跳交谊舞，穿得特别正式，还化了妆。",
+      "quotes": [
+        {
+          "momentId": "m_w-14",
+          "text": "这里的老人都在公园跳交谊舞，穿得特别正式，还化了妆"
+        }
+      ],
+      "ms": 6077,
+      "cost": 0.002388,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3325,
+          "inputTokens": 979,
+          "outputTokens": 135,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 2750,
+          "inputTokens": 428,
+          "outputTokens": 128,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 2750,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    },
+    {
+      "id": "w-15",
+      "trap": false,
+      "pass": false,
+      "violations": [],
+      "missing": [
+        "老板"
+      ],
+      "blacklisted": [],
+      "intercepted": true,
+      "degraded": false,
+      "verified": true,
+      "retries": 1,
+      "text": "夜市的人潮里，我突然很想我爸。他要是也在，一定会拉着摊主聊上半天。",
+      "quotes": [
+        {
+          "momentId": "m_w-15",
+          "text": "我突然很想我爸，他要是在一定会拉着人家老板聊半天"
+        }
+      ],
+      "ms": 12198,
+      "cost": 0.004337,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 2893,
+          "inputTokens": 974,
+          "outputTokens": 115,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3818,
+          "inputTokens": 437,
+          "outputTokens": 128,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3820,
+          "summary": "独立检查员：0/1 段每句都能对应到原话"
+        },
+        {
+          "kind": "retry",
+          "name": "rewrite",
+          "ms": 0,
+          "summary": "1 段没通过，带着问题重写一次",
+          "reason": "借鉴 Claude Code：检查拦下时带着原因重跑一轮"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 1879,
+          "inputTokens": 1088,
+          "outputTokens": 62,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3600,
+          "inputTokens": 426,
+          "outputTokens": 111,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3601,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    },
+    {
+      "id": "t-01",
+      "trap": true,
+      "pass": false,
+      "violations": [],
+      "missing": [
+        "排队|排着队"
+      ],
+      "blacklisted": [],
+      "intercepted": false,
+      "degraded": false,
+      "verified": true,
+      "retries": 0,
+      "text": "教堂门口，人们安安静静地排着长队。望着这一幕，我心里感到挺平静。",
+      "quotes": [
+        {
+          "momentId": "m_t-01",
+          "text": "看到那么多人在教堂门口安安静静地排队，我心里挺平静的"
+        }
+      ],
+      "ms": 5488,
+      "cost": 0.002122,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 2488,
+          "inputTokens": 975,
+          "outputTokens": 103,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 2997,
+          "inputTokens": 424,
+          "outputTokens": 106,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 2998,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    },
+    {
+      "id": "t-02",
+      "trap": true,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": false,
+      "degraded": false,
+      "verified": true,
+      "retries": 0,
+      "text": "我在山顶坐了一个小时，只看云飘过去。",
+      "quotes": [
+        {
+          "momentId": "m_t-02",
+          "text": "我在山顶坐了一个小时，就看云飘过去"
+        }
+      ],
+      "ms": 6055,
+      "cost": 0.002083,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3228,
+          "inputTokens": 972,
+          "outputTokens": 104,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 2823,
+          "inputTokens": 414,
+          "outputTokens": 99,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 2824,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    },
+    {
+      "id": "t-03",
+      "trap": true,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": true,
+      "degraded": false,
+      "verified": true,
+      "retries": 1,
+      "text": "这个博物馆里有一封一百年前的情书，字写得很工整。",
+      "quotes": [
+        {
+          "momentId": "m_t-03",
+          "text": "这个博物馆里有一封一百年前的情书，字写得很工整"
+        }
+      ],
+      "ms": 12421,
+      "cost": 0.004386,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 2916,
+          "inputTokens": 975,
+          "outputTokens": 130,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3898,
+          "inputTokens": 441,
+          "outputTokens": 134,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3901,
+          "summary": "独立检查员：0/1 段每句都能对应到原话"
+        },
+        {
+          "kind": "retry",
+          "name": "rewrite",
+          "ms": 0,
+          "summary": "1 段没通过，带着问题重写一次",
+          "reason": "借鉴 Claude Code：检查拦下时带着原因重跑一轮"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 2416,
+          "inputTokens": 1107,
+          "outputTokens": 56,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3182,
+          "inputTokens": 422,
+          "outputTokens": 103,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3184,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    },
+    {
+      "id": "t-04",
+      "trap": true,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": false,
+      "degraded": false,
+      "verified": true,
+      "retries": 0,
+      "text": "离开的时候，我回头看了一眼这个小镇。",
+      "quotes": [
+        {
+          "momentId": "m_t-04",
+          "text": "离开的时候回头看了一眼这个小镇"
+        }
+      ],
+      "ms": 7104,
+      "cost": 0.00203,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3720,
+          "inputTokens": 971,
+          "outputTokens": 118,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3379,
+          "inputTokens": 408,
+          "outputTokens": 75,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 3381,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    },
+    {
+      "id": "t-05",
+      "trap": true,
+      "pass": true,
+      "violations": [],
+      "missing": [],
+      "blacklisted": [],
+      "intercepted": false,
+      "degraded": false,
+      "verified": true,
+      "retries": 0,
+      "text": "海边的风好大，我把外套拉链拉到了最上面。",
+      "quotes": [
+        {
+          "momentId": "m_t-05",
+          "text": "海边的风好大，我把外套拉链拉到了最上面"
+        }
+      ],
+      "ms": 6423,
+      "cost": 0.00207,
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 3536,
+          "inputTokens": 974,
+          "outputTokens": 97,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：1/1 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 2885,
+          "inputTokens": 420,
+          "outputTokens": 102,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 2886,
+          "summary": "独立检查员：1/1 段每句都能对应到原话"
+        }
+      ]
+    }
+  ],
+  "ranAt": "2026-09-15T20:29:11.547Z",
+  "wallMs": 60939,
+  "provider": "dashscope"
+}

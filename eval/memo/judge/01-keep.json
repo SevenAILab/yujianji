@@ -1,0 +1,82 @@
+[
+  { "id": "k-diff-1", "tags": ["keep", "difference"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "这边地铁里大家都不说话，连打电话都压着声音，跟我们那边完全不一样。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "keep", "category": "difference" }] },
+
+  { "id": "k-diff-2", "tags": ["keep", "difference", "companion"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "你看他们排队都隔着一米站。" },
+    { "id": "u2", "speaker": "me", "text": "对，而且没有一个人插队，要是在我们那边早就挤上去了。" }
+  ] }, "expected": [{ "utteranceIds": ["u2"], "decision": "keep", "category": "difference" }] },
+
+  { "id": "k-diff-3", "tags": ["keep", "difference"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "这里的超市晚上八点就关门，周日干脆不开，我还以为 24 小时便利店到处都有。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "keep", "category": "difference" }] },
+
+  { "id": "k-obs-1", "tags": ["keep", "observation"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "那个卖花的阿姨一边包花一边哼歌，感觉她是真的喜欢这份工作。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "keep", "category": "observation" }] },
+
+  { "id": "k-obs-2", "tags": ["keep", "observation"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "河边一排人在钓鱼，谁也不说话，我看着心里一下子特别静。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "keep", "category": "observation" }] },
+
+  { "id": "k-obs-3", "tags": ["keep", "observation", "companion"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "你看前面那对老夫妻。" },
+    { "id": "u2", "speaker": "me", "text": "他们牵着手慢慢走，走两步就停下来看对方一眼，好可爱。" }
+  ] }, "expected": [{ "utteranceIds": ["u2"], "decision": "keep", "category": "observation" }] },
+
+  { "id": "k-mem-1", "tags": ["keep", "memory"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "这条巷子的味道好像我小学门口那家卤味店。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "keep", "category": "memory" }] },
+
+  { "id": "k-mem-2", "tags": ["keep", "memory"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "看到这种绿皮火车，一下就想起大学每年春运挤火车回家。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "keep", "category": "memory" }] },
+
+  { "id": "k-mem-3", "tags": ["keep", "memory", "companion"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "这首歌好老啊。" },
+    { "id": "u2", "speaker": "me", "text": "我高中晚自习偷偷戴耳机听的就是这首，那时候觉得自己特别酷。" }
+  ] }, "expected": [{ "utteranceIds": ["u2"], "decision": "keep", "category": "memory" }] },
+
+  { "id": "k-ref-1", "tags": ["keep", "reflection"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "看他们下午就在咖啡馆坐着发呆，我在想我上一次什么都不干是什么时候。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "keep", "category": "reflection" }] },
+
+  { "id": "k-ref-2", "tags": ["keep", "reflection"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "我发现我出来玩也一直在想怎么拍照发朋友圈，其实根本没好好看。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "keep", "category": "reflection" }] },
+
+  { "id": "k-ref-3", "tags": ["keep", "reflection", "companion"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "这边的人好像都不怎么加班。" },
+    { "id": "u2", "speaker": "me", "text": "我觉得不是他们懒，是他们把生活排在工作前面，我回去想试试周末真的不回工作消息。" }
+  ] }, "expected": [{ "utteranceIds": ["u2"], "decision": "keep", "category": "reflection" }] },
+
+  { "id": "k-first-1", "tags": ["keep", "first_experience"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "第一次坐这种悬在半空的缆车，脚底下就是悬崖，太刺激了。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "keep", "category": "first_experience" }] },
+
+  { "id": "k-first-2", "tags": ["keep", "first_experience"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "第一次吃到树上现摘的榴莲，没想到一点都不臭，是甜的。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "keep", "category": "first_experience" }] },
+
+  { "id": "k-first-3", "tags": ["keep", "first_experience"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "第一次看到真的极光，比照片里淡，但是它在动，那种感觉照片拍不出来。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "keep", "category": "first_experience" }] },
+
+  { "id": "k-retold-1", "tags": ["keep", "retold_fact", "companion"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "这座钟楼每天中午会敲十二下，已经敲了四百多年。" },
+    { "id": "u2", "speaker": "me", "text": "刚才讲解说这个钟敲了四百多年都没停过，好厉害。" }
+  ] }, "expected": [
+    { "utteranceIds": ["u1"], "decision": "drop", "category": "guide" },
+    { "utteranceIds": ["u2"], "decision": "keep", "category": "retold_fact" }
+  ] },
+
+  { "id": "k-retold-2", "tags": ["keep", "retold_fact"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "我刚看牌子上写，这片森林里的树平均都有五百岁了，比好多国家都老。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "keep", "category": "retold_fact" }] },
+
+  { "id": "k-retold-3", "tags": ["keep", "retold_fact", "companion"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "据说这个湖冬天会整个冻住，人可以直接走到对岸。" },
+    { "id": "u2", "speaker": "me", "text": "冬天居然能走着过湖，我好想冬天再来一次看看。" }
+  ] }, "expected": [{ "utteranceIds": ["u2"], "decision": "keep", "category": "retold_fact" }] }
+]

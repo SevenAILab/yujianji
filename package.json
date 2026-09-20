@@ -15,12 +15,16 @@
     "seed:check:final": "SEED_MIN_COUNT=20 npm run seed:check",
     "seed:ai": "tsx scripts/seed-ai.ts",
     "ping": "tsx scripts/ping.ts",
-    "qr": "bash scripts/qr.sh"
+    "qr": "bash scripts/qr.sh",
+    "eval:memo": "tsx scripts/eval-memo.ts",
+    "smoke:memo": "tsx scripts/memo-smoke.ts"
   },
   "dependencies": {
+    "@ai-sdk/openai-compatible": "^3.0.49",
     "@capacitor/android": "^8.5.1",
     "@capacitor/core": "^8.5.1",
     "@capacitor/ios": "^8.5.1",
+    "ai": "^7.0.102",
     "country-code-lookup": "^0.1.5",
     "d3-geo": "^3.1.1",
     "d3-selection": "^3.0.0",

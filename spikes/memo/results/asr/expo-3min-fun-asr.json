@@ -1,0 +1,1091 @@
+{
+  "file_url": "http://dashscope-file-mgr.oss-cn-beijing.aliyuncs.com/dashscope-instant/a931ee85280037836bcd24f0ba10106f/2026-09-16/6e3c66dc-712e-95ad-bb8b-84651f15b890/1789498910816-expo-3min-16k.m4a?Expires=1789671712&OSSAccessKeyId=LTAI5t64cnuuVx7xndFH9ULk&Signature=X41K8pm5bbzwxfprrQae2MJuOUA%3D",
+  "properties": {
+    "audio_format": "aac",
+    "channels": [
+      0
+    ],
+    "original_sampling_rate": 16000,
+    "original_duration_in_milliseconds": 77184
+  },
+  "transcripts": [
+    {
+      "channel_id": 0,
+      "content_duration_in_milliseconds": 46120,
+      "text": "接口明天几点对一下？我这边上传那块还没连掉。上午10点吧，你把steam发我。好，我今晚发。哇，第一次见到这么多超市，感觉像走进了动画片，大家都特别放得开。那个是《原神》的角色，做的好惊喜！我小时候也特别想穿成这样出门，但是那时候总觉得会被人笑。现在看他们这么自在，有点羡慕。这个展馆是去年新建的，据说用了很多回收材料。导游光说这个屋顶是用回收的塑料瓶做的，现在还在用，挺酷的。这个咖啡多少钱？给我来一杯拿铁，谢谢！我跟他分手，就是因为他从来不陪我出来玩。这个冰淇淋是我吃过最好吃的，有一点海盐的味道，so good！",
+      "sentences": [
+        {
+          "begin_time": 120,
+          "end_time": 1880,
+          "text": "接口明天几点对一下？",
+          "sentence_id": 1,
+          "speaker_id": 0,
+          "words": [
+            {
+              "begin_time": 120,
+              "end_time": 440,
+              "text": "接口",
+              "punctuation": "",
+              "confidence": 0.823
+            },
+            {
+              "begin_time": 440,
+              "end_time": 880,
+              "text": "明天",
+              "punctuation": "",
+              "confidence": 0.998
+            },
+            {
+              "begin_time": 880,
+              "end_time": 1280,
+              "text": "几点",
+              "punctuation": "",
+              "confidence": 0.955
+            },
+            {
+              "begin_time": 1280,
+              "end_time": 1480,
+              "text": "对",
+              "punctuation": "",
+              "confidence": 0.774
+            },
+            {
+              "begin_time": 1480,
+              "end_time": 1880,
+              "text": "一下",
+              "punctuation": "？",
+              "confidence": 0.997
+            }
+          ]
+        },
+        {
+          "begin_time": 2240,
+          "end_time": 4400,
+          "text": "我这边上传那块还没连掉。",
+          "sentence_id": 2,
+          "speaker_id": 0,
+          "words": [
+            {
+              "begin_time": 2240,
+              "end_time": 2440,
+              "text": "我",
+              "punctuation": "",
+              "confidence": 0.997
+            },
+            {
+              "begin_time": 2440,
+              "end_time": 2840,
+              "text": "这边",
+              "punctuation": "",
+              "confidence": 0.988
+            },
+            {
+              "begin_time": 2840,
+              "end_time": 3240,
+              "text": "上传",
+              "punctuation": "",
+              "confidence": 0.964
+            },
+            {
+              "begin_time": 3240,
+              "end_time": 3440,
+              "text": "那",
+              "punctuation": "",
+              "confidence": 0.0914
+            },
+            {
+              "begin_time": 3440,
+              "end_time": 3640,
+              "text": "块",
+              "punctuation": "",
+              "confidence": 0.218
+            },
+            {
+              "begin_time": 3640,
+              "end_time": 3920,
+              "text": "还没",
+              "punctuation": "",
+              "confidence": 0.88
+            },
+            {
+              "begin_time": 3920,
+              "end_time": 4160,
+              "text": "连",
+              "punctuation": "",
+              "confidence": 0.302
+            },
+            {
+              "begin_time": 4160,
+              "end_time": 4400,
+              "text": "掉",
+              "punctuation": "。",
+              "confidence": 0.0509
+            }
+          ]
+        },
+        {
+          "begin_time": 5660,
+          "end_time": 8380,
+          "text": "上午10点吧，你把steam发我。",
+          "sentence_id": 3,
+          "speaker_id": 1,
+          "words": [
+            {
+              "begin_time": 5660,
+              "end_time": 6100,
+              "text": "上午",
+              "punctuation": "",
+              "confidence": 0.994
+            },
+            {
+              "begin_time": 6100,
+              "end_time": 6200,
+              "text": "1",
+              "punctuation": "",
+              "confidence": 0.601
+            },
+            {
+              "begin_time": 6200,
+              "end_time": 6300,
+              "text": "0",
+              "punctuation": "",
+              "confidence": 0.601
+            },
+            {
+              "begin_time": 6300,
+              "end_time": 6540,
+              "text": "点",
+              "punctuation": "",
+              "confidence": 0.932
+            },
+            {
+              "begin_time": 6540,
+              "end_time": 6780,
+              "text": "吧",
+              "punctuation": "，",
+              "confidence": 0.937
+            },
+            {
+              "begin_time": 6980,
+              "end_time": 7180,
+              "text": "你",
+              "punctuation": "",
+              "confidence": 0.995
+            },
+            {
+              "begin_time": 7180,
+              "end_time": 7460,
+              "text": "把",
+              "punctuation": "",
+              "confidence": 0.988
+            },
+            {
+              "begin_time": 7460,
+              "end_time": 7900,
+              "text": "steam",
+              "punctuation": "",
+              "confidence": 0.0241
+            },
+            {
+              "begin_time": 7900,
+              "end_time": 8100,
+              "text": "发",
+              "punctuation": "",
+              "confidence": 0.99
+            },
+            {
+              "begin_time": 8100,
+              "end_time": 8380,
+              "text": "我",
+              "punctuation": "。",
+              "confidence": 0.949
+            }
+          ]
+        },
+        {
+          "begin_time": 9140,
+          "end_time": 10580,
+          "text": "好，我今晚发。",
+          "sentence_id": 4,
+          "speaker_id": 0,
+          "words": [
+            {
+              "begin_time": 9140,
+              "end_time": 9380,
+              "text": "好",
+              "punctuation": "，",
+              "confidence": 0.973
+            },
+            {
+              "begin_time": 9620,
+              "end_time": 9780,
+              "text": "我",
+              "punctuation": "",
+              "confidence": 0.975
+            },
+            {
+              "begin_time": 9780,
+              "end_time": 10300,
+              "text": "今晚",
+              "punctuation": "",
+              "confidence": 0.91
+            },
+            {
+              "begin_time": 10300,
+              "end_time": 10580,
+              "text": "发",
+              "punctuation": "。",
+              "confidence": 0.984
+            }
+          ]
+        },
+        {
+          "begin_time": 20000,
+          "end_time": 25760,
+          "text": "哇，第一次见到这么多超市，感觉像走进了动画片，大家都特别放得开。",
+          "sentence_id": 5,
+          "speaker_id": 0,
+          "words": [
+            {
+              "begin_time": 20000,
+              "end_time": 20160,
+              "text": "哇",
+              "punctuation": "，",
+              "confidence": 0.795
+            },
+            {
+              "begin_time": 20400,
+              "end_time": 20960,
+              "text": "第一次",
+              "punctuation": "",
+              "confidence": 0.993
+            },
+            {
+              "begin_time": 20960,
+              "end_time": 21240,
+              "text": "见到",
+              "punctuation": "",
+              "confidence": 0.974
+            },
+            {
+              "begin_time": 21240,
+              "end_time": 21760,
+              "text": "这么多",
+              "punctuation": "",
+              "confidence": 0.993
+            },
+            {
+              "begin_time": 21760,
+              "end_time": 22240,
+              "text": "超市",
+              "punctuation": "，",
+              "confidence": 0.117
+            },
+            {
+              "begin_time": 22480,
+              "end_time": 22840,
+              "text": "感觉",
+              "punctuation": "",
+              "confidence": 0.998
+            },
+            {
+              "begin_time": 22840,
+              "end_time": 23040,
+              "text": "像",
+              "punctuation": "",
+              "confidence": 0.984
+            },
+            {
+              "begin_time": 23040,
+              "end_time": 23360,
+              "text": "走进",
+              "punctuation": "",
+              "confidence": 0.963
+            },
+            {
+              "begin_time": 23360,
+              "end_time": 23520,
+              "text": "了",
+              "punctuation": "",
+              "confidence": 0.949
+            },
+            {
+              "begin_time": 23520,
+              "end_time": 23880,
+              "text": "动画",
+              "punctuation": "",
+              "confidence": 0.994
+            },
+            {
+              "begin_time": 23880,
+              "end_time": 24120,
+              "text": "片",
+              "punctuation": "，",
+              "confidence": 0.996
+            },
+            {
+              "begin_time": 24320,
+              "end_time": 24880,
+              "text": "大家都",
+              "punctuation": "",
+              "confidence": 0.923
+            },
+            {
+              "begin_time": 24880,
+              "end_time": 25200,
+              "text": "特别",
+              "punctuation": "",
+              "confidence": 0.994
+            },
+            {
+              "begin_time": 25200,
+              "end_time": 25320,
+              "text": "放",
+              "punctuation": "",
+              "confidence": 0.987
+            },
+            {
+              "begin_time": 25320,
+              "end_time": 25520,
+              "text": "得",
+              "punctuation": "",
+              "confidence": 0.217
+            },
+            {
+              "begin_time": 25520,
+              "end_time": 25760,
+              "text": "开",
+              "punctuation": "。",
+              "confidence": 0.954
+            }
+          ]
+        },
+        {
+          "begin_time": 27000,
+          "end_time": 29880,
+          "text": "那个是《原神》的角色，做的好惊喜！",
+          "sentence_id": 6,
+          "speaker_id": 1,
+          "words": [
+            {
+              "begin_time": 27000,
+              "end_time": 27280,
+              "text": "那个",
+              "punctuation": "",
+              "confidence": 0.991
+            },
+            {
+              "begin_time": 27280,
+              "end_time": 27440,
+              "text": "是",
+              "punctuation": "",
+              "confidence": 0.989
+            },
+            {
+              "begin_time": 27440,
+              "end_time": 27520,
+              "text": "《",
+              "punctuation": "",
+              "confidence": 0.0433
+            },
+            {
+              "begin_time": 27520,
+              "end_time": 27760,
+              "text": "原",
+              "punctuation": "",
+              "confidence": 0.651
+            },
+            {
+              "begin_time": 27760,
+              "end_time": 27840,
+              "text": "神",
+              "punctuation": "",
+              "confidence": 0.995
+            },
+            {
+              "begin_time": 27840,
+              "end_time": 27920,
+              "text": "》",
+              "punctuation": "",
+              "confidence": 0.00609
+            },
+            {
+              "begin_time": 27920,
+              "end_time": 28520,
+              "text": "的角色",
+              "punctuation": "，",
+              "confidence": 0.991
+            },
+            {
+              "begin_time": 28800,
+              "end_time": 29120,
+              "text": "做的",
+              "punctuation": "",
+              "confidence": 0.81
+            },
+            {
+              "begin_time": 29120,
+              "end_time": 29400,
+              "text": "好",
+              "punctuation": "",
+              "confidence": 0.988
+            },
+            {
+              "begin_time": 29400,
+              "end_time": 29880,
+              "text": "惊喜",
+              "punctuation": "！",
+              "confidence": 0.96
+            }
+          ]
+        },
+        {
+          "begin_time": 30520,
+          "end_time": 35440,
+          "text": "我小时候也特别想穿成这样出门，但是那时候总觉得会被人笑。",
+          "sentence_id": 7,
+          "speaker_id": 0,
+          "words": [
+            {
+              "begin_time": 30520,
+              "end_time": 30720,
+              "text": "我",
+              "punctuation": "",
+              "confidence": 0.988
+            },
+            {
+              "begin_time": 30720,
+              "end_time": 31200,
+              "text": "小时候",
+              "punctuation": "",
+              "confidence": 0.973
+            },
+            {
+              "begin_time": 31200,
+              "end_time": 31360,
+              "text": "也",
+              "punctuation": "",
+              "confidence": 0.991
+            },
+            {
+              "begin_time": 31360,
+              "end_time": 31680,
+              "text": "特别",
+              "punctuation": "",
+              "confidence": 0.985
+            },
+            {
+              "begin_time": 31680,
+              "end_time": 31920,
+              "text": "想",
+              "punctuation": "",
+              "confidence": 0.993
+            },
+            {
+              "begin_time": 31920,
+              "end_time": 32160,
+              "text": "穿",
+              "punctuation": "",
+              "confidence": 0.994
+            },
+            {
+              "begin_time": 32160,
+              "end_time": 32360,
+              "text": "成",
+              "punctuation": "",
+              "confidence": 0.969
+            },
+            {
+              "begin_time": 32360,
+              "end_time": 32680,
+              "text": "这样",
+              "punctuation": "",
+              "confidence": 0.991
+            },
+            {
+              "begin_time": 32680,
+              "end_time": 33080,
+              "text": "出门",
+              "punctuation": "，",
+              "confidence": 0.993
+            },
+            {
+              "begin_time": 33320,
+              "end_time": 33680,
+              "text": "但是",
+              "punctuation": "",
+              "confidence": 0.985
+            },
+            {
+              "begin_time": 33680,
+              "end_time": 34160,
+              "text": "那时候",
+              "punctuation": "",
+              "confidence": 0.958
+            },
+            {
+              "begin_time": 34160,
+              "end_time": 34640,
+              "text": "总觉得",
+              "punctuation": "",
+              "confidence": 0.985
+            },
+            {
+              "begin_time": 34640,
+              "end_time": 34840,
+              "text": "会",
+              "punctuation": "",
+              "confidence": 0.991
+            },
+            {
+              "begin_time": 34840,
+              "end_time": 35200,
+              "text": "被人",
+              "punctuation": "",
+              "confidence": 0.731
+            },
+            {
+              "begin_time": 35200,
+              "end_time": 35440,
+              "text": "笑",
+              "punctuation": "。",
+              "confidence": 0.993
+            }
+          ]
+        },
+        {
+          "begin_time": 35760,
+          "end_time": 38320,
+          "text": "现在看他们这么自在，有点羡慕。",
+          "sentence_id": 8,
+          "speaker_id": 0,
+          "words": [
+            {
+              "begin_time": 35760,
+              "end_time": 36160,
+              "text": "现在",
+              "punctuation": "",
+              "confidence": 0.989
+            },
+            {
+              "begin_time": 36160,
+              "end_time": 36400,
+              "text": "看",
+              "punctuation": "",
+              "confidence": 0.995
+            },
+            {
+              "begin_time": 36400,
+              "end_time": 36640,
+              "text": "他们",
+              "punctuation": "",
+              "confidence": 0.985
+            },
+            {
+              "begin_time": 36640,
+              "end_time": 36920,
+              "text": "这么",
+              "punctuation": "",
+              "confidence": 0.912
+            },
+            {
+              "begin_time": 36920,
+              "end_time": 37240,
+              "text": "自在",
+              "punctuation": "，",
+              "confidence": 0.965
+            },
+            {
+              "begin_time": 37520,
+              "end_time": 37920,
+              "text": "有点",
+              "punctuation": "",
+              "confidence": 0.987
+            },
+            {
+              "begin_time": 37920,
+              "end_time": 38320,
+              "text": "羡慕",
+              "punctuation": "。",
+              "confidence": 0.971
+            }
+          ]
+        },
+        {
+          "begin_time": 39750,
+          "end_time": 44190,
+          "text": "这个展馆是去年新建的，据说用了很多回收材料。",
+          "sentence_id": 9,
+          "speaker_id": 1,
+          "words": [
+            {
+              "begin_time": 39750,
+              "end_time": 40030,
+              "text": "这个",
+              "punctuation": "",
+              "confidence": 0.998
+            },
+            {
+              "begin_time": 40030,
+              "end_time": 40510,
+              "text": "展馆",
+              "punctuation": "",
+              "confidence": 0.999
+            },
+            {
+              "begin_time": 40510,
+              "end_time": 40750,
+              "text": "是",
+              "punctuation": "",
+              "confidence": 0.997
+            },
+            {
+              "begin_time": 40750,
+              "end_time": 41190,
+              "text": "去年",
+              "punctuation": "",
+              "confidence": 0.999
+            },
+            {
+              "begin_time": 41190,
+              "end_time": 41590,
+              "text": "新建",
+              "punctuation": "",
+              "confidence": 0.995
+            },
+            {
+              "begin_time": 41590,
+              "end_time": 41790,
+              "text": "的",
+              "punctuation": "，",
+              "confidence": 0.993
+            },
+            {
+              "begin_time": 42070,
+              "end_time": 42470,
+              "text": "据说",
+              "punctuation": "",
+              "confidence": 0.998
+            },
+            {
+              "begin_time": 42470,
+              "end_time": 42630,
+              "text": "用",
+              "punctuation": "",
+              "confidence": 0.999
+            },
+            {
+              "begin_time": 42630,
+              "end_time": 43270,
+              "text": "了很多",
+              "punctuation": "",
+              "confidence": 0.997
+            },
+            {
+              "begin_time": 43270,
+              "end_time": 43710,
+              "text": "回收",
+              "punctuation": "",
+              "confidence": 0.998
+            },
+            {
+              "begin_time": 43710,
+              "end_time": 44190,
+              "text": "材料",
+              "punctuation": "。",
+              "confidence": 0.997
+            }
+          ]
+        },
+        {
+          "begin_time": 44950,
+          "end_time": 50190,
+          "text": "导游光说这个屋顶是用回收的塑料瓶做的，现在还在用，挺酷的。",
+          "sentence_id": 10,
+          "speaker_id": 0,
+          "words": [
+            {
+              "begin_time": 44950,
+              "end_time": 45310,
+              "text": "导游",
+              "punctuation": "",
+              "confidence": 0.108
+            },
+            {
+              "begin_time": 45310,
+              "end_time": 45510,
+              "text": "光",
+              "punctuation": "",
+              "confidence": 0.588
+            },
+            {
+              "begin_time": 45510,
+              "end_time": 45710,
+              "text": "说",
+              "punctuation": "",
+              "confidence": 0.989
+            },
+            {
+              "begin_time": 45710,
+              "end_time": 45910,
+              "text": "这个",
+              "punctuation": "",
+              "confidence": 0.964
+            },
+            {
+              "begin_time": 45910,
+              "end_time": 46270,
+              "text": "屋顶",
+              "punctuation": "",
+              "confidence": 0.748
+            },
+            {
+              "begin_time": 46270,
+              "end_time": 46430,
+              "text": "是",
+              "punctuation": "",
+              "confidence": 0.927
+            },
+            {
+              "begin_time": 46430,
+              "end_time": 46630,
+              "text": "用",
+              "punctuation": "",
+              "confidence": 0.99
+            },
+            {
+              "begin_time": 46630,
+              "end_time": 46990,
+              "text": "回收",
+              "punctuation": "",
+              "confidence": 0.993
+            },
+            {
+              "begin_time": 46990,
+              "end_time": 47150,
+              "text": "的",
+              "punctuation": "",
+              "confidence": 0.959
+            },
+            {
+              "begin_time": 47150,
+              "end_time": 47510,
+              "text": "塑料",
+              "punctuation": "",
+              "confidence": 0.998
+            },
+            {
+              "begin_time": 47510,
+              "end_time": 47750,
+              "text": "瓶",
+              "punctuation": "",
+              "confidence": 0.828
+            },
+            {
+              "begin_time": 47750,
+              "end_time": 48070,
+              "text": "做的",
+              "punctuation": "，",
+              "confidence": 0.952
+            },
+            {
+              "begin_time": 48390,
+              "end_time": 48750,
+              "text": "现在",
+              "punctuation": "",
+              "confidence": 0.997
+            },
+            {
+              "begin_time": 48750,
+              "end_time": 49070,
+              "text": "还在",
+              "punctuation": "",
+              "confidence": 0.992
+            },
+            {
+              "begin_time": 49070,
+              "end_time": 49270,
+              "text": "用",
+              "punctuation": "，",
+              "confidence": 0.992
+            },
+            {
+              "begin_time": 49470,
+              "end_time": 49790,
+              "text": "挺",
+              "punctuation": "",
+              "confidence": 0.953
+            },
+            {
+              "begin_time": 49790,
+              "end_time": 50030,
+              "text": "酷",
+              "punctuation": "",
+              "confidence": 0.762
+            },
+            {
+              "begin_time": 50030,
+              "end_time": 50190,
+              "text": "的",
+              "punctuation": "。",
+              "confidence": 0.937
+            }
+          ]
+        },
+        {
+          "begin_time": 59600,
+          "end_time": 60920,
+          "text": "这个咖啡多少钱？",
+          "sentence_id": 11,
+          "speaker_id": 0,
+          "words": [
+            {
+              "begin_time": 59600,
+              "end_time": 59920,
+              "text": "这个",
+              "punctuation": "",
+              "confidence": 0.961
+            },
+            {
+              "begin_time": 59920,
+              "end_time": 60320,
+              "text": "咖啡",
+              "punctuation": "",
+              "confidence": 0.999
+            },
+            {
+              "begin_time": 60320,
+              "end_time": 60920,
+              "text": "多少钱",
+              "punctuation": "？",
+              "confidence": 0.996
+            }
+          ]
+        },
+        {
+          "begin_time": 61280,
+          "end_time": 63240,
+          "text": "给我来一杯拿铁，谢谢！",
+          "sentence_id": 12,
+          "speaker_id": 0,
+          "words": [
+            {
+              "begin_time": 61280,
+              "end_time": 61600,
+              "text": "给我",
+              "punctuation": "",
+              "confidence": 0.996
+            },
+            {
+              "begin_time": 61600,
+              "end_time": 61760,
+              "text": "来",
+              "punctuation": "",
+              "confidence": 0.978
+            },
+            {
+              "begin_time": 61760,
+              "end_time": 62080,
+              "text": "一杯",
+              "punctuation": "",
+              "confidence": 0.993
+            },
+            {
+              "begin_time": 62080,
+              "end_time": 62240,
+              "text": "拿",
+              "punctuation": "",
+              "confidence": 0.771
+            },
+            {
+              "begin_time": 62240,
+              "end_time": 62560,
+              "text": "铁",
+              "punctuation": "，",
+              "confidence": 0.993
+            },
+            {
+              "begin_time": 62800,
+              "end_time": 63240,
+              "text": "谢谢",
+              "punctuation": "！",
+              "confidence": 0.992
+            }
+          ]
+        },
+        {
+          "begin_time": 64460,
+          "end_time": 68860,
+          "text": "我跟他分手，就是因为他从来不陪我出来玩。",
+          "sentence_id": 13,
+          "speaker_id": 1,
+          "words": [
+            {
+              "begin_time": 64460,
+              "end_time": 64660,
+              "text": "我",
+              "punctuation": "",
+              "confidence": 0.998
+            },
+            {
+              "begin_time": 64660,
+              "end_time": 65060,
+              "text": "跟他",
+              "punctuation": "",
+              "confidence": 0.905
+            },
+            {
+              "begin_time": 65060,
+              "end_time": 65540,
+              "text": "分手",
+              "punctuation": "，",
+              "confidence": 0.999
+            },
+            {
+              "begin_time": 65820,
+              "end_time": 66260,
+              "text": "就是",
+              "punctuation": "",
+              "confidence": 0.998
+            },
+            {
+              "begin_time": 66260,
+              "end_time": 66860,
+              "text": "因为他",
+              "punctuation": "",
+              "confidence": 0.905
+            },
+            {
+              "begin_time": 66860,
+              "end_time": 67420,
+              "text": "从来不",
+              "punctuation": "",
+              "confidence": 0.999
+            },
+            {
+              "begin_time": 67420,
+              "end_time": 67660,
+              "text": "陪",
+              "punctuation": "",
+              "confidence": 0.999
+            },
+            {
+              "begin_time": 67660,
+              "end_time": 67860,
+              "text": "我",
+              "punctuation": "",
+              "confidence": 0.997
+            },
+            {
+              "begin_time": 67860,
+              "end_time": 68260,
+              "text": "出来",
+              "punctuation": "",
+              "confidence": 0.998
+            },
+            {
+              "begin_time": 68260,
+              "end_time": 68860,
+              "text": "玩",
+              "punctuation": "。",
+              "confidence": 0.995
+            }
+          ]
+        },
+        {
+          "begin_time": 71140,
+          "end_time": 75700,
+          "text": "这个冰淇淋是我吃过最好吃的，有一点海盐的味道，so good！",
+          "sentence_id": 14,
+          "speaker_id": 0,
+          "words": [
+            {
+              "begin_time": 71140,
+              "end_time": 71420,
+              "text": "这个",
+              "punctuation": "",
+              "confidence": 0.989
+            },
+            {
+              "begin_time": 71420,
+              "end_time": 72020,
+              "text": "冰淇淋",
+              "punctuation": "",
+              "confidence": 0.886
+            },
+            {
+              "begin_time": 72020,
+              "end_time": 72260,
+              "text": "是我",
+              "punctuation": "",
+              "confidence": 0.996
+            },
+            {
+              "begin_time": 72260,
+              "end_time": 72620,
+              "text": "吃过",
+              "punctuation": "",
+              "confidence": 0.967
+            },
+            {
+              "begin_time": 72620,
+              "end_time": 72900,
+              "text": "最好",
+              "punctuation": "",
+              "confidence": 0.998
+            },
+            {
+              "begin_time": 72900,
+              "end_time": 73300,
+              "text": "吃的",
+              "punctuation": "，",
+              "confidence": 0.993
+            },
+            {
+              "begin_time": 73540,
+              "end_time": 74100,
+              "text": "有一点",
+              "punctuation": "",
+              "confidence": 0.641
+            },
+            {
+              "begin_time": 74100,
+              "end_time": 74220,
+              "text": "海",
+              "punctuation": "",
+              "confidence": 0.0307
+            },
+            {
+              "begin_time": 74220,
+              "end_time": 74340,
+              "text": "盐",
+              "punctuation": "",
+              "confidence": 0.644
+            },
+            {
+              "begin_time": 74340,
+              "end_time": 74860,
+              "text": "的味道",
+              "punctuation": "，",
+              "confidence": 0.794
+            },
+            {
+              "begin_time": 75060,
+              "end_time": 75420,
+              "text": "so",
+              "punctuation": "",
+              "confidence": 0.729
+            },
+            {
+              "begin_time": 75420,
+              "end_time": 75700,
+              "text": " good",
+              "punctuation": "！",
+              "confidence": 0.0132
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
