@@ -1,0 +1,119 @@
+{"runTag":"A-0","ok":false,"ms":7264,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+{"runTag":"A-1","ok":false,"ms":8388,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+{"runTag":"A-2","ok":false,"ms":9301,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+{"runTag":"A-3","ok":false,"ms":6771,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+{"runTag":"A-4","ok":false,"ms":6679,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+{"runTag":"A-5","ok":false,"ms":7730,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+{"runTag":"A-6","ok":false,"ms":9446,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+{"runTag":"A-7","ok":false,"ms":8539,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+{"runTag":"A-8","ok":false,"ms":8952,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+{"runTag":"A-9","ok":false,"ms":4473,"steps":2,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+(node:34504) Warning: AI SDK Warning System: To turn off warning logging, set the AI_SDK_LOG_WARNINGS global to false.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+{"runTag":"B-0","ok":false,"ms":7225,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+{"runTag":"B-1","ok":false,"ms":8036,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+{"runTag":"B-2","ok":false,"ms":8999,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+{"runTag":"B-3","ok":false,"ms":7019,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+{"runTag":"B-4","ok":false,"ms":7989,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+{"runTag":"B-5","ok":false,"ms":6880,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+{"runTag":"B-6","ok":false,"ms":7981,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+{"runTag":"B-7","ok":false,"ms":7519,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+{"runTag":"B-8","ok":false,"ms":8015,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+{"runTag":"B-9","ok":false,"ms":8955,"steps":3,"error":"AI_NoObjectGeneratedError: No object generated: could not parse the response."}
+(node:34504) Warning: AI SDK Warning (dashscope.chat / qwen3.5-plus): The feature "responseFormat" is not supported. JSON response format schema is only supported with structuredOutputs
+{"runTag":"C-0","ok":true,"ms":6802,"steps":3,"toolsUsed":["recall_memory","lookup_fact","submit_judgement"],"invalidToolCalls":0,"toolErrors":[],"recallFirst":true,"decisions":["u1:keep/reflection"],"tokens":{"in":3554,"out":205}}
+{"runTag":"C-1","ok":true,"ms":7443,"steps":3,"toolsUsed":["recall_memory","lookup_fact","submit_judgement"],"invalidToolCalls":0,"toolErrors":[],"recallFirst":true,"decisions":["u1:keep/reflection"],"tokens":{"in":3554,"out":206}}
+{"runTag":"C-2","ok":true,"ms":7077,"steps":3,"toolsUsed":["recall_memory","lookup_fact","submit_judgement"],"invalidToolCalls":0,"toolErrors":[],"recallFirst":true,"decisions":["u1:keep/reflection"],"tokens":{"in":3555,"out":205}}
+{"runTag":"C-3","ok":true,"ms":9960,"steps":3,"toolsUsed":["recall_memory","lookup_fact","submit_judgement"],"invalidToolCalls":0,"toolErrors":[],"recallFirst":true,"decisions":["u1:keep/reflection"],"tokens":{"in":3554,"out":206}}
+{"runTag":"C-4","ok":true,"ms":7800,"steps":3,"toolsUsed":["recall_memory","lookup_fact","submit_judgement"],"invalidToolCalls":0,"toolErrors":[],"recallFirst":true,"decisions":["u1:keep/reflection"],"tokens":{"in":3554,"out":210}}
+{"runTag":"C-5","ok":true,"ms":9163,"steps":3,"toolsUsed":["recall_memory","lookup_fact","submit_judgement"],"invalidToolCalls":0,"toolErrors":[],"recallFirst":true,"decisions":["u1:keep/reflection"],"tokens":{"in":3557,"out":209}}
+{"runTag":"C-6","ok":true,"ms":7108,"steps":3,"toolsUsed":["recall_memory","lookup_fact","submit_judgement"],"invalidToolCalls":0,"toolErrors":[],"recallFirst":true,"decisions":["u1:keep/reflection"],"tokens":{"in":3555,"out":213}}
+{"runTag":"C-7","ok":true,"ms":7505,"steps":3,"toolsUsed":["recall_memory","lookup_fact","submit_judgement"],"invalidToolCalls":0,"toolErrors":[],"recallFirst":true,"decisions":["u1:keep/reflection"],"tokens":{"in":3554,"out":231}}
+{"runTag":"C-8","ok":true,"ms":7043,"steps":3,"toolsUsed":["recall_memory","lookup_fact","submit_judgement"],"invalidToolCalls":0,"toolErrors":[],"recallFirst":true,"decisions":["u1:keep/reflection"],"tokens":{"in":3554,"out":203}}
+{"runTag":"C-9","ok":true,"ms":6691,"steps":3,"toolsUsed":["recall_memory","lookup_fact","submit_judgement"],"invalidToolCalls":0,"toolErrors":[],"recallFirst":true,"decisions":["u1:keep/reflection"],"tokens":{"in":3555,"out":208}}
+SUMMARY [
+  {
+    "mode": "A",
+    "model": "qwen3.5-plus",
+    "runs": 10,
+    "ok": 0,
+    "recallFirst": 0,
+    "invalidToolCalls": 0,
+    "errors": [
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response."
+    ],
+    "p50": 8388,
+    "p95": 9446
+  },
+  {
+    "mode": "B",
+    "model": "qwen3.5-plus",
+    "runs": 10,
+    "ok": 0,
+    "recallFirst": 0,
+    "invalidToolCalls": 0,
+    "errors": [
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "AI_NoObjectGeneratedError: No object generated: could not parse the response."
+    ],
+    "p50": 7989,
+    "p95": 8999
+  },
+  {
+    "mode": "C",
+    "model": "qwen3.5-plus",
+    "runs": 10,
+    "ok": 10,
+    "recallFirst": 10,
+    "invalidToolCalls": 0,
+    "errors": [],
+    "p50": 7443,
+    "p95": 9960
+  }
+]

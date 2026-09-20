@@ -1,0 +1,2328 @@
+{
+  "summary": [
+    {
+      "mode": "A",
+      "model": "qwen3.5-plus",
+      "runs": 10,
+      "ok": 0,
+      "recallFirst": 0,
+      "invalidToolCalls": 0,
+      "errors": [
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response."
+      ],
+      "p50": 8388,
+      "p95": 9446
+    },
+    {
+      "mode": "B",
+      "model": "qwen3.5-plus",
+      "runs": 10,
+      "ok": 0,
+      "recallFirst": 0,
+      "invalidToolCalls": 0,
+      "errors": [
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+        "AI_NoObjectGeneratedError: No object generated: could not parse the response."
+      ],
+      "p50": 7989,
+      "p95": 8999
+    },
+    {
+      "mode": "C",
+      "model": "qwen3.5-plus",
+      "runs": 10,
+      "ok": 10,
+      "recallFirst": 10,
+      "invalidToolCalls": 0,
+      "errors": [],
+      "p50": 7443,
+      "p95": 9960
+    }
+  ],
+  "results": [
+    {
+      "runTag": "A-0",
+      "ok": false,
+      "ms": 7264,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是哪一年建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 48
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 944,
+          "out": 137
+        }
+      ]
+    },
+    {
+      "runTag": "A-1",
+      "ok": false,
+      "ms": 8388,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是什么时候建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 47
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 943,
+          "out": 122
+        }
+      ]
+    },
+    {
+      "runTag": "A-2",
+      "ok": false,
+      "ms": 9301,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是什么时候建成并开始开合的？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 47
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 943,
+          "out": 151
+        }
+      ]
+    },
+    {
+      "runTag": "A-3",
+      "ok": false,
+      "ms": 6771,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是什么时候建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 47
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 943,
+          "out": 130
+        }
+      ]
+    },
+    {
+      "runTag": "A-4",
+      "ok": false,
+      "ms": 6679,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是哪一年建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 48
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 944,
+          "out": 138
+        }
+      ]
+    },
+    {
+      "runTag": "A-5",
+      "ok": false,
+      "ms": 7730,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是哪一年建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 48
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 944,
+          "out": 134
+        }
+      ]
+    },
+    {
+      "runTag": "A-6",
+      "ok": false,
+      "ms": 9446,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是哪一年建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 48
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 944,
+          "out": 120
+        }
+      ]
+    },
+    {
+      "runTag": "A-7",
+      "ok": false,
+      "ms": 8539,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是哪一年建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 48
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 944,
+          "out": 131
+        }
+      ]
+    },
+    {
+      "runTag": "A-8",
+      "ok": false,
+      "ms": 8952,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是什么时候建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 47
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 943,
+          "out": 148
+        }
+      ]
+    },
+    {
+      "runTag": "A-9",
+      "ok": false,
+      "ms": 4473,
+      "steps": 2,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 857,
+          "out": 125
+        }
+      ]
+    },
+    {
+      "runTag": "B-0",
+      "ok": false,
+      "ms": 7225,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是哪一年建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 48
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 944,
+          "out": 119
+        }
+      ]
+    },
+    {
+      "runTag": "B-1",
+      "ok": false,
+      "ms": 8036,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是哪一年建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 48
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 944,
+          "out": 137
+        }
+      ]
+    },
+    {
+      "runTag": "B-2",
+      "ok": false,
+      "ms": 8999,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "它是开合桥吗？建了多少年？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 48
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 944,
+          "out": 147
+        }
+      ]
+    },
+    {
+      "runTag": "B-3",
+      "ok": false,
+      "ms": 7019,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是什么时候建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 47
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 943,
+          "out": 136
+        }
+      ]
+    },
+    {
+      "runTag": "B-4",
+      "ok": false,
+      "ms": 7989,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是哪一年建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 48
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 944,
+          "out": 121
+        }
+      ]
+    },
+    {
+      "runTag": "B-5",
+      "ok": false,
+      "ms": 6880,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是什么时候建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 47
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 943,
+          "out": 133
+        }
+      ]
+    },
+    {
+      "runTag": "B-6",
+      "ok": false,
+      "ms": 7981,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是哪一年建成并开始开合的？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 48
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 944,
+          "out": 127
+        }
+      ]
+    },
+    {
+      "runTag": "B-7",
+      "ok": false,
+      "ms": 7519,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是哪一年建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 48
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 944,
+          "out": 152
+        }
+      ]
+    },
+    {
+      "runTag": "B-8",
+      "ok": false,
+      "ms": 8015,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是哪一年建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 48
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 944,
+          "out": 147
+        }
+      ]
+    },
+    {
+      "runTag": "B-9",
+      "ok": false,
+      "ms": 8955,
+      "steps": 3,
+      "error": "AI_NoObjectGeneratedError: No object generated: could not parse the response.",
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 767,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是哪一年建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 857,
+          "out": 48
+        },
+        {
+          "n": 2,
+          "finish": "stop",
+          "toolCalls": [],
+          "toolErrors": [],
+          "in": 944,
+          "out": 126
+        }
+      ]
+    },
+    {
+      "runTag": "C-0",
+      "ok": true,
+      "ms": 6802,
+      "steps": 3,
+      "toolsUsed": [
+        "recall_memory",
+        "lookup_fact",
+        "submit_judgement"
+      ],
+      "invalidToolCalls": 0,
+      "toolErrors": [],
+      "recallFirst": true,
+      "decisions": [
+        "u1:keep/reflection"
+      ],
+      "tokens": {
+        "in": 3554,
+        "out": 205
+      },
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1096,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是什么时候建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1186,
+          "out": 47
+        },
+        {
+          "n": 2,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "submit_judgement",
+              "input": {
+                "moments": [
+                  {
+                    "sourceUtteranceIds": [
+                      "u1"
+                    ],
+                    "decision": "keep",
+                    "category": "reflection",
+                    "salience": 0.8,
+                    "trigger": "回酒店路上想起桥的对比",
+                    "why": "感叹百年老桥仍在使用，反思家乡桥梁维护差异"
+                  }
+                ],
+                "sessionNotes": "2026-09-23 伦敦，回酒店路上反思塔桥与家乡桥梁的维护差异。"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1272,
+          "out": 128
+        }
+      ]
+    },
+    {
+      "runTag": "C-1",
+      "ok": true,
+      "ms": 7443,
+      "steps": 3,
+      "toolsUsed": [
+        "recall_memory",
+        "lookup_fact",
+        "submit_judgement"
+      ],
+      "invalidToolCalls": 0,
+      "toolErrors": [],
+      "recallFirst": true,
+      "decisions": [
+        "u1:keep/reflection"
+      ],
+      "tokens": {
+        "in": 3554,
+        "out": 206
+      },
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1096,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是什么类型的桥，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1186,
+          "out": 47
+        },
+        {
+          "n": 2,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "submit_judgement",
+              "input": {
+                "moments": [
+                  {
+                    "sourceUtteranceIds": [
+                      "u1"
+                    ],
+                    "decision": "keep",
+                    "category": "reflection",
+                    "salience": 0.8,
+                    "trigger": "回酒店路上看到百年开合桥",
+                    "why": "对比家乡桥梁维护差异引发思考"
+                  }
+                ],
+                "sessionNotes": "2026-09-23 伦敦，回酒店路上反思塔桥百年仍开合运作，对比家乡桥梁维护现状。"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1272,
+          "out": 129
+        }
+      ]
+    },
+    {
+      "runTag": "C-2",
+      "ok": true,
+      "ms": 7077,
+      "steps": 3,
+      "toolsUsed": [
+        "recall_memory",
+        "lookup_fact",
+        "submit_judgement"
+      ],
+      "invalidToolCalls": 0,
+      "toolErrors": [],
+      "recallFirst": true,
+      "decisions": [
+        "u1:keep/reflection"
+      ],
+      "tokens": {
+        "in": 3555,
+        "out": 205
+      },
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1096,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是哪一年建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1186,
+          "out": 48
+        },
+        {
+          "n": 2,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "submit_judgement",
+              "input": {
+                "moments": [
+                  {
+                    "sourceUtteranceIds": [
+                      "u1"
+                    ],
+                    "decision": "keep",
+                    "category": "reflection",
+                    "salience": 0.8,
+                    "trigger": "回酒店路上想起桥的对比",
+                    "why": "由塔桥百年仍开合联想到家乡桥梁维护差异"
+                  }
+                ],
+                "sessionNotes": "2026-09-23 伦敦，回酒店路上反思塔桥与家乡桥梁维护差异。"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1273,
+          "out": 127
+        }
+      ]
+    },
+    {
+      "runTag": "C-3",
+      "ok": true,
+      "ms": 9960,
+      "steps": 3,
+      "toolsUsed": [
+        "recall_memory",
+        "lookup_fact",
+        "submit_judgement"
+      ],
+      "invalidToolCalls": 0,
+      "toolErrors": [],
+      "recallFirst": true,
+      "decisions": [
+        "u1:keep/reflection"
+      ],
+      "tokens": {
+        "in": 3554,
+        "out": 206
+      },
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1096,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是什么时候建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1186,
+          "out": 47
+        },
+        {
+          "n": 2,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "submit_judgement",
+              "input": {
+                "moments": [
+                  {
+                    "sourceUtteranceIds": [
+                      "u1"
+                    ],
+                    "decision": "keep",
+                    "category": "reflection",
+                    "salience": 0.8,
+                    "trigger": "回酒店路上想起那座百年开合桥",
+                    "why": "对比家乡桥梁维护差异，引发思考"
+                  }
+                ],
+                "sessionNotes": "2026-09-23 伦敦，回酒店路上反思塔桥百年仍正常使用，对比家乡桥梁维护不足。"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1272,
+          "out": 129
+        }
+      ]
+    },
+    {
+      "runTag": "C-4",
+      "ok": true,
+      "ms": 7800,
+      "steps": 3,
+      "toolsUsed": [
+        "recall_memory",
+        "lookup_fact",
+        "submit_judgement"
+      ],
+      "invalidToolCalls": 0,
+      "toolErrors": [],
+      "recallFirst": true,
+      "decisions": [
+        "u1:keep/reflection"
+      ],
+      "tokens": {
+        "in": 3554,
+        "out": 210
+      },
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1096,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是什么时候建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1186,
+          "out": 47
+        },
+        {
+          "n": 2,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "submit_judgement",
+              "input": {
+                "moments": [
+                  {
+                    "sourceUtteranceIds": [
+                      "u1"
+                    ],
+                    "decision": "keep",
+                    "category": "reflection",
+                    "salience": 0.8,
+                    "trigger": "回酒店路上想到桥的维护差异",
+                    "why": "对比两地桥梁维护方式，引发思考"
+                  }
+                ],
+                "sessionNotes": "2026-09-23 伦敦，回酒店路上反思塔桥百年仍开合运作，对比家乡桥梁修后少管的现象。"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1272,
+          "out": 133
+        }
+      ]
+    },
+    {
+      "runTag": "C-5",
+      "ok": true,
+      "ms": 9163,
+      "steps": 3,
+      "toolsUsed": [
+        "recall_memory",
+        "lookup_fact",
+        "submit_judgement"
+      ],
+      "invalidToolCalls": 0,
+      "toolErrors": [],
+      "recallFirst": true,
+      "decisions": [
+        "u1:keep/reflection"
+      ],
+      "tokens": {
+        "in": 3557,
+        "out": 209
+      },
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1096,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是开合桥吗？建成多久了？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1186,
+          "out": 50
+        },
+        {
+          "n": 2,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "submit_judgement",
+              "input": {
+                "moments": [
+                  {
+                    "sourceUtteranceIds": [
+                      "u1"
+                    ],
+                    "decision": "keep",
+                    "category": "reflection",
+                    "salience": 0.8,
+                    "trigger": "回酒店路上想到百年开合桥",
+                    "why": "对比家乡桥梁维护差异引发反思"
+                  }
+                ],
+                "sessionNotes": "2026-09-23 伦敦，回酒店路上反思塔桥百年仍开合运作，对比家乡桥梁缺乏维护。"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1275,
+          "out": 129
+        }
+      ]
+    },
+    {
+      "runTag": "C-6",
+      "ok": true,
+      "ms": 7108,
+      "steps": 3,
+      "toolsUsed": [
+        "recall_memory",
+        "lookup_fact",
+        "submit_judgement"
+      ],
+      "invalidToolCalls": 0,
+      "toolErrors": [],
+      "recallFirst": true,
+      "decisions": [
+        "u1:keep/reflection"
+      ],
+      "tokens": {
+        "in": 3555,
+        "out": 213
+      },
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1096,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是哪一年建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1186,
+          "out": 48
+        },
+        {
+          "n": 2,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "submit_judgement",
+              "input": {
+                "moments": [
+                  {
+                    "sourceUtteranceIds": [
+                      "u1"
+                    ],
+                    "decision": "keep",
+                    "category": "reflection",
+                    "salience": 0.8,
+                    "trigger": "回酒店路上想起桥的对比",
+                    "why": "由塔桥百年仍开合联想到家乡桥梁维护差异"
+                  }
+                ],
+                "sessionNotes": "2026-09-23 伦敦，回酒店路上反思塔桥（1894 年建）与家乡桥梁维护差异。"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1273,
+          "out": 135
+        }
+      ]
+    },
+    {
+      "runTag": "C-7",
+      "ok": true,
+      "ms": 7505,
+      "steps": 3,
+      "toolsUsed": [
+        "recall_memory",
+        "lookup_fact",
+        "submit_judgement"
+      ],
+      "invalidToolCalls": 0,
+      "toolErrors": [],
+      "recallFirst": true,
+      "decisions": [
+        "u1:keep/reflection"
+      ],
+      "tokens": {
+        "in": 3554,
+        "out": 231
+      },
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1096,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是什么时候建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1186,
+          "out": 47
+        },
+        {
+          "n": 2,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "submit_judgement",
+              "input": {
+                "moments": [
+                  {
+                    "sourceUtteranceIds": [
+                      "u1"
+                    ],
+                    "decision": "keep",
+                    "category": "reflection",
+                    "salience": 0.8,
+                    "trigger": "回酒店路上想起那座百年开合桥",
+                    "why": "对比家乡桥梁维护，引发对工程寿命的反思"
+                  }
+                ],
+                "sessionNotes": "2026-09-23 伦敦，回酒店路上。提到塔桥（1894年建成，开合桥），感叹其百年仍在使用，对比家乡桥梁修好后缺乏维护。晚餐计划吃拉面。"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1272,
+          "out": 154
+        }
+      ]
+    },
+    {
+      "runTag": "C-8",
+      "ok": true,
+      "ms": 7043,
+      "steps": 3,
+      "toolsUsed": [
+        "recall_memory",
+        "lookup_fact",
+        "submit_judgement"
+      ],
+      "invalidToolCalls": 0,
+      "toolErrors": [],
+      "recallFirst": true,
+      "decisions": [
+        "u1:keep/reflection"
+      ],
+      "tokens": {
+        "in": 3554,
+        "out": 203
+      },
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1096,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是什么时候建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1186,
+          "out": 47
+        },
+        {
+          "n": 2,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "submit_judgement",
+              "input": {
+                "moments": [
+                  {
+                    "sourceUtteranceIds": [
+                      "u1"
+                    ],
+                    "decision": "keep",
+                    "category": "reflection",
+                    "salience": 0.8,
+                    "trigger": "回酒店路上想起桥的对比",
+                    "why": "由塔桥百年仍用联想到家乡桥梁维护差异"
+                  }
+                ],
+                "sessionNotes": "2026-09-23 伦敦，回酒店路上反思塔桥与家乡桥梁维护差异。"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1272,
+          "out": 126
+        }
+      ]
+    },
+    {
+      "runTag": "C-9",
+      "ok": true,
+      "ms": 6691,
+      "steps": 3,
+      "toolsUsed": [
+        "recall_memory",
+        "lookup_fact",
+        "submit_judgement"
+      ],
+      "invalidToolCalls": 0,
+      "toolErrors": [],
+      "recallFirst": true,
+      "decisions": [
+        "u1:keep/reflection"
+      ],
+      "tokens": {
+        "in": 3555,
+        "out": 208
+      },
+      "stepDetail": [
+        {
+          "n": 0,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "recall_memory",
+              "input": {
+                "query": "桥 开合 酒店"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1096,
+          "out": 30
+        },
+        {
+          "n": 1,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "lookup_fact",
+              "input": {
+                "entity": "塔桥",
+                "question": "塔桥是哪一年建成的，有什么特点？"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1186,
+          "out": 48
+        },
+        {
+          "n": 2,
+          "finish": "tool-calls",
+          "toolCalls": [
+            {
+              "name": "submit_judgement",
+              "input": {
+                "moments": [
+                  {
+                    "sourceUtteranceIds": [
+                      "u1"
+                    ],
+                    "decision": "keep",
+                    "category": "reflection",
+                    "salience": 0.8,
+                    "trigger": "回酒店路上想起百年开合桥",
+                    "why": "对比两地桥梁维护差异引发思考"
+                  }
+                ],
+                "sessionNotes": "用户回忆起伦敦塔桥（1894年建成）的开合机制，对比家乡桥梁修好后缺乏维护的现状，表达了对基础设施长久运营的思考。"
+              },
+              "invalid": false
+            }
+          ],
+          "toolErrors": [],
+          "in": 1273,
+          "out": 130
+        }
+      ]
+    }
+  ],
+  "toolLog": [
+    {
+      "runTag": "A-2",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "A-0",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "A-1",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "A-0",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是哪一年建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "A-2",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是什么时候建成并开始开合的？"
+      }
+    },
+    {
+      "runTag": "A-1",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是什么时候建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "A-3",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "A-4",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "A-5",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "A-4",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是哪一年建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "A-3",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是什么时候建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "A-5",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是哪一年建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "A-7",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "A-8",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "A-6",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "A-8",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是什么时候建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "A-7",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是哪一年建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "A-6",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是哪一年建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "A-9",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "B-2",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "B-1",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "B-0",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "B-2",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "它是开合桥吗？建了多少年？"
+      }
+    },
+    {
+      "runTag": "B-0",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是哪一年建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "B-1",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是哪一年建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "B-5",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "B-3",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "B-4",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "B-5",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是什么时候建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "B-3",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是什么时候建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "B-4",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是哪一年建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "B-7",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "B-6",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "B-8",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "B-7",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是哪一年建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "B-6",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是哪一年建成并开始开合的？"
+      }
+    },
+    {
+      "runTag": "B-8",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是哪一年建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "B-9",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "B-9",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是哪一年建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "C-0",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "C-2",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "C-1",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "C-0",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是什么时候建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "C-2",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是哪一年建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "C-1",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是什么类型的桥，有什么特点？"
+      }
+    },
+    {
+      "runTag": "C-4",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "C-5",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "C-3",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "C-4",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是什么时候建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "C-5",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是开合桥吗？建成多久了？"
+      }
+    },
+    {
+      "runTag": "C-3",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是什么时候建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "C-6",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "C-8",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "C-7",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "C-6",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是哪一年建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "C-8",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是什么时候建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "C-7",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是什么时候建成的，有什么特点？"
+      }
+    },
+    {
+      "runTag": "C-9",
+      "tool": "recall_memory",
+      "input": {
+        "query": "桥 开合 酒店"
+      }
+    },
+    {
+      "runTag": "C-9",
+      "tool": "lookup_fact",
+      "input": {
+        "entity": "塔桥",
+        "question": "塔桥是哪一年建成的，有什么特点？"
+      }
+    }
+  ]
+}

@@ -1,0 +1,366 @@
+[
+  {
+    "id": "w-01",
+    "moment": {
+      "heading": "15:10 · 京都 · 鸭川",
+      "myQuotes": [
+        "河边好多人就坐着吃便当，也不玩手机，就看水。",
+        "我好久没有这样坐着什么都不干了。"
+      ]
+    },
+    "mustNotContain": [
+      "我终于明白",
+      "人生",
+      "意义"
+    ],
+    "mustKeepKeywords": [
+      "便当",
+      "看水"
+    ]
+  },
+  {
+    "id": "w-02",
+    "moment": {
+      "heading": "12:30 · 京都 · 拉面店",
+      "myQuotes": [
+        "这家的拉面汤是透明的，但是味道好浓。"
+      ]
+    },
+    "mustNotContain": [
+      "我终于明白",
+      "治愈"
+    ],
+    "mustKeepKeywords": [
+      "透明",
+      "浓"
+    ]
+  },
+  {
+    "id": "w-03",
+    "moment": {
+      "heading": "19:05 · 大阪 · 居酒屋",
+      "myQuotes": [
+        "第一次在国外自己点菜，手心都出汗了，结果老板还夸我发音好。"
+      ]
+    },
+    "mustNotContain": [
+      "勇气",
+      "成长",
+      "人生"
+    ],
+    "mustKeepKeywords": [
+      "手心",
+      "发音"
+    ]
+  },
+  {
+    "id": "w-04",
+    "moment": {
+      "heading": "10:20 · 阿姆斯特丹 · 运河边",
+      "myQuotes": [
+        "他们一周只上四天班，我听着都有点恍惚。"
+      ],
+      "othersParaphrase": "朋友说这边很多公司一周只上四天班"
+    },
+    "mustNotContain": [
+      "我终于明白",
+      "这就是生活"
+    ],
+    "mustKeepKeywords": [
+      "四天"
+    ]
+  },
+  {
+    "id": "w-05",
+    "moment": {
+      "heading": "16:40 · 里斯本 · 海边广场",
+      "myQuotes": [
+        "这里的海鸥一点都不怕人，直接落在我鞋上。"
+      ]
+    },
+    "mustNotContain": [
+      "自由",
+      "人生"
+    ],
+    "mustKeepKeywords": [
+      "海鸥",
+      "鞋"
+    ]
+  },
+  {
+    "id": "w-06",
+    "moment": {
+      "heading": "11:15 · 墨尔本 · 小巷咖啡馆",
+      "myQuotes": [
+        "这里的 brunch 文化太夸张了，周日早上十一点全城都在排队吃 eggs benedict。"
+      ]
+    },
+    "mustNotContain": [
+      "我终于明白",
+      "生活的真谛"
+    ],
+    "mustKeepKeywords": [
+      "brunch",
+      "eggs benedict"
+    ]
+  },
+  {
+    "id": "w-07",
+    "moment": {
+      "heading": "14:00 · 墨尔本 · 涂鸦街",
+      "myQuotes": [
+        "这条街的墙上全是涂鸦，每一面都不一样，像一个免费的美术馆。"
+      ]
+    },
+    "mustNotContain": [
+      "灵魂",
+      "艺术的意义"
+    ],
+    "mustKeepKeywords": [
+      "涂鸦",
+      "美术馆"
+    ]
+  },
+  {
+    "id": "w-08",
+    "moment": {
+      "heading": "09:30 · 九寨沟 · 五花海",
+      "myQuotes": [
+        "嗯就是那个，然后这个湖的颜色，是那种，像薄荷糖一样的绿。"
+      ]
+    },
+    "mustNotContain": [
+      "仙境",
+      "人间"
+    ],
+    "mustKeepKeywords": [
+      "薄荷糖"
+    ]
+  },
+  {
+    "id": "w-09",
+    "moment": {
+      "heading": "15:50 · 平遥 · 古城民宿",
+      "myQuotes": [
+        "我小时候家里也有一台这样的缝纫机，我妈晚上就在灯下踩。"
+      ]
+    },
+    "mustNotContain": [
+      "母爱",
+      "岁月"
+    ],
+    "mustKeepKeywords": [
+      "缝纫机",
+      "灯下|灯光下"
+    ]
+  },
+  {
+    "id": "w-10",
+    "moment": {
+      "heading": "08:40 · 东京 · 人行道",
+      "myQuotes": [
+        "他们过马路都等绿灯，哪怕一辆车都没有。",
+        "我在想我是不是太习惯赶时间了。"
+      ]
+    },
+    "mustNotContain": [
+      "我终于明白",
+      "规则的意义"
+    ],
+    "mustKeepKeywords": [
+      "绿灯",
+      "赶时间"
+    ]
+  },
+  {
+    "id": "w-11",
+    "moment": {
+      "heading": "13:20 · 伦敦 · 贝克街站",
+      "myQuotes": [
+        "这里的地铁站是 1863 年的，砖都是黑的。"
+      ]
+    },
+    "mustNotContain": [
+      "历史的厚重",
+      "时光"
+    ],
+    "mustKeepKeywords": [
+      "1863"
+    ]
+  },
+  {
+    "id": "w-12",
+    "moment": {
+      "heading": "21:10 · 雷克雅未克 · 民宿",
+      "myQuotes": [
+        "冰岛水龙头出来的热水有硫磺味，洗完澡头发都是鸡蛋味。"
+      ]
+    },
+    "mustNotContain": [
+      "神奇的大自然"
+    ],
+    "mustKeepKeywords": [
+      "硫磺",
+      "鸡蛋"
+    ]
+  },
+  {
+    "id": "w-13",
+    "moment": {
+      "heading": "23:00 · 敦煌 · 沙漠营地",
+      "myQuotes": [
+        "原来沙漠晚上这么冷，我穿了三件还在发抖。"
+      ]
+    },
+    "mustNotContain": [
+      "星空下",
+      "浪漫"
+    ],
+    "mustKeepKeywords": [
+      "三件",
+      "发抖"
+    ]
+  },
+  {
+    "id": "w-14",
+    "moment": {
+      "heading": "07:30 · 成都 · 人民公园",
+      "myQuotes": [
+        "这里的老人都在公园跳交谊舞，穿得特别正式，还化了妆。"
+      ]
+    },
+    "mustNotContain": [
+      "热爱生活的意义",
+      "人生"
+    ],
+    "mustKeepKeywords": [
+      "交谊舞",
+      "化了妆"
+    ]
+  },
+  {
+    "id": "w-15",
+    "moment": {
+      "heading": "18:20 · 清迈 · 夜市",
+      "myQuotes": [
+        "我突然很想我爸，他要是在一定会拉着人家老板聊半天。"
+      ]
+    },
+    "mustNotContain": [
+      "父爱",
+      "我终于明白"
+    ],
+    "mustKeepKeywords": [
+      "我爸",
+      "老板"
+    ]
+  },
+  {
+    "id": "t-01",
+    "trap": true,
+    "moment": {
+      "heading": "10:00 · 布拉格 · 教堂门口",
+      "myQuotes": [
+        "看到那么多人在教堂门口安安静静地排队，我心里挺平静的。"
+      ]
+    },
+    "mustNotContain": [
+      "我终于明白",
+      "这就是生活",
+      "人生",
+      "意义在于",
+      "灵魂",
+      "心灵"
+    ],
+    "mustKeepKeywords": [
+      "排队|排着队",
+      "平静"
+    ]
+  },
+  {
+    "id": "t-02",
+    "trap": true,
+    "moment": {
+      "heading": "16:00 · 黄山 · 光明顶",
+      "myQuotes": [
+        "我在山顶坐了一个小时，就看云飘过去。"
+      ]
+    },
+    "mustNotContain": [
+      "我终于明白",
+      "人生",
+      "意义",
+      "岁月静好",
+      "治愈",
+      "原来"
+    ],
+    "mustKeepKeywords": [
+      "山顶",
+      "云"
+    ]
+  },
+  {
+    "id": "t-03",
+    "trap": true,
+    "moment": {
+      "heading": "14:30 · 维也纳 · 博物馆",
+      "myQuotes": [
+        "这个博物馆里有一封一百年前的情书，字写得很工整。"
+      ]
+    },
+    "mustNotContain": [
+      "爱情",
+      "永恒",
+      "我明白了",
+      "人生",
+      "感动得"
+    ],
+    "mustKeepKeywords": [
+      "情书",
+      "工整"
+    ]
+  },
+  {
+    "id": "t-04",
+    "trap": true,
+    "moment": {
+      "heading": "17:45 · 哈尔施塔特 · 湖边小路",
+      "myQuotes": [
+        "离开的时候回头看了一眼这个小镇。"
+      ]
+    },
+    "mustNotContain": [
+      "不舍",
+      "再见",
+      "人生",
+      "或许这就是",
+      "我终于明白",
+      "旅行的意义"
+    ],
+    "mustKeepKeywords": [
+      "回头",
+      "小镇"
+    ]
+  },
+  {
+    "id": "t-05",
+    "trap": true,
+    "moment": {
+      "heading": "19:30 · 青岛 · 海边",
+      "myQuotes": [
+        "海边的风好大，我把外套拉链拉到了最上面。"
+      ]
+    },
+    "mustNotContain": [
+      "自由",
+      "人生",
+      "我终于明白",
+      "心灵",
+      "治愈"
+    ],
+    "mustKeepKeywords": [
+      "拉链",
+      "风"
+    ]
+  }
+]

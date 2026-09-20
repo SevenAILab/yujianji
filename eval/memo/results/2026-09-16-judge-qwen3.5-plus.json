@@ -1,0 +1,3514 @@
+{
+  "summary": {
+    "suite": "judge",
+    "model": "qwen3.5-plus",
+    "cases": 56,
+    "entries": 61,
+    "accuracy": 1,
+    "categoryAccuracy": 0.7868852459016393,
+    "keepPrecision": 1,
+    "keepRecall": 1,
+    "byTag": {
+      "background": {
+        "total": 3,
+        "correct": 3
+      },
+      "boundary1": {
+        "total": 2,
+        "correct": 2
+      },
+      "boundary2": {
+        "total": 2,
+        "correct": 2
+      },
+      "boundary3": {
+        "total": 3,
+        "correct": 3
+      },
+      "boundary4": {
+        "total": 6,
+        "correct": 6
+      },
+      "companion": {
+        "total": 26,
+        "correct": 26
+      },
+      "complaint": {
+        "total": 3,
+        "correct": 3
+      },
+      "difference": {
+        "total": 3,
+        "correct": 3
+      },
+      "drop": {
+        "total": 22,
+        "correct": 22
+      },
+      "first_experience": {
+        "total": 3,
+        "correct": 3
+      },
+      "functional": {
+        "total": 3,
+        "correct": 3
+      },
+      "guide": {
+        "total": 4,
+        "correct": 4
+      },
+      "hackathon": {
+        "total": 6,
+        "correct": 6
+      },
+      "keep": {
+        "total": 19,
+        "correct": 19
+      },
+      "memory": {
+        "total": 3,
+        "correct": 3
+      },
+      "noise_or_functional": {
+        "total": 6,
+        "correct": 6
+      },
+      "observation": {
+        "total": 3,
+        "correct": 3
+      },
+      "others_only": {
+        "total": 3,
+        "correct": 3
+      },
+      "private": {
+        "total": 3,
+        "correct": 3
+      },
+      "reflection": {
+        "total": 3,
+        "correct": 3
+      },
+      "retold_fact": {
+        "total": 4,
+        "correct": 4
+      },
+      "speaker_uncertain": {
+        "total": 2,
+        "correct": 2
+      },
+      "work_task": {
+        "total": 3,
+        "correct": 3
+      }
+    },
+    "errors": 0,
+    "degraded": 0,
+    "toolCalls": {
+      "lookup_fact": 1
+    },
+    "p50Ms": 8007,
+    "p95Ms": 16339,
+    "costYuan": 0.30556800000000006,
+    "wrong": []
+  },
+  "results": [
+    {
+      "id": "k-diff-1",
+      "tags": [
+        "keep",
+        "difference"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "difference",
+          "got": "keep",
+          "gotCategory": "difference",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 10408,
+      "cost": 0.005509,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-diff-1:u1"
+          ],
+          "decision": "keep",
+          "category": "difference",
+          "salience": 0.8,
+          "trigger": "地铁里大家都不说话",
+          "why": "你注意到了这里安静的习惯与国内不同",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 10372,
+          "inputTokens": 3988,
+          "outputTokens": 483,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 10408,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-diff-2",
+      "tags": [
+        "keep",
+        "difference",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "difference",
+          "got": "keep",
+          "gotCategory": "difference",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 11612,
+      "cost": 0.005713,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-diff-2:u1",
+            "k-diff-2:u2"
+          ],
+          "decision": "keep",
+          "category": "difference",
+          "salience": 0.8,
+          "trigger": "看到排队保持距离且不插队",
+          "why": "你发现了这里和国内排队习惯的差异",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 11605,
+          "inputTokens": 4009,
+          "outputTokens": 522,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 11612,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-diff-3",
+      "tags": [
+        "keep",
+        "difference"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "difference",
+          "got": "keep",
+          "gotCategory": "difference",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 14129,
+      "cost": 0.009033,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-diff-3:u1"
+          ],
+          "decision": "keep",
+          "category": "difference",
+          "salience": 0.8,
+          "trigger": "发现超市早关门且周日不开",
+          "why": "你发现了当地生活习惯与你认知的差异",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 9635,
+          "inputTokens": 3991,
+          "outputTokens": 369,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "retry",
+          "name": "submit_judgement",
+          "ms": 0,
+          "summary": "还没有调用 submit_judgement 交卷 → 带着原因补跑一轮，只开放交卷工具",
+          "reason": "交卷有上限：最多补一次"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 4486,
+          "inputTokens": 4228,
+          "outputTokens": 143,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 14129,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-obs-1",
+      "tags": [
+        "keep",
+        "observation"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "observation",
+          "got": "keep",
+          "gotCategory": "observation",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 10119,
+      "cost": 0.005373,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-obs-1:u1"
+          ],
+          "decision": "keep",
+          "category": "observation",
+          "salience": 0.8,
+          "trigger": "卖花阿姨边包花边哼歌",
+          "why": "你捕捉到了她对工作的热爱瞬间",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 10111,
+          "inputTokens": 3986,
+          "outputTokens": 455,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 10118,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-obs-2",
+      "tags": [
+        "keep",
+        "observation"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "observation",
+          "got": "keep",
+          "gotCategory": "observation",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 7767,
+      "cost": 0.00493,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-obs-2:u1"
+          ],
+          "decision": "keep",
+          "category": "observation",
+          "salience": 0.8,
+          "trigger": "河边安静钓鱼的人群",
+          "why": "你记录了眼前场景带来的内心平静",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 7763,
+          "inputTokens": 3984,
+          "outputTokens": 363,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 7767,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-obs-3",
+      "tags": [
+        "keep",
+        "observation",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "observation",
+          "got": "keep",
+          "gotCategory": "observation",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 10014,
+      "cost": 0.005423,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-obs-3:u2"
+          ],
+          "decision": "keep",
+          "category": "observation",
+          "salience": 0.8,
+          "trigger": "看到前面那对老夫妻",
+          "why": "你看到了温馨的画面并表达了感受",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 10011,
+          "inputTokens": 4007,
+          "outputTokens": 462,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 10013,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-mem-1",
+      "tags": [
+        "keep",
+        "memory"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "memory",
+          "got": "keep",
+          "gotCategory": "memory",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 7803,
+      "cost": 0.004766,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-mem-1:u1"
+          ],
+          "decision": "keep",
+          "category": "memory",
+          "salience": 0.8,
+          "trigger": "巷子里的特殊气味",
+          "why": "这个味道让你想起了小学门口。",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 7800,
+          "inputTokens": 3983,
+          "outputTokens": 329,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 7803,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-mem-2",
+      "tags": [
+        "keep",
+        "memory"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "memory",
+          "got": "keep",
+          "gotCategory": "memory",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 10197,
+      "cost": 0.005779,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-mem-2:u1"
+          ],
+          "decision": "keep",
+          "category": "memory",
+          "salience": 0.8,
+          "trigger": "看到绿皮火车",
+          "why": "眼前的景象让你想起了大学春运回家的经历。",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 10192,
+          "inputTokens": 3984,
+          "outputTokens": 540,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 10197,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-mem-3",
+      "tags": [
+        "keep",
+        "memory",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "memory",
+          "got": "keep",
+          "gotCategory": "memory",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 11442,
+      "cost": 0.005829,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-mem-3:u1",
+            "k-mem-3:u2"
+          ],
+          "decision": "keep",
+          "category": "memory",
+          "salience": 0.8,
+          "trigger": "听到一首老歌",
+          "why": "这首歌让你想起了高中的自己",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 11437,
+          "inputTokens": 4004,
+          "outputTokens": 547,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 11442,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-ref-1",
+      "tags": [
+        "keep",
+        "reflection"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "reflection",
+          "got": "keep",
+          "gotCategory": "reflection",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 9011,
+      "cost": 0.005214,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-ref-1:u1"
+          ],
+          "decision": "keep",
+          "category": "reflection",
+          "salience": 0.8,
+          "trigger": "看到当地人下午在咖啡馆发呆",
+          "why": "你由他人的松弛反思自己的生活节奏",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 9006,
+          "inputTokens": 3985,
+          "outputTokens": 422,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 9011,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-ref-2",
+      "tags": [
+        "keep",
+        "reflection"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "reflection",
+          "got": "keep",
+          "gotCategory": "reflection",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 6834,
+      "cost": 0.00484,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-ref-2:u1"
+          ],
+          "decision": "keep",
+          "category": "reflection",
+          "salience": 0.9,
+          "trigger": "旅行中只顾拍照发朋友圈",
+          "why": "你对自己旅行状态的反思，意识到被社交网络绑架。",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 6831,
+          "inputTokens": 3986,
+          "outputTokens": 344,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 6834,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-ref-3",
+      "tags": [
+        "keep",
+        "reflection",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "reflection",
+          "got": "keep",
+          "gotCategory": "reflection",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 10798,
+      "cost": 0.005518,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-ref-3:u1",
+            "k-ref-3:u2"
+          ],
+          "decision": "keep",
+          "category": "reflection",
+          "salience": 0.9,
+          "trigger": "听到别人说这边不加班",
+          "why": "你由他人的生活节奏反思自己，想做出改变",
+          "guardNotes": [
+            "G9"
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 10794,
+          "inputTokens": 4012,
+          "outputTokens": 481,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "guard",
+          "name": "G9",
+          "ms": 0,
+          "summary": "片段 #1：转述与他人原话连续相同过多，视为照抄，已移除"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 10798,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-first-1",
+      "tags": [
+        "keep",
+        "first_experience"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "first_experience",
+          "got": "keep",
+          "gotCategory": "first_experience",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 9864,
+      "cost": 0.005153,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-first-1:u1"
+          ],
+          "decision": "keep",
+          "category": "first_experience",
+          "salience": 0.9,
+          "trigger": "第一次坐悬空缆车",
+          "why": "记录了初次体验的真实刺激感",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 9859,
+          "inputTokens": 3987,
+          "outputTokens": 409,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 9864,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-first-2",
+      "tags": [
+        "keep",
+        "first_experience"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "first_experience",
+          "got": "keep",
+          "gotCategory": "first_experience",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 9875,
+      "cost": 0.005621,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-first-2:u1"
+          ],
+          "decision": "keep",
+          "category": "first_experience",
+          "salience": 0.9,
+          "trigger": "第一次吃到树上现摘的榴莲",
+          "why": "记录了你对榴莲味道的第一次惊喜体验",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 9870,
+          "inputTokens": 3984,
+          "outputTokens": 507,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 9875,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-first-3",
+      "tags": [
+        "keep",
+        "first_experience"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "first_experience",
+          "got": "keep",
+          "gotCategory": "first_experience",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 6493,
+      "cost": 0.004737,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-first-3:u1"
+          ],
+          "decision": "keep",
+          "category": "first_experience",
+          "salience": 0.9,
+          "trigger": "第一次亲眼见到极光",
+          "why": "你记录了第一次体验的真实感受，照片无法替代。",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 6491,
+          "inputTokens": 3989,
+          "outputTokens": 322,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 6493,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-retold-1",
+      "tags": [
+        "keep",
+        "retold_fact",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "guide",
+          "got": "drop",
+          "gotCategory": "guide",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        },
+        {
+          "expected": "keep",
+          "expectedCategory": "retold_fact",
+          "got": "keep",
+          "gotCategory": "retold_fact",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 11752,
+      "cost": 0.006283,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-retold-1:u2"
+          ],
+          "decision": "keep",
+          "category": "retold_fact",
+          "salience": 0.8,
+          "trigger": "听到钟楼四百年未停的讲解",
+          "why": "你复述了这个打动你的新知",
+          "guardNotes": []
+        },
+        {
+          "ids": [
+            "k-retold-1:u1"
+          ],
+          "decision": "drop",
+          "category": "guide",
+          "salience": 0,
+          "trigger": "讲解员介绍钟楼历史",
+          "why": "讲解员原话不留",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 11747,
+          "inputTokens": 4014,
+          "outputTokens": 640,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 11752,
+          "summary": "交卷 2 个片段，守卫后 keep 1 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "k-retold-2",
+      "tags": [
+        "keep",
+        "retold_fact"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "retold_fact",
+          "got": "keep",
+          "gotCategory": "retold_fact",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 13846,
+      "cost": 0.006485,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-retold-2:u1"
+          ],
+          "decision": "keep",
+          "category": "retold_fact",
+          "salience": 0.8,
+          "trigger": "看到森林里古树的介绍牌",
+          "why": "你复述了树龄并感叹历史厚重",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 13843,
+          "inputTokens": 3990,
+          "outputTokens": 686,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 13846,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-retold-3",
+      "tags": [
+        "keep",
+        "retold_fact",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "retold_fact",
+          "got": "keep",
+          "gotCategory": "retold_fact",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 30669,
+      "cost": 0.010784,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-retold-3:u2"
+          ],
+          "decision": "keep",
+          "category": "retold_fact",
+          "salience": 0.8,
+          "trigger": "听说湖冬天能走人",
+          "why": "你复述了这个新奇事实并表达了向往",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 30668,
+          "inputTokens": 4012,
+          "outputTokens": 1578,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 30669,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "d-func-1",
+      "tags": [
+        "drop",
+        "functional",
+        "noise_or_functional",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "functional",
+          "got": "drop",
+          "gotCategory": "functional",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 8078,
+      "cost": 0.005119,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-func-1:u1",
+            "d-func-1:u2"
+          ],
+          "decision": "drop",
+          "category": "functional",
+          "salience": 0,
+          "trigger": "购买去机场的车票",
+          "why": "买票属于功能性事务",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 8076,
+          "inputTokens": 3999,
+          "outputTokens": 400,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 8078,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-func-2",
+      "tags": [
+        "drop",
+        "functional",
+        "noise_or_functional"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "functional",
+          "got": "drop",
+          "gotCategory": "functional",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 5523,
+      "cost": 0.004437,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-func-2:u1"
+          ],
+          "decision": "drop",
+          "category": "functional",
+          "salience": 0,
+          "trigger": "在市场或摊位前砍价",
+          "why": "这是砍价的功能性事务，不留。",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 5521,
+          "inputTokens": 3980,
+          "outputTokens": 261,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 5523,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-func-3",
+      "tags": [
+        "drop",
+        "functional",
+        "noise_or_functional",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "functional",
+          "got": "drop",
+          "gotCategory": "functional",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 6259,
+      "cost": 0.004681,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-func-3:u1",
+            "d-func-3:u2"
+          ],
+          "decision": "drop",
+          "category": "functional",
+          "salience": 0,
+          "trigger": "询问酒店提前入住时间",
+          "why": "这是办理入住的功能性事务",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 6255,
+          "inputTokens": 4003,
+          "outputTokens": 308,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 6259,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-comp-1",
+      "tags": [
+        "drop",
+        "complaint"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "complaint",
+          "got": "drop",
+          "gotCategory": "complaint",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 6328,
+      "cost": 0.004506,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-comp-1:u1"
+          ],
+          "decision": "drop",
+          "category": "complaint",
+          "salience": 0.1,
+          "trigger": "伦敦早晨阳光太烈",
+          "why": "只是对当下天气和身体不适的抱怨",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 6325,
+          "inputTokens": 3983,
+          "outputTokens": 275,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 6328,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-comp-2",
+      "tags": [
+        "drop",
+        "complaint"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "complaint",
+          "got": "drop",
+          "gotCategory": "complaint",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 6031,
+      "cost": 0.004368,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-comp-2:u1"
+          ],
+          "decision": "drop",
+          "category": "complaint",
+          "salience": 0.1,
+          "trigger": "导航绕圈走不出去",
+          "why": "只是对当下不便的抱怨，没上升到反思",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 6028,
+          "inputTokens": 3984,
+          "outputTokens": 246,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 6031,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-comp-3",
+      "tags": [
+        "drop",
+        "complaint"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "complaint",
+          "got": "drop",
+          "gotCategory": "complaint",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 5081,
+      "cost": 0.004398,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-comp-3:u1"
+          ],
+          "decision": "drop",
+          "category": "complaint",
+          "salience": 0.1,
+          "trigger": "走路脚磨出泡",
+          "why": "针对当下身体不便的抱怨，未上升反思",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 5077,
+          "inputTokens": 3985,
+          "outputTokens": 252,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 5081,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-oth-1",
+      "tags": [
+        "drop",
+        "others_only",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "others_only",
+          "got": "drop",
+          "gotCategory": "others_only",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 7432,
+      "cost": 0.004598,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-oth-1:u1",
+            "d-oth-1:u2"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0,
+          "trigger": "朋友讲述店主故事",
+          "why": "朋友讲得精彩，你只附和，未表达想法",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 7429,
+          "inputTokens": 4008,
+          "outputTokens": 290,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 7431,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-oth-2",
+      "tags": [
+        "drop",
+        "others_only",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "others_only",
+          "got": "drop",
+          "gotCategory": "others_only",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 7104,
+      "cost": 0.004886,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-oth-2:u1",
+            "d-oth-2:u2",
+            "d-oth-2:u3"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0,
+          "trigger": "同伴聊伦敦薪资假期",
+          "why": "精彩的是同伴的话，你只附和",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 3 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 7100,
+          "inputTokens": 4020,
+          "outputTokens": 348,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 7104,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-oth-3",
+      "tags": [
+        "drop",
+        "others_only",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "others_only",
+          "got": "drop",
+          "gotCategory": "(未交)",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": true
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 8692,
+      "cost": 0.004987,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 8690,
+          "inputTokens": 4002,
+          "outputTokens": 372,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 8692,
+          "summary": "交卷 0 个片段，守卫后 keep 0 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "d-guide-1",
+      "tags": [
+        "drop",
+        "guide"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "guide",
+          "got": "drop",
+          "gotCategory": "guide",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 5387,
+      "cost": 0.004152,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-guide-1:u1"
+          ],
+          "decision": "drop",
+          "category": "guide",
+          "salience": 0,
+          "trigger": "导游讲解海关大楼历史",
+          "why": "讲解员原话，你未复述或表达感想",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 5385,
+          "inputTokens": 3990,
+          "outputTokens": 200,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 5387,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-guide-2",
+      "tags": [
+        "drop",
+        "guide"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "guide",
+          "got": "drop",
+          "gotCategory": "others_only",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 6681,
+      "cost": 0.004398,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-guide-2:u1"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0,
+          "trigger": "别人讲解青花瓷瓶",
+          "why": "别人说得精彩，但你没说出自己的想法",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 6678,
+          "inputTokens": 3992,
+          "outputTokens": 251,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 6681,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-guide-3",
+      "tags": [
+        "drop",
+        "guide",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "guide",
+          "got": "drop",
+          "gotCategory": "(未交)",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": true
+        },
+        {
+          "expected": "drop",
+          "expectedCategory": "functional",
+          "got": "drop",
+          "gotCategory": "(未交)",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": true
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 5819,
+      "cost": 0.004504,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 5816,
+          "inputTokens": 4004,
+          "outputTokens": 271,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 5819,
+          "summary": "交卷 0 个片段，守卫后 keep 0 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "d-bg-1",
+      "tags": [
+        "drop",
+        "background"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "background",
+          "got": "drop",
+          "gotCategory": "(未交)",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": true
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 9638,
+      "cost": 0.005366,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 9633,
+          "inputTokens": 3983,
+          "outputTokens": 454,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 9638,
+          "summary": "交卷 0 个片段，守卫后 keep 0 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "d-bg-2",
+      "tags": [
+        "drop",
+        "background"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "background",
+          "got": "drop",
+          "gotCategory": "(未交)",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": true
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 9263,
+      "cost": 0.005313,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 9260,
+          "inputTokens": 3977,
+          "outputTokens": 444,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 9262,
+          "summary": "交卷 0 个片段，守卫后 keep 0 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "d-bg-3",
+      "tags": [
+        "drop",
+        "background"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "background",
+          "got": "drop",
+          "gotCategory": "background",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 9215,
+      "cost": 0.005286,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-bg-3:u1"
+          ],
+          "decision": "drop",
+          "category": "background",
+          "salience": 0,
+          "trigger": "车站广播提示",
+          "why": "背景广播，非用户所言",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 9211,
+          "inputTokens": 3979,
+          "outputTokens": 438,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 9215,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-priv-1",
+      "tags": [
+        "drop",
+        "private"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "private",
+          "got": "drop",
+          "gotCategory": "private",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 5699,
+      "cost": 0.004493,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-priv-1:u1"
+          ],
+          "decision": "drop",
+          "category": "private",
+          "salience": 0,
+          "trigger": "提到工资和房贷的具体数字",
+          "why": "涉及具体收入和支出，属于隐私不留",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 5696,
+          "inputTokens": 3984,
+          "outputTokens": 272,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 5699,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-priv-2",
+      "tags": [
+        "drop",
+        "private"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "private",
+          "got": "drop",
+          "gotCategory": "private",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 5510,
+      "cost": 0.004449,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-priv-2:u1"
+          ],
+          "decision": "drop",
+          "category": "private",
+          "salience": 0,
+          "trigger": "体检结果和复查安排",
+          "why": "涉及具体身体状况，属于隐私不留。",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 5506,
+          "inputTokens": 3983,
+          "outputTokens": 263,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 5509,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-priv-3",
+      "tags": [
+        "drop",
+        "private"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "private",
+          "got": "drop",
+          "gotCategory": "private",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 4923,
+      "cost": 0.004322,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-priv-3:u1"
+          ],
+          "decision": "drop",
+          "category": "private",
+          "salience": 0,
+          "trigger": "提到与老公分居",
+          "why": "涉及具体感情关系，属隐私不留",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 4920,
+          "inputTokens": 3986,
+          "outputTokens": 236,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 4923,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-work-1",
+      "tags": [
+        "drop",
+        "work_task"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "work_task",
+          "got": "drop",
+          "gotCategory": "work_task",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 7365,
+      "cost": 0.004946,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-work-1:u1"
+          ],
+          "decision": "drop",
+          "category": "work_task",
+          "salience": 0,
+          "trigger": "安排修改 PPT 数据",
+          "why": "这是事务性的工作讨论，不留。",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 7362,
+          "inputTokens": 3986,
+          "outputTokens": 366,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 7365,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-work-2",
+      "tags": [
+        "drop",
+        "work_task",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "work_task",
+          "got": "drop",
+          "gotCategory": "work_task",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 6819,
+      "cost": 0.004853,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-work-2:u1",
+            "d-work-2:u2"
+          ],
+          "decision": "drop",
+          "category": "work_task",
+          "salience": 0,
+          "trigger": "讨论合同违约金和付款周期",
+          "why": "这是事务性的工作讨论，不是旅行感受。",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 6814,
+          "inputTokens": 4002,
+          "outputTokens": 344,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 6819,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-work-3",
+      "tags": [
+        "drop",
+        "work_task"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "work_task",
+          "got": "drop",
+          "gotCategory": "work_task",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 6576,
+      "cost": 0.004838,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-work-3:u1"
+          ],
+          "decision": "drop",
+          "category": "work_task",
+          "salience": 0,
+          "trigger": "安排明天工作进度",
+          "why": "这是事务性的工作讨论，不留。",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 6571,
+          "inputTokens": 3983,
+          "outputTokens": 344,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 6576,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "b1-1",
+      "tags": [
+        "boundary1"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "reflection",
+          "got": "keep",
+          "gotCategory": "reflection",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 11883,
+      "cost": 0.006179,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b1-1:u1"
+          ],
+          "decision": "keep",
+          "category": "reflection",
+          "salience": 0.9,
+          "trigger": "等公交时当地人的松弛",
+          "why": "你从差异中反思了自己的生活节奏",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 11879,
+          "inputTokens": 3998,
+          "outputTokens": 621,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 11883,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "b1-2",
+      "tags": [
+        "boundary1"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "complaint",
+          "got": "drop",
+          "gotCategory": "complaint",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 5095,
+      "cost": 0.004406,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b1-2:u1"
+          ],
+          "decision": "drop",
+          "category": "complaint",
+          "salience": 0.1,
+          "trigger": "等公交四十分钟没来",
+          "why": "你只是在抱怨当下的交通不便",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 5092,
+          "inputTokens": 3984,
+          "outputTokens": 254,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 5095,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "b2-1",
+      "tags": [
+        "boundary2"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "reflection",
+          "got": "keep",
+          "gotCategory": "reflection",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 8003,
+      "cost": 0.00527,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b2-1:u1"
+          ],
+          "decision": "keep",
+          "category": "reflection",
+          "salience": 0.9,
+          "trigger": "看到当地人六点下班接孩子",
+          "why": "你由当地作息联想到自己，产生反思",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 7999,
+          "inputTokens": 3990,
+          "outputTokens": 433,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 8003,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "b2-2",
+      "tags": [
+        "boundary2"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "private",
+          "got": "drop",
+          "gotCategory": "private",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 6317,
+      "cost": 0.004421,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b2-2:u1"
+          ],
+          "decision": "drop",
+          "category": "private",
+          "salience": 0,
+          "trigger": "提到前任和分手原因",
+          "why": "涉及具体感情关系，属隐私不留",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 6313,
+          "inputTokens": 3984,
+          "outputTokens": 257,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 6317,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "b3-1",
+      "tags": [
+        "boundary3",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "guide",
+          "got": "drop",
+          "gotCategory": "(未交)",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": true
+        },
+        {
+          "expected": "keep",
+          "expectedCategory": "retold_fact",
+          "got": "keep",
+          "gotCategory": "retold_fact",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 24067,
+      "cost": 0.014122,
+      "outcome": "ok",
+      "tools": [
+        "lookup_fact"
+      ],
+      "moments": [
+        {
+          "ids": [
+            "b3-1:u2"
+          ],
+          "decision": "keep",
+          "category": "retold_fact",
+          "salience": 0.8,
+          "trigger": "听到灯塔照射距离及历史用途",
+          "why": "你复述了新知并表达了感动",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus+search",
+          "ms": 3581,
+          "inputTokens": 3415,
+          "outputTokens": 24,
+          "summary": "lookup_fact 子调用（联网搜索）：伦敦唯一灯塔"
+        },
+        {
+          "kind": "tool",
+          "name": "lookup_fact",
+          "ms": 3582,
+          "summary": "entity=伦敦唯一灯塔，question=它的光能照多远，有什么历史背景 → 事实：伦敦无“唯一灯塔”记载，泰晤士河口有历史灯塔群，具体数据需查航海档案。（AI 补充，未经核实）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 17824,
+          "inputTokens": 4020,
+          "outputTokens": 635,
+          "summary": "第 1 步：调用 lookup_fact；模型结束信号 tool_calls（只记录）",
+          "reason": "有 1 个工具调用 → 执行后继续"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 6238,
+          "inputTokens": 4716,
+          "outputTokens": 258,
+          "summary": "第 2 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 24067,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "b3-2",
+      "tags": [
+        "boundary3"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "guide",
+          "got": "drop",
+          "gotCategory": "(未交)",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": true
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 4733,
+      "cost": 0.004271,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 4731,
+          "inputTokens": 4001,
+          "outputTokens": 223,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 4733,
+          "summary": "交卷 0 个片段，守卫后 keep 0 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "b4-1",
+      "tags": [
+        "boundary4",
+        "hackathon",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "work_task",
+          "got": "drop",
+          "gotCategory": "work_task",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 13417,
+      "cost": 0.006397,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b4-1:u1"
+          ],
+          "decision": "drop",
+          "category": "work_task",
+          "salience": 0,
+          "trigger": "讨论评审表打分项",
+          "why": "事务性工作讨论，不留入手记",
+          "guardNotes": []
+        },
+        {
+          "ids": [
+            "b4-1:u2"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0,
+          "trigger": "同伴说剪视频",
+          "why": "别人说的话，你没表达想法",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 13412,
+          "inputTokens": 4000,
+          "outputTokens": 666,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 13417,
+          "summary": "交卷 2 个片段，守卫后 keep 0 / fold 0 / drop 2"
+        }
+      ]
+    },
+    {
+      "id": "b4-2",
+      "tags": [
+        "boundary4",
+        "hackathon"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "first_experience",
+          "got": "keep",
+          "gotCategory": "first_experience",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 10385,
+      "cost": 0.005711,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b4-2:u1"
+          ],
+          "decision": "keep",
+          "category": "first_experience",
+          "salience": 0.9,
+          "trigger": "第一次参加黑客松的深夜场景",
+          "why": "第一次的体验让你想起了大学通宵的日子",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 10382,
+          "inputTokens": 3995,
+          "outputTokens": 524,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 10385,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "b4-3",
+      "tags": [
+        "boundary4",
+        "hackathon",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "work_task",
+          "got": "drop",
+          "gotCategory": "work_task",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        },
+        {
+          "expected": "keep",
+          "expectedCategory": "reflection",
+          "got": "keep",
+          "gotCategory": "reflection",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 7975,
+      "cost": 0.005143,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b4-3:u1"
+          ],
+          "decision": "drop",
+          "category": "work_task",
+          "salience": 0.1,
+          "trigger": "讨论数据库字段修改",
+          "why": "事务性工作讨论，不留",
+          "guardNotes": []
+        },
+        {
+          "ids": [
+            "b4-3:u3"
+          ],
+          "decision": "keep",
+          "category": "reflection",
+          "salience": 0.8,
+          "trigger": "和陌生人一起熬夜做项目",
+          "why": "你感受到了久违的投入状态",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 3 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 7972,
+          "inputTokens": 4029,
+          "outputTokens": 400,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 7975,
+          "summary": "交卷 2 个片段，守卫后 keep 1 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "b4-4",
+      "tags": [
+        "boundary4",
+        "hackathon",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "work_task",
+          "got": "drop",
+          "gotCategory": "work_task",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        },
+        {
+          "expected": "keep",
+          "expectedCategory": "observation",
+          "got": "keep",
+          "gotCategory": "observation",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 10198,
+      "cost": 0.005805,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b4-4:u2"
+          ],
+          "decision": "drop",
+          "category": "work_task",
+          "salience": 0.1,
+          "trigger": "讨论项目接口",
+          "why": "事务性工作讨论不留",
+          "guardNotes": []
+        },
+        {
+          "ids": [
+            "b4-4:u3"
+          ],
+          "decision": "keep",
+          "category": "observation",
+          "salience": 0.8,
+          "trigger": "评委耐心听讲",
+          "why": "你注意到这里与想象的不同",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 3 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 10195,
+          "inputTokens": 4028,
+          "outputTokens": 538,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 10198,
+          "summary": "交卷 2 个片段，守卫后 keep 1 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "n-noise-1",
+      "tags": [
+        "noise_or_functional"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "background",
+          "got": "drop",
+          "gotCategory": "(未交)",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": true
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 6602,
+      "cost": 0.004787,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 3 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 6600,
+          "inputTokens": 4004,
+          "outputTokens": 330,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 6602,
+          "summary": "交卷 0 个片段，守卫后 keep 0 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "n-noise-2",
+      "tags": [
+        "noise_or_functional"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "background",
+          "got": "drop",
+          "gotCategory": "others_only",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 7735,
+      "cost": 0.00442,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "n-noise-2:u1",
+            "n-noise-2:u2",
+            "n-noise-2:u3"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0,
+          "trigger": "同伴引导移动",
+          "why": "你只附和了一句，没说出自己的想法",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 3 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 7731,
+          "inputTokens": 4007,
+          "outputTokens": 253,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 7735,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "s-uncertain-1",
+      "tags": [
+        "speaker_uncertain"
+      ],
+      "entries": [
+        {
+          "expected": "fold",
+          "expectedCategory": "first_experience",
+          "got": "fold",
+          "gotCategory": "observation",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 8007,
+      "cost": 0.004834,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "s-uncertain-1:u1"
+          ],
+          "decision": "fold",
+          "category": "observation",
+          "salience": 0.4,
+          "trigger": "抬头看到满天繁星和银河",
+          "why": "拿不准是不是你说的，先折叠",
+          "guardNotes": [
+            "G2U"
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 8005,
+          "inputTokens": 3984,
+          "outputTokens": 343,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 8007,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 1 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "s-uncertain-2",
+      "tags": [
+        "speaker_uncertain",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "fold",
+          "expectedCategory": "observation",
+          "got": "fold",
+          "gotCategory": "observation",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 7756,
+      "cost": 0.004984,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "s-uncertain-2:u1"
+          ],
+          "decision": "fold",
+          "category": "observation",
+          "salience": 0.3,
+          "trigger": "面馆的骨头汤",
+          "why": "拿不准是不是你说的",
+          "guardNotes": [
+            "G2U"
+          ]
+        },
+        {
+          "ids": [
+            "s-uncertain-2:u2"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0,
+          "trigger": "同伴说好吃",
+          "why": "别人说得精彩，你没说出想法",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 7751,
+          "inputTokens": 4010,
+          "outputTokens": 370,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 7756,
+          "summary": "交卷 2 个片段，守卫后 keep 0 / fold 1 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "c-companion-1",
+      "tags": [
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "reflection",
+          "got": "keep",
+          "gotCategory": "reflection",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 16339,
+      "cost": 0.007207,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "c-companion-1:u2",
+            "c-companion-1:u4"
+          ],
+          "decision": "keep",
+          "category": "reflection",
+          "salience": 0.8,
+          "trigger": "街头艺人拉手风琴",
+          "why": "你羡慕他的投入，反思自己太在意他人眼光。",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 4 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 16331,
+          "inputTokens": 4059,
+          "outputTokens": 825,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 16339,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "c-companion-2",
+      "tags": [
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "observation",
+          "got": "keep",
+          "gotCategory": "difference",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 13325,
+      "cost": 0.006223,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "c-companion-2:u2"
+          ],
+          "decision": "keep",
+          "category": "difference",
+          "salience": 0.8,
+          "trigger": "街头老奶奶主动搭话",
+          "why": "你注意到当地人不怕生的习惯",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 3 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 13322,
+          "inputTokens": 4029,
+          "outputTokens": 625,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 13324,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "c-companion-3",
+      "tags": [
+        "companion",
+        "noise_or_functional"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "functional",
+          "got": "drop",
+          "gotCategory": "(未交)",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": true
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 10652,
+      "cost": 0.005498,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 3 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 10650,
+          "inputTokens": 4017,
+          "outputTokens": 476,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 10652,
+          "summary": "交卷 0 个片段，守卫后 keep 0 / fold 0 / drop 0"
+        }
+      ]
+    }
+  ],
+  "ranAt": "2026-09-15T20:28:09.931Z",
+  "wallMs": 133058,
+  "provider": "dashscope"
+}

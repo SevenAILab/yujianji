@@ -1,0 +1,97 @@
+[
+  { "id": "b1-1", "tags": ["boundary1"], "note": "抱怨上升到自己的生活方式", "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "等了四十分钟公交还没来，他们居然一个人都不急，我们要是等十分钟早就骂人了，我是不是太习惯什么都要快了。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "keep", "category": "reflection" }] },
+
+  { "id": "b1-2", "tags": ["boundary1"], "note": "只针对当下不方便", "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "等了四十分钟公交还没来，真服了，早知道直接打车。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "complaint" }] },
+
+  { "id": "b2-1", "tags": ["boundary2"], "note": "对工作节奏的反思，留", "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "看他们六点就下班去接孩子，我想到自己一年到头都在加班，好像错过了很多东西。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "keep", "category": "reflection" }] },
+
+  { "id": "b2-2", "tags": ["boundary2"], "note": "具体的感情关系，丢", "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "我那个前任就是个工作狂，我们就是因为这个吵到分开的。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "private" }] },
+
+  { "id": "b3-1", "tags": ["boundary3", "companion"], "note": "讲解原话丢，自己复述留", "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "这座灯塔的光可以照到三十公里外，现在依然每晚点亮。" },
+    { "id": "u2", "speaker": "me", "text": "讲解员说这灯塔能照三十公里，想想以前的船就靠这点光回家，有点感动。" }
+  ] }, "expected": [
+    { "utteranceIds": ["u1"], "decision": "drop", "category": "guide" },
+    { "utteranceIds": ["u2"], "decision": "keep", "category": "retold_fact" }
+  ] },
+
+  { "id": "b3-2", "tags": ["boundary3"], "note": "只有讲解，用户没复述", "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "这面墙上一共有一千二百块手绘瓷砖，讲的是航海的故事。" },
+    { "id": "u2", "speaker": "me", "text": "嗯。" }
+  ] }, "expected": [{ "utteranceIds": ["u1", "u2"], "decision": "drop", "category": "guide" }] },
+
+  { "id": "b4-1", "tags": ["boundary4", "hackathon", "companion"], "note": "黑客松现场：纯工作事务", "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "评审表的打分项我们要不要先对一下？" },
+    { "id": "u2", "speaker": "other", "text": "我先把演示视频剪完。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "work_task" }] },
+
+  { "id": "b4-2", "tags": ["boundary4", "hackathon"], "note": "黑客松现场：新场合里的感受", "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "第一次来黑客松，凌晨三点整个场馆还亮着灯，大家都趴在电脑前，有种回到大学宿舍通宵的感觉。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "keep", "category": "first_experience" }] },
+
+  { "id": "b4-3", "tags": ["boundary4", "hackathon", "companion"], "note": "同一场合里既有工作又有感受", "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "数据库那张表的字段名你先别改。" },
+    { "id": "u2", "speaker": "other", "text": "好。" },
+    { "id": "u3", "speaker": "me", "text": "说真的，跟一群刚认识一天的人一起熬夜做东西，我好久没有这么投入过了。" }
+  ] }, "expected": [
+    { "utteranceIds": ["u1"], "decision": "drop", "category": "work_task" },
+    { "utteranceIds": ["u3"], "decision": "keep", "category": "reflection" }
+  ] },
+
+  { "id": "b4-4", "tags": ["boundary4", "hackathon", "companion"], "note": "工作问答夹着对人的观察", "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "你们项目用的什么模型？" },
+    { "id": "u2", "speaker": "me", "text": "千问，接口我们晚点再调。" },
+    { "id": "u3", "speaker": "me", "text": "不过这里的评委会一个个坐下来听你讲，比我想象中耐心太多了。" }
+  ] }, "expected": [
+    { "utteranceIds": ["u2"], "decision": "drop", "category": "work_task" },
+    { "utteranceIds": ["u3"], "decision": "keep", "category": "observation" }
+  ] },
+
+  { "id": "n-noise-1", "tags": ["noise_or_functional"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "嗯。" },
+    { "id": "u2", "speaker": "other", "text": "嗯？" },
+    { "id": "u3", "speaker": "me", "text": "没事没事。" }
+  ] }, "expected": [{ "utteranceIds": ["u1", "u2", "u3"], "decision": "drop", "category": "background" }] },
+
+  { "id": "n-noise-2", "tags": ["noise_or_functional"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "哈哈哈哈哈。" },
+    { "id": "u2", "speaker": "other", "text": "来来来这边这边。" },
+    { "id": "u3", "speaker": "me", "text": "好。" }
+  ] }, "expected": [{ "utteranceIds": ["u1", "u2", "u3"], "decision": "drop", "category": "background" }] },
+
+  { "id": "s-uncertain-1", "tags": ["speaker_uncertain"], "note": "内容值得留但说话人拿不准：只能 fold", "window": { "utterances": [
+    { "id": "u1", "speaker": "uncertain", "text": "这里的星星多到有点吓人，我从来没见过银河是这个样子。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "fold", "category": "first_experience" }] },
+
+  { "id": "s-uncertain-2", "tags": ["speaker_uncertain", "companion"], "window": { "utterances": [
+    { "id": "u1", "speaker": "uncertain", "text": "这家面馆的汤是用骨头熬了一整夜的，喝一口我整个人都暖了。" },
+    { "id": "u2", "speaker": "other", "text": "是吧，我说了好吃。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "fold", "category": "observation" }] },
+
+  { "id": "c-companion-1", "tags": ["companion"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "你看那个街头艺人，一个人拉手风琴。" },
+    { "id": "u2", "speaker": "me", "text": "他拉得好投入，旁边根本没人听他也不在乎，我好羡慕这种不在乎别人眼光的样子。" },
+    { "id": "u3", "speaker": "other", "text": "你也可以啊。" },
+    { "id": "u4", "speaker": "me", "text": "我不行，我连在 KTV 唱歌都要看别人脸色。" }
+  ] }, "expected": [{ "utteranceIds": ["u2", "u4"], "decision": "keep", "category": "reflection" }] },
+
+  { "id": "c-companion-2", "tags": ["companion"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "这边的人真的会在街上直接跟陌生人聊天。" },
+    { "id": "u2", "speaker": "me", "text": "刚才那个老奶奶问我从哪来，还教我怎么念这个地名，一点都不怕生。" },
+    { "id": "u3", "speaker": "other", "text": "对啊。" }
+  ] }, "expected": [{ "utteranceIds": ["u2"], "decision": "keep", "category": "observation" }] },
+
+  { "id": "c-companion-3", "tags": ["companion", "noise_or_functional"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "我们要不要去买点水？" },
+    { "id": "u2", "speaker": "me", "text": "走吧，顺便看看有没有卖伞的。" },
+    { "id": "u3", "speaker": "other", "text": "那个店好像有。" }
+  ] }, "expected": [{ "utteranceIds": ["u2"], "decision": "drop", "category": "functional" }] }
+]

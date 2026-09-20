@@ -1,0 +1,96 @@
+[
+  { "id": "d-func-1", "tags": ["drop", "functional", "noise_or_functional", "companion"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "你好，两张明天早上九点去机场的车票。" },
+    { "id": "u2", "speaker": "other", "text": "一共六十八。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "functional" }] },
+
+  { "id": "d-func-2", "tags": ["drop", "functional", "noise_or_functional"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "这个可以便宜点吗？两个一百行不行？" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "functional" }] },
+
+  { "id": "d-func-3", "tags": ["drop", "functional", "noise_or_functional", "companion"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "我们订的是 1203 房，可以提前入住吗？" },
+    { "id": "u2", "speaker": "other", "text": "需要等到两点。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "functional" }] },
+
+  { "id": "d-comp-1", "tags": ["drop", "complaint"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "太晒了，防晒霜又忘带了，脸都要烤熟了。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "complaint" }] },
+
+  { "id": "d-comp-2", "tags": ["drop", "complaint"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "这个导航一直在绕圈，走了半天还在原地，气死我了。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "complaint" }] },
+
+  { "id": "d-comp-3", "tags": ["drop", "complaint"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "脚上磨出泡了，这双鞋真的不能再穿出来走路。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "complaint" }] },
+
+  { "id": "d-oth-1", "tags": ["drop", "others_only", "companion"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "我跟你说，这家店老板以前是乐队主唱，后来回老家开了这个店，每天晚上还会弹琴。" },
+    { "id": "u2", "speaker": "me", "text": "哦是吗。" }
+  ] }, "expected": [{ "utteranceIds": ["u1", "u2"], "decision": "drop", "category": "others_only" }] },
+
+  { "id": "d-oth-2", "tags": ["drop", "others_only", "companion"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "这边的房价其实比我们那边还便宜，但是工资高一倍。" },
+    { "id": "u2", "speaker": "other", "text": "而且人家一年有五周的假。" },
+    { "id": "u3", "speaker": "me", "text": "嗯嗯。" }
+  ] }, "expected": [{ "utteranceIds": ["u1", "u2", "u3"], "decision": "drop", "category": "others_only" }] },
+
+  { "id": "d-oth-3", "tags": ["drop", "others_only", "companion"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "你知道吗，这里的人结婚都不办酒席，就请几个朋友吃顿饭。" },
+    { "id": "u2", "speaker": "me", "text": "哈哈。" }
+  ] }, "expected": [{ "utteranceIds": ["u1", "u2"], "decision": "drop", "category": "others_only" }] },
+
+  { "id": "d-guide-1", "tags": ["drop", "guide"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "大家请看左手边，这座建筑建于十八世纪，是当时的海关大楼，外立面用的是花岗岩。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "guide" }] },
+
+  { "id": "d-guide-2", "tags": ["drop", "guide"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "展品编号十二，这件青花瓷瓶出土于景德镇窑址，瓶身绘有缠枝莲纹。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "guide" }] },
+
+  { "id": "d-guide-3", "tags": ["drop", "guide", "companion"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "这条街以前是马车道，所以你看路面中间是凹下去的。" },
+    { "id": "u2", "speaker": "me", "text": "那边有洗手间吗？" }
+  ] }, "expected": [
+    { "utteranceIds": ["u1"], "decision": "drop", "category": "guide" },
+    { "utteranceIds": ["u2"], "decision": "drop", "category": "functional" }
+  ] },
+
+  { "id": "d-bg-1", "tags": ["drop", "background"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "喂？妈，我在外面呢，晚点给你回电话。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "background" }] },
+
+  { "id": "d-bg-2", "tags": ["drop", "background"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "欢迎光临，今天全场第二杯半价。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "background" }] },
+
+  { "id": "d-bg-3", "tags": ["drop", "background"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "Next stop, Central Station. Please mind the gap." }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "background" }] },
+
+  { "id": "d-priv-1", "tags": ["drop", "private"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "我这个月工资到手才一万二，还完房贷就剩三千。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "private" }] },
+
+  { "id": "d-priv-2", "tags": ["drop", "private"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "我最近体检查出甲状腺结节，医生让我三个月复查一次。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "private" }] },
+
+  { "id": "d-priv-3", "tags": ["drop", "private"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "我跟我老公其实已经分居半年了，这次出来就是想自己静一静。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "private" }] },
+
+  { "id": "d-work-1", "tags": ["drop", "work_task"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "PPT 第三页的数据你帮我改成最新的，今晚十二点前发给评委。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "work_task" }] },
+
+  { "id": "d-work-2", "tags": ["drop", "work_task", "companion"], "window": { "utterances": [
+    { "id": "u1", "speaker": "other", "text": "合同里违约金那一条要不要改？" },
+    { "id": "u2", "speaker": "me", "text": "改成百分之十吧，付款周期写三十天。" }
+  ] }, "expected": [{ "utteranceIds": ["u2"], "decision": "drop", "category": "work_task" }] },
+
+  { "id": "d-work-3", "tags": ["drop", "work_task"], "window": { "utterances": [
+    { "id": "u1", "speaker": "me", "text": "明天上午先把登录接口联调完，下午再排部署。" }
+  ] }, "expected": [{ "utteranceIds": ["u1"], "decision": "drop", "category": "work_task" }] }
+]

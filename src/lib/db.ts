@@ -4,6 +4,19 @@ import Dexie, { type Table } from "dexie";
 import type { Item, Trip } from "./types";
 import { itemSchema } from "./schema";
 import type { NativeHealthSample } from "./native-bridge";
+import type {
+  AgentTrace,
+  DiaryDay,
+  FeedbackEvent,
+  MemoAudio,
+  MemoChunk,
+  MemoSession,
+  MemoWindow,
+  Moment,
+  Profile,
+  TimelineEvent,
+  Utterance,
+} from "./memo/types";
 
 type SeedMeta = { key: string; value: boolean | string };
 
@@ -22,6 +35,18 @@ class YujianjiDatabase extends Dexie {
   meta!: Table<SeedMeta, string>;
   healthSamples!: Table<NativeHealthSample & { key: string }, string>;
   pendingEncounters!: Table<PendingEncounterRow, string>;
+  // 遇见手记（version 6，只新增表）
+  memoSessions!: Table<MemoSession, string>;
+  timeline!: Table<TimelineEvent, string>;
+  memoChunks!: Table<MemoChunk, [string, number]>;
+  memoAudio!: Table<MemoAudio, string>;
+  utterances!: Table<Utterance, string>;
+  memoWindows!: Table<MemoWindow, string>;
+  moments!: Table<Moment, string>;
+  diaryDays!: Table<DiaryDay, string>;
+  profiles!: Table<Profile, number>;
+  feedbackEvents!: Table<FeedbackEvent, string>;
+  agentTraces!: Table<AgentTrace, string>;
 
   constructor() {
     super("yujianji");
@@ -30,6 +55,19 @@ class YujianjiDatabase extends Dexie {
     this.version(3).stores({ items: "id,date,country", meta: "key", trips: "id,status,startedAt,createdAt" });
     this.version(4).stores({ healthSamples: "key,timestamp,originId,metric" });
     this.version(5).stores({ pendingEncounters: "key" });
+    this.version(6).stores({
+      memoSessions: "id, status, startedAt",
+      timeline: "id, startAt, kind, sessionId",
+      memoChunks: "[sessionId+index], sessionId",
+      memoAudio: "sessionId",
+      utterances: "id, sessionId, expiresAt",
+      memoWindows: "id, sessionId",
+      moments: "id, sessionId, dayKey, decision",
+      diaryDays: "dayKey",
+      profiles: "version",
+      feedbackEvents: "id, momentId, consumedByVersion",
+      agentTraces: "runId, scope, refId, sessionId, dayKey",
+    });
   }
 }
 

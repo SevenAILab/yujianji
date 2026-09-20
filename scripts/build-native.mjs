@@ -14,7 +14,8 @@ await rm(project, { recursive: true, force: true });
 await mkdir(project, { recursive: true });
 await cp(path.join(root, "src"), path.join(project, "src"), {
   recursive: true,
-  filter: (source) => !["app/api", "app/item/[id]", "app/panorama/[id]"].includes(path.relative(path.join(root, "src"), source).split(path.sep).join("/")),
+  // app/memo：遇见手记必须有服务端（上传、转写、模型），离线本地版不打包
+  filter: (source) => !["app/api", "app/item/[id]", "app/panorama/[id]", "app/memo"].includes(path.relative(path.join(root, "src"), source).split(path.sep).join("/")),
 });
 for (const filename of ["public", "postcss.config.mjs"]) {
   await cp(path.join(root, filename), path.join(project, filename), { recursive: true });

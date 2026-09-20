@@ -1,0 +1,21 @@
+[
+  { "id": "q-01", "note": "去口水词后逐字能找到", "sources": [{ "momentId": "m1", "salience": 0.8, "myQuotes": ["嗯，这个面包是我在国外吃过最软的，然后，那个黄油是咸的。"] }],
+    "candidates": [{ "momentId": "m1", "text": "这个面包是我在国外吃过最软的", "expectPass": true }] },
+  { "id": "q-02", "note": "口水词在中间，去掉后两个分句相连，仍算逐字", "sources": [{ "momentId": "m1", "salience": 0.8, "myQuotes": ["嗯，这个面包是我在国外吃过最软的，然后，那个黄油是咸的。"] }],
+    "candidates": [{ "momentId": "m1", "text": "我在国外吃过最软的，黄油是咸的", "expectPass": true }] },
+  { "id": "q-03", "note": "中英混说，空格和大小写不影响", "sources": [{ "momentId": "m1", "salience": 0.8, "myQuotes": ["这里的 sunset 真的是 next level，天是粉紫色的。"] }],
+    "candidates": [{ "momentId": "m1", "text": "这里的Sunset真的是next level", "expectPass": true }] },
+  { "id": "q-04", "note": "太短（< 8 字）不当金句", "sources": [{ "momentId": "m1", "salience": 0.8, "myQuotes": ["好美啊，我都看呆了。"] }],
+    "candidates": [{ "momentId": "m1", "text": "好美", "expectPass": false }] },
+  { "id": "q-05", "note": "同一片段最多 1 条", "sources": [{ "momentId": "m1", "salience": 0.8, "myQuotes": ["第一次在雪地里泡温泉，头发都结冰了，身子却是烫的。"] }],
+    "candidates": [
+      { "momentId": "m1", "text": "第一次在雪地里泡温泉", "expectPass": true },
+      { "momentId": "m1", "text": "头发都结冰了，身子却是烫的", "expectPass": false }
+    ] },
+  { "id": "q-06", "trap": true, "note": "陷阱：换近义词（开过去 → 驶过）", "sources": [{ "momentId": "m1", "salience": 0.8, "myQuotes": ["我站在桥上，看着船从脚下开过去，有点想哭。"] }],
+    "candidates": [{ "momentId": "m1", "text": "我站在桥上，看着船从脚下驶过，有点想哭", "expectPass": false }] },
+  { "id": "q-07", "trap": true, "note": "陷阱：调语序 + 润色", "sources": [{ "momentId": "m1", "salience": 0.8, "myQuotes": ["这是我第一次一个人出国，刚落地的时候腿都在抖。"] }],
+    "candidates": [{ "momentId": "m1", "text": "第一次一个人出国，落地那一刻我的腿都在发抖", "expectPass": false }] },
+  { "id": "q-08", "trap": true, "note": "陷阱：加修饰词", "sources": [{ "momentId": "m1", "salience": 0.8, "myQuotes": ["奶奶做的饺子也是这种褶子。"] }],
+    "candidates": [{ "momentId": "m1", "text": "奶奶包的饺子，也是这种细密的褶子", "expectPass": false }] }
+]

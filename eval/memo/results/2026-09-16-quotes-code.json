@@ -1,0 +1,184 @@
+{
+  "summary": {
+    "suite": "quotes",
+    "cases": 8,
+    "ok": 8,
+    "trapsBlocked": "3/3"
+  },
+  "results": [
+    {
+      "id": "q-01",
+      "trap": false,
+      "ok": true,
+      "outcomes": [
+        {
+          "text": "这个面包是我在国外吃过最软的",
+          "expectPass": true,
+          "passed": true,
+          "reason": null,
+          "ok": true,
+          "index": 0
+        }
+      ],
+      "shown": [
+        {
+          "momentId": "m1",
+          "text": "这个面包是我在国外吃过最软的"
+        }
+      ]
+    },
+    {
+      "id": "q-02",
+      "trap": false,
+      "ok": true,
+      "outcomes": [
+        {
+          "text": "我在国外吃过最软的，黄油是咸的",
+          "expectPass": true,
+          "passed": true,
+          "reason": null,
+          "ok": true,
+          "index": 0
+        }
+      ],
+      "shown": [
+        {
+          "momentId": "m1",
+          "text": "我在国外吃过最软的，黄油是咸的"
+        }
+      ]
+    },
+    {
+      "id": "q-03",
+      "trap": false,
+      "ok": true,
+      "outcomes": [
+        {
+          "text": "这里的Sunset真的是next level",
+          "expectPass": true,
+          "passed": true,
+          "reason": null,
+          "ok": true,
+          "index": 0
+        }
+      ],
+      "shown": [
+        {
+          "momentId": "m1",
+          "text": "这里的 sunset 真的是 next level"
+        }
+      ]
+    },
+    {
+      "id": "q-04",
+      "trap": false,
+      "ok": true,
+      "outcomes": [
+        {
+          "text": "好美",
+          "expectPass": false,
+          "passed": false,
+          "reason": "LENGTH",
+          "ok": true,
+          "index": 0
+        }
+      ],
+      "shown": []
+    },
+    {
+      "id": "q-05",
+      "trap": false,
+      "ok": true,
+      "outcomes": [
+        {
+          "text": "第一次在雪地里泡温泉",
+          "expectPass": true,
+          "passed": true,
+          "reason": null,
+          "ok": true,
+          "index": 0
+        },
+        {
+          "text": "头发都结冰了，身子却是烫的",
+          "expectPass": false,
+          "passed": false,
+          "reason": "DUP_MOMENT",
+          "ok": true,
+          "index": 1
+        }
+      ],
+      "shown": [
+        {
+          "momentId": "m1",
+          "text": "第一次在雪地里泡温泉"
+        }
+      ]
+    },
+    {
+      "id": "q-06",
+      "trap": true,
+      "ok": true,
+      "outcomes": [
+        {
+          "text": "我站在桥上，看着船从脚下驶过，有点想哭",
+          "expectPass": false,
+          "passed": false,
+          "reason": "NOT_VERBATIM",
+          "ok": true,
+          "index": 0
+        }
+      ],
+      "shown": [
+        {
+          "momentId": "m1",
+          "text": "我站在桥上，看着船从脚下开过去，有点想哭"
+        }
+      ]
+    },
+    {
+      "id": "q-07",
+      "trap": true,
+      "ok": true,
+      "outcomes": [
+        {
+          "text": "第一次一个人出国，落地那一刻我的腿都在发抖",
+          "expectPass": false,
+          "passed": false,
+          "reason": "NOT_VERBATIM",
+          "ok": true,
+          "index": 0
+        }
+      ],
+      "shown": [
+        {
+          "momentId": "m1",
+          "text": "这是我第一次一个人出国，刚落地的时候腿都在抖"
+        }
+      ]
+    },
+    {
+      "id": "q-08",
+      "trap": true,
+      "ok": true,
+      "outcomes": [
+        {
+          "text": "奶奶包的饺子，也是这种细密的褶子",
+          "expectPass": false,
+          "passed": false,
+          "reason": "NOT_VERBATIM",
+          "ok": true,
+          "index": 0
+        }
+      ],
+      "shown": [
+        {
+          "momentId": "m1",
+          "text": "奶奶做的饺子也是这种褶子"
+        }
+      ]
+    }
+  ],
+  "ranAt": "2026-09-15T20:11:10.295Z",
+  "wallMs": 7,
+  "provider": "dashscope"
+}

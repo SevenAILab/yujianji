@@ -22,6 +22,13 @@ const csp = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    ignoreIssue: [
+      // 遇见手记服务端要按环境变量找 ffmpeg 和临时目录，Turbopack 会提示"动态文件访问导致整个项目被 trace"。
+      // 只影响 output: "standalone" 的打包体积；本项目用 next start 部署，不受影响。
+      { path: /src\/lib\/memo\/server\/(ffmpeg|tmp-store)\.ts$/, title: /Dynamic filesystem access/ },
+    ],
+  },
   async headers() {
     return [
       {

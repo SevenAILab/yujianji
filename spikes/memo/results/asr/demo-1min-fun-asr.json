@@ -1,0 +1,617 @@
+{
+  "file_url": "http://dashscope-file-mgr.oss-cn-beijing.aliyuncs.com/dashscope-instant/a931ee85280037836bcd24f0ba10106f/2026-09-16/df784795-3479-955d-a331-34d882cc54ba/1789498892678-demo-1min-16k.m4a?Expires=1789671694&OSSAccessKeyId=LTAI5t64cnuuVx7xndFH9ULk&Signature=5QB07pGgEYYv945wPGe%2FLNiqIqU%3D",
+  "properties": {
+    "audio_format": "aac",
+    "channels": [
+      0
+    ],
+    "original_sampling_rate": 16000,
+    "original_duration_in_milliseconds": 33088
+  },
+  "transcripts": [
+    {
+      "channel_id": 0,
+      "content_duration_in_milliseconds": 25560,
+      "text": "你看那边，好多人躺在草坪上。麻烦问你一下，洗手间在哪边？左边过了那个小桥，就是。我突然觉得我们平时太着急了，他们就这么躺着晒太阳，一点都不觉得休息是件可耻的事。在国内，我下班了还要做账号，根本不敢停下来。他们四点就下班了，下了班是真的不回消息。真的假的？排了一个小时队，腿都要断了。",
+      "sentences": [
+        {
+          "begin_time": 80,
+          "end_time": 3120,
+          "text": "你看那边，好多人躺在草坪上。",
+          "sentence_id": 1,
+          "speaker_id": 0,
+          "words": [
+            {
+              "begin_time": 80,
+              "end_time": 440,
+              "text": "你看",
+              "punctuation": "",
+              "confidence": 0.999
+            },
+            {
+              "begin_time": 440,
+              "end_time": 880,
+              "text": "那边",
+              "punctuation": "，",
+              "confidence": 0.998
+            },
+            {
+              "begin_time": 1200,
+              "end_time": 1400,
+              "text": "好",
+              "punctuation": "",
+              "confidence": 1
+            },
+            {
+              "begin_time": 1400,
+              "end_time": 1880,
+              "text": "多人",
+              "punctuation": "",
+              "confidence": 0.999
+            },
+            {
+              "begin_time": 1880,
+              "end_time": 2360,
+              "text": "躺在",
+              "punctuation": "",
+              "confidence": 0.995
+            },
+            {
+              "begin_time": 2360,
+              "end_time": 2840,
+              "text": "草坪",
+              "punctuation": "",
+              "confidence": 0.999
+            },
+            {
+              "begin_time": 2840,
+              "end_time": 3120,
+              "text": "上",
+              "punctuation": "。",
+              "confidence": 0.996
+            }
+          ]
+        },
+        {
+          "begin_time": 3680,
+          "end_time": 6040,
+          "text": "麻烦问你一下，洗手间在哪边？",
+          "sentence_id": 2,
+          "speaker_id": 1,
+          "words": [
+            {
+              "begin_time": 3680,
+              "end_time": 4040,
+              "text": "麻烦",
+              "punctuation": "",
+              "confidence": 0.954
+            },
+            {
+              "begin_time": 4040,
+              "end_time": 4200,
+              "text": "问",
+              "punctuation": "",
+              "confidence": 0.995
+            },
+            {
+              "begin_time": 4200,
+              "end_time": 4320,
+              "text": "你",
+              "punctuation": "",
+              "confidence": 0.907
+            },
+            {
+              "begin_time": 4320,
+              "end_time": 4640,
+              "text": "一下",
+              "punctuation": "，",
+              "confidence": 0.993
+            },
+            {
+              "begin_time": 4920,
+              "end_time": 5280,
+              "text": "洗手",
+              "punctuation": "",
+              "confidence": 0.998
+            },
+            {
+              "begin_time": 5280,
+              "end_time": 5520,
+              "text": "间",
+              "punctuation": "",
+              "confidence": 0.995
+            },
+            {
+              "begin_time": 5520,
+              "end_time": 5840,
+              "text": "在哪",
+              "punctuation": "",
+              "confidence": 0.865
+            },
+            {
+              "begin_time": 5840,
+              "end_time": 6040,
+              "text": "边",
+              "punctuation": "？",
+              "confidence": 0.987
+            }
+          ]
+        },
+        {
+          "begin_time": 7320,
+          "end_time": 9800,
+          "text": "左边过了那个小桥，就是。",
+          "sentence_id": 3,
+          "speaker_id": 0,
+          "words": [
+            {
+              "begin_time": 7320,
+              "end_time": 8080,
+              "text": "左边",
+              "punctuation": "",
+              "confidence": 0.951
+            },
+            {
+              "begin_time": 8080,
+              "end_time": 8480,
+              "text": "过了",
+              "punctuation": "",
+              "confidence": 0.975
+            },
+            {
+              "begin_time": 8480,
+              "end_time": 8800,
+              "text": "那个",
+              "punctuation": "",
+              "confidence": 0.979
+            },
+            {
+              "begin_time": 8800,
+              "end_time": 9040,
+              "text": "小",
+              "punctuation": "",
+              "confidence": 0.967
+            },
+            {
+              "begin_time": 9040,
+              "end_time": 9200,
+              "text": "桥",
+              "punctuation": "，",
+              "confidence": 0.934
+            },
+            {
+              "begin_time": 9320,
+              "end_time": 9800,
+              "text": "就是",
+              "punctuation": "。",
+              "confidence": 0.937
+            }
+          ]
+        },
+        {
+          "begin_time": 10760,
+          "end_time": 17600,
+          "text": "我突然觉得我们平时太着急了，他们就这么躺着晒太阳，一点都不觉得休息是件可耻的事。",
+          "sentence_id": 4,
+          "speaker_id": 1,
+          "words": [
+            {
+              "begin_time": 10760,
+              "end_time": 10960,
+              "text": "我",
+              "punctuation": "",
+              "confidence": 0.958
+            },
+            {
+              "begin_time": 10960,
+              "end_time": 11320,
+              "text": "突然",
+              "punctuation": "",
+              "confidence": 0.973
+            },
+            {
+              "begin_time": 11320,
+              "end_time": 11560,
+              "text": "觉得",
+              "punctuation": "",
+              "confidence": 0.977
+            },
+            {
+              "begin_time": 11560,
+              "end_time": 11840,
+              "text": "我们",
+              "punctuation": "",
+              "confidence": 0.987
+            },
+            {
+              "begin_time": 11840,
+              "end_time": 12280,
+              "text": "平时",
+              "punctuation": "",
+              "confidence": 0.981
+            },
+            {
+              "begin_time": 12280,
+              "end_time": 12440,
+              "text": "太",
+              "punctuation": "",
+              "confidence": 0.982
+            },
+            {
+              "begin_time": 12440,
+              "end_time": 12760,
+              "text": "着急",
+              "punctuation": "",
+              "confidence": 0.992
+            },
+            {
+              "begin_time": 12760,
+              "end_time": 12920,
+              "text": "了",
+              "punctuation": "，",
+              "confidence": 0.983
+            },
+            {
+              "begin_time": 13200,
+              "end_time": 13480,
+              "text": "他们",
+              "punctuation": "",
+              "confidence": 0.973
+            },
+            {
+              "begin_time": 13480,
+              "end_time": 13960,
+              "text": "就这么",
+              "punctuation": "",
+              "confidence": 0.963
+            },
+            {
+              "begin_time": 13960,
+              "end_time": 14400,
+              "text": "躺着",
+              "punctuation": "",
+              "confidence": 0.905
+            },
+            {
+              "begin_time": 14400,
+              "end_time": 14560,
+              "text": "晒",
+              "punctuation": "",
+              "confidence": 0.999
+            },
+            {
+              "begin_time": 14560,
+              "end_time": 14920,
+              "text": "太阳",
+              "punctuation": "，",
+              "confidence": 0.992
+            },
+            {
+              "begin_time": 15160,
+              "end_time": 15880,
+              "text": "一点都不",
+              "punctuation": "",
+              "confidence": 0.947
+            },
+            {
+              "begin_time": 15880,
+              "end_time": 16160,
+              "text": "觉得",
+              "punctuation": "",
+              "confidence": 0.98
+            },
+            {
+              "begin_time": 16160,
+              "end_time": 16480,
+              "text": "休息",
+              "punctuation": "",
+              "confidence": 0.984
+            },
+            {
+              "begin_time": 16480,
+              "end_time": 16640,
+              "text": "是",
+              "punctuation": "",
+              "confidence": 0.577
+            },
+            {
+              "begin_time": 16640,
+              "end_time": 16840,
+              "text": "件",
+              "punctuation": "",
+              "confidence": 0.943
+            },
+            {
+              "begin_time": 16840,
+              "end_time": 17000,
+              "text": "可",
+              "punctuation": "",
+              "confidence": 0.986
+            },
+            {
+              "begin_time": 17000,
+              "end_time": 17240,
+              "text": "耻",
+              "punctuation": "",
+              "confidence": 0.979
+            },
+            {
+              "begin_time": 17240,
+              "end_time": 17600,
+              "text": "的事",
+              "punctuation": "。",
+              "confidence": 0.823
+            }
+          ]
+        },
+        {
+          "begin_time": 17960,
+          "end_time": 21640,
+          "text": "在国内，我下班了还要做账号，根本不敢停下来。",
+          "sentence_id": 5,
+          "speaker_id": 1,
+          "words": [
+            {
+              "begin_time": 17960,
+              "end_time": 18400,
+              "text": "在国内",
+              "punctuation": "，",
+              "confidence": 0.995
+            },
+            {
+              "begin_time": 18440,
+              "end_time": 18560,
+              "text": "我",
+              "punctuation": "",
+              "confidence": 0.986
+            },
+            {
+              "begin_time": 18560,
+              "end_time": 18920,
+              "text": "下班",
+              "punctuation": "",
+              "confidence": 0.846
+            },
+            {
+              "begin_time": 18920,
+              "end_time": 19080,
+              "text": "了",
+              "punctuation": "",
+              "confidence": 0.975
+            },
+            {
+              "begin_time": 19080,
+              "end_time": 19360,
+              "text": "还要",
+              "punctuation": "",
+              "confidence": 0.989
+            },
+            {
+              "begin_time": 19360,
+              "end_time": 19560,
+              "text": "做",
+              "punctuation": "",
+              "confidence": 0.988
+            },
+            {
+              "begin_time": 19560,
+              "end_time": 19960,
+              "text": "账号",
+              "punctuation": "，",
+              "confidence": 0.967
+            },
+            {
+              "begin_time": 20200,
+              "end_time": 20600,
+              "text": "根本",
+              "punctuation": "",
+              "confidence": 0.981
+            },
+            {
+              "begin_time": 20600,
+              "end_time": 21000,
+              "text": "不敢",
+              "punctuation": "",
+              "confidence": 0.65
+            },
+            {
+              "begin_time": 21000,
+              "end_time": 21640,
+              "text": "停下来",
+              "punctuation": "。",
+              "confidence": 0.977
+            }
+          ]
+        },
+        {
+          "begin_time": 22860,
+          "end_time": 26780,
+          "text": "他们四点就下班了，下了班是真的不回消息。",
+          "sentence_id": 6,
+          "speaker_id": 0,
+          "words": [
+            {
+              "begin_time": 22860,
+              "end_time": 23180,
+              "text": "他们",
+              "punctuation": "",
+              "confidence": 0.995
+            },
+            {
+              "begin_time": 23180,
+              "end_time": 23380,
+              "text": "四",
+              "punctuation": "",
+              "confidence": 0.779
+            },
+            {
+              "begin_time": 23380,
+              "end_time": 23620,
+              "text": "点",
+              "punctuation": "",
+              "confidence": 0.996
+            },
+            {
+              "begin_time": 23620,
+              "end_time": 23860,
+              "text": "就",
+              "punctuation": "",
+              "confidence": 0.999
+            },
+            {
+              "begin_time": 23860,
+              "end_time": 24260,
+              "text": "下班",
+              "punctuation": "",
+              "confidence": 0.999
+            },
+            {
+              "begin_time": 24260,
+              "end_time": 24460,
+              "text": "了",
+              "punctuation": "，",
+              "confidence": 0.997
+            },
+            {
+              "begin_time": 24740,
+              "end_time": 25100,
+              "text": "下了",
+              "punctuation": "",
+              "confidence": 0.992
+            },
+            {
+              "begin_time": 25100,
+              "end_time": 25420,
+              "text": "班",
+              "punctuation": "",
+              "confidence": 0.999
+            },
+            {
+              "begin_time": 25420,
+              "end_time": 25860,
+              "text": "是真的",
+              "punctuation": "",
+              "confidence": 0.994
+            },
+            {
+              "begin_time": 25860,
+              "end_time": 26060,
+              "text": "不",
+              "punctuation": "",
+              "confidence": 0.998
+            },
+            {
+              "begin_time": 26060,
+              "end_time": 26300,
+              "text": "回",
+              "punctuation": "",
+              "confidence": 0.999
+            },
+            {
+              "begin_time": 26300,
+              "end_time": 26780,
+              "text": "消息",
+              "punctuation": "。",
+              "confidence": 0.979
+            }
+          ]
+        },
+        {
+          "begin_time": 27460,
+          "end_time": 28220,
+          "text": "真的假的？",
+          "sentence_id": 7,
+          "speaker_id": 1,
+          "words": [
+            {
+              "begin_time": 27460,
+              "end_time": 27820,
+              "text": "真的",
+              "punctuation": "",
+              "confidence": 0.959
+            },
+            {
+              "begin_time": 27820,
+              "end_time": 28020,
+              "text": "假",
+              "punctuation": "",
+              "confidence": 0.947
+            },
+            {
+              "begin_time": 28020,
+              "end_time": 28220,
+              "text": "的",
+              "punctuation": "？",
+              "confidence": 0.951
+            }
+          ]
+        },
+        {
+          "begin_time": 29570,
+          "end_time": 32050,
+          "text": "排了一个小时队，腿都要断了。",
+          "sentence_id": 8,
+          "speaker_id": 1,
+          "words": [
+            {
+              "begin_time": 29570,
+              "end_time": 29810,
+              "text": "排",
+              "punctuation": "",
+              "confidence": 0.742
+            },
+            {
+              "begin_time": 29810,
+              "end_time": 30290,
+              "text": "了一个",
+              "punctuation": "",
+              "confidence": 0.957
+            },
+            {
+              "begin_time": 30290,
+              "end_time": 30610,
+              "text": "小时",
+              "punctuation": "",
+              "confidence": 0.994
+            },
+            {
+              "begin_time": 30610,
+              "end_time": 30850,
+              "text": "队",
+              "punctuation": "，",
+              "confidence": 0.231
+            },
+            {
+              "begin_time": 31090,
+              "end_time": 31330,
+              "text": "腿",
+              "punctuation": "",
+              "confidence": 0.962
+            },
+            {
+              "begin_time": 31330,
+              "end_time": 31690,
+              "text": "都要",
+              "punctuation": "",
+              "confidence": 0.976
+            },
+            {
+              "begin_time": 31690,
+              "end_time": 31850,
+              "text": "断",
+              "punctuation": "",
+              "confidence": 0.947
+            },
+            {
+              "begin_time": 31850,
+              "end_time": 32050,
+              "text": "了",
+              "punctuation": "。",
+              "confidence": 0.995
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

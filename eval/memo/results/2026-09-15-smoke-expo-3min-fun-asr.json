@@ -1,0 +1,279 @@
+{
+  "windows": 3,
+  "stages": [
+    {
+      "stage": "triage smoke:w0",
+      "ms": 714,
+      "cost": 0.00007,
+      "outcome": "skip:纯功能对接事务，无用户情感表达"
+    },
+    {
+      "stage": "triage smoke:w1",
+      "ms": 535,
+      "cost": 0.00008,
+      "outcome": "judge:用户表达羡慕、回忆与感受"
+    },
+    {
+      "stage": "judge smoke:w1",
+      "ms": 30821,
+      "cost": 0.016266,
+      "outcome": "ok"
+    },
+    {
+      "stage": "triage smoke:w2",
+      "ms": 378,
+      "cost": 0.000069,
+      "outcome": "judge:用户表达了对冰淇淋的强烈感受"
+    },
+    {
+      "stage": "judge smoke:w2",
+      "ms": 13375,
+      "cost": 0.006825,
+      "outcome": "ok"
+    },
+    {
+      "stage": "write",
+      "ms": 11721,
+      "cost": 0.003775,
+      "outcome": "ok"
+    },
+    {
+      "stage": "reflect",
+      "ms": 3384,
+      "cost": 0.005235,
+      "outcome": "单纯描述‘第一次’或转述事实不够，必须有个人感受或反思才留。"
+    }
+  ],
+  "diary": {
+    "title": "会展中心的松弛感",
+    "quotes": [
+      {
+        "momentId": "m_0",
+        "text": "小时候也特别想穿成这样出门，但是那时候总觉得会被人笑"
+      },
+      {
+        "momentId": "m_4",
+        "text": "这个冰淇淋是我吃过最好吃的，有一点海盐的味道，so good"
+      }
+    ],
+    "paragraphs": [
+      {
+        "momentId": "m_0",
+        "heading": "10:05 · 深圳 · 会展中心",
+        "text": "第一次见到这么多超市，感觉像走进了动画片，大家都特别放得开。小时候也特别想穿成这样出门，但是那时候总觉得会被人笑。现在看他们这么自在，有点羡慕。",
+        "verified": true,
+        "degraded": false,
+        "retries": 0
+      },
+      {
+        "momentId": "m_4",
+        "heading": "10:06 · 深圳 · 会展中心",
+        "text": "这个冰淇淋是我吃过最好吃的，有一点海盐的味道，so good！",
+        "verified": true,
+        "degraded": false,
+        "retries": 0
+      }
+    ],
+    "trace": {
+      "runId": "smoke_write_1789501793289",
+      "scope": "write",
+      "refId": "2026-09-21",
+      "dayKey": "2026-09-21",
+      "startedAt": "2026-09-15T19:49:53.295Z",
+      "ms": 11721,
+      "costYuan": 0.003775,
+      "model": "qwen3.5-plus",
+      "outcome": "ok",
+      "steps": [
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 4970,
+          "inputTokens": 999,
+          "outputTokens": 212,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "fidelity",
+          "ms": 0,
+          "summary": "确定性检查：2/2 段通过（长度、升华黑名单、引号、数字和英文）"
+        },
+        {
+          "kind": "model",
+          "name": "qwen3.5-plus",
+          "ms": 6737,
+          "inputTokens": 414,
+          "outputTokens": 339,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "verify",
+          "name": "verifier",
+          "ms": 6740,
+          "summary": "独立检查员：2/2 段每句都能对应到原话"
+        }
+      ]
+    }
+  },
+  "moments": [
+    {
+      "id": "m_0",
+      "sessionId": "smoke",
+      "windowId": "smoke:w1",
+      "dayKey": "2026-09-21",
+      "at": "2026-09-21T02:05:20.000Z",
+      "place": {
+        "name": "深圳 · 会展中心",
+        "source": "manual"
+      },
+      "decision": "keep",
+      "salience": 0.9,
+      "category": "first_experience",
+      "trigger": "看到漫展 coser 自在的样子",
+      "why": "第一次的体验勾起回忆和羡慕",
+      "myQuotes": [
+        "哇，第一次见到这么多超市，感觉像走进了动画片，大家都特别放得开。",
+        "我小时候也特别想穿成这样出门，但是那时候总觉得会被人笑。",
+        "现在看他们这么自在，有点羡慕。"
+      ],
+      "uncertainQuotes": [],
+      "speakerUncertain": false,
+      "sourceUtteranceIds": [
+        "smoke:4",
+        "smoke:6",
+        "smoke:7"
+      ],
+      "user": {
+        "copiedCount": 0
+      },
+      "runId": "smoke_judge_1_1789501748709",
+      "profileVersion": 1,
+      "createdAt": "2026-09-15T19:49:39.533Z"
+    },
+    {
+      "id": "m_1",
+      "sessionId": "smoke",
+      "windowId": "smoke:w1",
+      "dayKey": "2026-09-21",
+      "at": "2026-09-21T02:05:44.950Z",
+      "place": {
+        "name": "深圳 · 会展中心",
+        "source": "manual"
+      },
+      "decision": "keep",
+      "salience": 0.6,
+      "category": "retold_fact",
+      "trigger": "导游介绍屋顶用回收塑料瓶",
+      "why": "复述了打动你的环保新知",
+      "myQuotes": [
+        "导游光说这个屋顶是用回收的塑料瓶做的，现在还在用，挺酷的。"
+      ],
+      "uncertainQuotes": [],
+      "speakerUncertain": false,
+      "sourceUtteranceIds": [
+        "smoke:9"
+      ],
+      "user": {
+        "copiedCount": 0
+      },
+      "runId": "smoke_judge_1_1789501748709",
+      "profileVersion": 1,
+      "createdAt": "2026-09-15T19:49:39.533Z"
+    },
+    {
+      "id": "m_2",
+      "sessionId": "smoke",
+      "windowId": "smoke:w2",
+      "dayKey": "2026-09-21",
+      "at": "2026-09-21T02:05:59.600Z",
+      "place": {
+        "name": "深圳 · 会展中心",
+        "source": "manual"
+      },
+      "decision": "drop",
+      "salience": 0,
+      "category": "functional",
+      "trigger": "买咖啡点单",
+      "why": "功能性事务，不留",
+      "myQuotes": [],
+      "uncertainQuotes": [],
+      "speakerUncertain": false,
+      "sourceUtteranceIds": [
+        "smoke:10",
+        "smoke:11"
+      ],
+      "user": {
+        "copiedCount": 0
+      },
+      "runId": "smoke_judge_2_1789501779911",
+      "profileVersion": 1,
+      "createdAt": "2026-09-15T19:49:53.288Z"
+    },
+    {
+      "id": "m_3",
+      "sessionId": "smoke",
+      "windowId": "smoke:w2",
+      "dayKey": "2026-09-21",
+      "at": "2026-09-21T02:06:04.460Z",
+      "place": {
+        "name": "深圳 · 会展中心",
+        "source": "manual"
+      },
+      "decision": "drop",
+      "salience": 0,
+      "category": "others_only",
+      "trigger": "同伴讲述感情",
+      "why": "别人说的隐私，你没表态",
+      "myQuotes": [],
+      "uncertainQuotes": [],
+      "speakerUncertain": false,
+      "sourceUtteranceIds": [
+        "smoke:12"
+      ],
+      "user": {
+        "copiedCount": 0
+      },
+      "runId": "smoke_judge_2_1789501779911",
+      "profileVersion": 1,
+      "createdAt": "2026-09-15T19:49:53.289Z"
+    },
+    {
+      "id": "m_4",
+      "sessionId": "smoke",
+      "windowId": "smoke:w2",
+      "dayKey": "2026-09-21",
+      "at": "2026-09-21T02:06:11.140Z",
+      "place": {
+        "name": "深圳 · 会展中心",
+        "source": "manual"
+      },
+      "decision": "keep",
+      "salience": 0.8,
+      "category": "first_experience",
+      "trigger": "尝到海盐冰淇淋",
+      "why": "第一次的体验和评价",
+      "myQuotes": [
+        "这个冰淇淋是我吃过最好吃的，有一点海盐的味道，so good！"
+      ],
+      "uncertainQuotes": [],
+      "speakerUncertain": false,
+      "sourceUtteranceIds": [
+        "smoke:13"
+      ],
+      "user": {
+        "copiedCount": 0
+      },
+      "runId": "smoke_judge_2_1789501779911",
+      "profileVersion": 1,
+      "createdAt": "2026-09-15T19:49:53.289Z"
+    }
+  ],
+  "timings": {
+    "judgeAllWindowsMs": 45829,
+    "writeMs": 11727
+  },
+  "totalCostYuan": 0.03232
+}
