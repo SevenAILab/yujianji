@@ -87,7 +87,7 @@ export interface MemoSession {
   parts?: { partIndex: number; offsetMs: number; durationMs: number }[];
   asrTaskIds?: string[];
   speakers?: SessionSpeaker[];
-  meSource?: "loudness" | "single_speaker" | "user" | "unavailable";
+  meSource?: "enrolled" | "opening" | "loudness" | "loudness_weak" | "single_speaker" | "user" | "unavailable";
   meUncertain?: boolean;
   interruptions?: string[];
   timings?: StageTiming[];
@@ -102,6 +102,18 @@ export interface MemoChunk {
   sessionId: string;
   index: number;
   blob: Blob;
+  createdAt: string;
+}
+
+/**
+ * 声纹注册：用户首次录的那一小段「随便说点什么，让我认识一下」。
+ * 只存在这台手机上，每次录音上传时临时送到服务器拼在 ASR 分段前面，用完即删。
+ */
+export interface MemoVoiceprint {
+  id: "me";
+  blob: Blob;
+  mime: string;
+  durationMs: number;
   createdAt: string;
 }
 
@@ -188,6 +200,11 @@ export interface Moment {
   sourceUtteranceIds: string[];
   othersParaphrase?: string;
   facts?: { entity: string; fact: string }[];
+  /**
+   * 配图：遇见集藏品 Item.id。Agent 从 find_photos 的候选里按内容挑，挑不到就留空——
+   * 留白好过配错图。一段最多一张；drop 片段不配图；同一张图不会被两段同时用（守卫保证）。
+   */
+  photoId?: string;
   linkedItemIds?: string[];
   backfill?: BackfillInfo;
   guardNotes?: string[];

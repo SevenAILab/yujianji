@@ -89,6 +89,8 @@ export interface TranscribeStatusResponse {
   sentences?: { partIndex: number; beginMs: number; endMs: number; speakerId: string; speakerKey: string; text: string }[];
   speakers?: { key: string; meanDb: number | null; talkMs: number }[];
   speakersDegraded?: boolean;
+  /** 声纹注册命中时，每个分段里"我"的 speakerKey */
+  meSpeakerKeys?: string[];
   asrSeconds?: number;
   asrModel?: string;
   asrCostYuan?: number;
@@ -108,6 +110,8 @@ export interface JudgeResponse {
     facts?: { entity: string; fact: string }[];
     backfillTarget?: { dayKey: string; place?: string; confidence: number };
     backfillCandidates?: { dayKey: string; place?: string; momentId?: string; label: string }[];
+    /** G10 校验过的配图（遇见集藏品 id）；没配到就没有这个字段 */
+    photoId?: string;
     myQuotes: string[];
     uncertainQuotes: string[];
     speakerUncertain: boolean;
@@ -129,8 +133,17 @@ export const memoApi = {
   uploadStatus(uploadId: string) {
     return call<{ phase: string; totalChunks: number; received: number[] }>("GET", `/api/memo/upload/status?uploadId=${encodeURIComponent(uploadId)}`);
   },
-  finishUpload(uploadId: string, totalChunks: number, mime: string) {
-    return call<{ sizeBytes: number }>("POST", "/api/memo/upload/finish", { json: { uploadId, totalChunks, mime } });
+  /** 声纹注册音频：必须在 finishUpload 之前传，服务端会把它拼到每个 ASR 分段前面 */
+  uploadEnroll(uploadId: string, enrollMs: number, blob: Blob) {
+    return call<{ ok: true; enrollMs: number }>("POST", "/api/memo/upload/enroll", {
+      body: blob,
+      headers: { "x-upload-id": uploadId, "x-enroll-ms": String(enrollMs), "content-type": "application/octet-stream" },
+    });
+  },
+  finishUpload(uploadId: string, totalChunks: number, mime: string, enrollMs?: number) {
+    return call<{ sizeBytes: number }>("POST", "/api/memo/upload/finish", {
+      json: { uploadId, totalChunks, mime, ...(enrollMs ? { enrollMs } : {}) },
+    });
   },
   prepare(uploadId: string) {
     return call<{ status: string }>("POST", "/api/memo/prepare", { json: { uploadId } });

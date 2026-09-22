@@ -10,6 +10,8 @@ const bodySchema = z.object({
   uploadId: uploadIdSchema,
   totalChunks: z.number().int().min(1).max(400),
   mime: z.string().max(80),
+  /** 声纹注册音频毫秒数；有它才会走"每段拼注册前缀"的定我路径 */
+  enrollMs: z.number().int().min(0).max(30_000).optional(),
 });
 
 export async function POST(request: Request) {

@@ -36,6 +36,14 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const byId = useMemo(() => new Map(moments.map((m) => [m.id, m])), [moments]);
+  // 配图：片段上存的是遇见集藏品 id，这里取回照片本身
+  const photoIds = useMemo(() => [...new Set(moments.map((m) => m.photoId).filter((id): id is string => Boolean(id)))], [moments]);
+  const photos = useLiveQuery(
+    async () => new Map((await db.items.bulkGet(photoIds)).filter(Boolean).map((item) => [item!.id, item!])),
+    [photoIds.join(",")],
+    new Map(),
+  );
+  const [showFolded, setShowFolded] = useState(false);
   const folded = useMemo(() => {
     const ids = diary?.foldedMomentIds ?? selectForDiary(moments).foldedIds;
     return ids.map((id) => byId.get(id)).filter((m): m is Moment => Boolean(m) && effectiveDecision(m!) !== "drop");
@@ -117,12 +125,16 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
         </section>
       ) : null}
 
-      <div className={styles.stack}>
+      <div className={styles.diaryBody}>
         {diary?.paragraphs.map((p) => (
           <ParagraphCard
             key={p.momentId}
             paragraph={p}
             moment={byId.get(p.momentId)}
+            photo={(() => {
+              const id = byId.get(p.momentId)?.photoId;
+              return id ? photos.get(id) : undefined;
+            })()}
             editing={editing?.momentId === p.momentId ? editing : null}
             onEdit={() => setEditing({ momentId: p.momentId, text: p.text, before: p.text })}
             onEditChange={(text) => setEditing((e) => (e ? { ...e, text } : e))}
@@ -144,10 +156,18 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
         ))}
       </div>
 
-      <div className={styles.row} style={{ marginTop: 16 }}>
+      {diary?.paragraphs.length ? <p className={styles.diaryEnd}>· · ·</p> : null}
+
+      {/* 以下都是次级入口：手记本身要干净，但删改捞回是它学习的唯一来源，不能没有 */}
+      <div className={styles.row} style={{ marginTop: 28 }}>
         {moments.length ? (
           <button type="button" className={`${styles.button} ${diary ? "" : styles.buttonPrimary}`} onClick={() => void regenerate()} disabled={busy}>
             <RefreshCw size={13} /> {busy ? "正在写…" : diary ? "重新生成" : "生成今日手记"}
+          </button>
+        ) : null}
+        {folded.length ? (
+          <button type="button" className={styles.button} onClick={() => setShowFolded((v) => !v)} aria-expanded={showFolded}>
+            还有 {folded.length} 段没写进来
           </button>
         ) : null}
         {diary?.runId ? (
@@ -158,10 +178,9 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
       </div>
       {error ? <div className={styles.warning} style={{ marginTop: 10 }}>{error}</div> : null}
 
-      {folded.length ? (
+      {folded.length && showFolded ? (
         <>
-          <h2 className={styles.sectionTitle}>折叠区（{folded.length}）</h2>
-          <section className={styles.card}>
+          <section className={styles.card} style={{ marginTop: 12 }}>
             {folded.map((m) => (
               <div key={m.id} className={styles.listItem}>
                 <div className={styles.between}>
@@ -269,6 +288,7 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
 function ParagraphCard(props: {
   paragraph: DiaryParagraph;
   moment?: Moment;
+  photo?: { id: string; name: string; photo: string };
   editing: { text: string } | null;
   onEdit: () => void;
   onEditChange: (text: string) => void;
@@ -279,17 +299,15 @@ function ParagraphCard(props: {
   onCopied: () => void;
   onPickBackfill: (target: { dayKey: string; place?: string }) => Promise<void>;
 }) {
-  const { paragraph: p, moment: m } = props;
+  const { paragraph: p, moment: m, photo } = props;
   const backfill = m?.backfill;
   return (
-    <article className={styles.paragraph}>
-      <div className={styles.between}>
-        <h3 className={styles.heading}>{p.heading}</h3>
-        <span className={styles.row}>
-          {p.degraded ? <span className={`${styles.badge} ${styles.badgeWarn}`}>未润色</span> : null}
-          {p.userEdited ? <span className={`${styles.badge} ${styles.badgeMuted}`}>你改过</span> : null}
-        </span>
-      </div>
+    <article className={styles.diaryEntry}>
+      <h3 className={styles.diaryStamp}>{p.heading}</h3>
+      {photo ? (
+        // 没配到图就什么都不放——留白好过占位灰块
+        <img className={styles.diaryPhoto} src={photo.photo} alt={photo.name} loading="lazy" />
+      ) : null}
       {backfill ? (
         <p className={`${styles.small} ${styles.muted}`} style={{ margin: "0 0 6px" }}>
           这段说的是 {shortDay(backfill.targetDayKey)}
@@ -320,27 +338,31 @@ function ParagraphCard(props: {
           </div>
         </>
       ) : (
-        <p className={styles.paraText}>{p.text}</p>
+        <p className={styles.diaryText}>{p.text}</p>
       )}
-      {m?.facts?.map((f) => (
-        <p key={f.entity} className={styles.fact}>
-          AI 补充，未经核实：{f.fact}
-        </p>
-      ))}
-      {m ? <p className={styles.why}>为什么留下：{m.why} · {placeLabel(m.place)}</p> : null}
+      {/* 原话、改写、删除、复制全部收在这里：页面要干净，但这些操作是它学习的唯一来源 */}
       {!props.editing ? (
-        <div className={styles.actions}>
-          <button type="button" className={styles.button} onClick={props.onOpen}>
-            <Eye size={13} /> 看原话
-          </button>
-          <CopyButton text={p.text} onCopied={props.onCopied} />
-          <button type="button" className={styles.button} onClick={props.onEdit}>
-            <Pencil size={13} /> 改写
-          </button>
-          <button type="button" className={`${styles.button} ${styles.buttonDanger}`} onClick={props.onDelete}>
-            <Trash2 size={13} /> 删除
-          </button>
-        </div>
+        <details className={styles.entryMore}>
+          <summary className={styles.entryMoreSummary} aria-label="这一段的操作">···</summary>
+          <div className={styles.actions}>
+            <button type="button" className={styles.button} onClick={props.onOpen}>
+              <Eye size={13} /> 看原话
+            </button>
+            <CopyButton text={p.text} onCopied={props.onCopied} />
+            <button type="button" className={styles.button} onClick={props.onEdit}>
+              <Pencil size={13} /> 改写
+            </button>
+            <button type="button" className={`${styles.button} ${styles.buttonDanger}`} onClick={props.onDelete}>
+              <Trash2 size={13} /> 删除
+            </button>
+          </div>
+          {m?.facts?.length ? (
+            <p className={styles.fact}>AI 补充，未经核实：{m.facts.map((f) => f.fact).join("；")}</p>
+          ) : null}
+          {m ? <p className={styles.why}>为什么留下：{m.why} · {placeLabel(m.place)}</p> : null}
+          {p.degraded ? <p className={styles.why}>这段没润色，直接用的你的原话。</p> : null}
+          {p.userEdited ? <p className={styles.why}>这段你改过措辞。</p> : null}
+        </details>
       ) : null}
     </article>
   );

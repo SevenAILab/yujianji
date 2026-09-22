@@ -12,11 +12,13 @@ import { asrCostYuan } from "../../agent/pricing";
 import { speakerLoudness } from "../loudness";
 import { pendingChunks } from "../upload-plan";
 import { asrModel, BailianError, fetchTranscription, queryTask, submitTranscription, uploadToTempStorage } from "./bailian";
-import { cutPart, ffmpegAvailable, FfmpegError, planParts, probe, transcode } from "./ffmpeg";
+import { cutPart, ffmpegAvailable, FfmpegError, planParts, prependAudio, probe, transcode } from "./ffmpeg";
 import {
   atomicWrite,
   chunkPath,
   chunksDir,
+  enroll16kPath,
+  enrollSourcePath,
   patchState,
   readState,
   receivedChunks,
@@ -98,7 +100,7 @@ export async function uploadStatus(uploadId: string, deviceId: string): Promise<
   return { phase: state.phase, totalChunks: state.totalChunks, received };
 }
 
-export async function finishUpload(input: { uploadId: string; deviceId: string; totalChunks: number; mime: string }): Promise<{ sizeBytes: number }> {
+export async function finishUpload(input: { uploadId: string; deviceId: string; totalChunks: number; mime: string; enrollMs?: number }): Promise<{ sizeBytes: number }> {
   const state = await loadOwned(input.uploadId, input.deviceId);
   if (state.phase !== "uploading") return { sizeBytes: state.sizeBytes ?? 0 };
   const missing = pendingChunks(input.totalChunks, await receivedChunks(input.uploadId));
@@ -115,7 +117,7 @@ export async function finishUpload(input: { uploadId: string; deviceId: string; 
   await rename(partial, out);
   const sizeBytes = (await stat(out)).size;
   await rm(chunksDir(input.uploadId), { recursive: true, force: true });
-  await patchState(input.uploadId, { phase: "assembled", mime: input.mime, sizeBytes });
+  await patchState(input.uploadId, { phase: "assembled", mime: input.mime, sizeBytes, ...(input.enrollMs ? { enrollMs: input.enrollMs } : {}) });
   return { sizeBytes };
 }
 
@@ -164,16 +166,44 @@ async function runPrepare(uploadId: string): Promise<void> {
     startedAt = Date.now();
     const plans = planParts(durationSec);
     const parts: UploadPart[] = [];
+
+    // 声纹注册：把注册音频转成和正文一样的 16k 单声道，然后拼到**每一个**分段前面。
+    // speakerKey 是按分段隔离的（`${partIndex}:${speakerId}`），只拼在整段最前面的话，
+    // 后面的分段找不到"我"，会被全判成别人。
+    let enroll16k: string | null = null;
+    if (state.enrollMs && (await exists(enrollSourcePath(uploadId)))) {
+      try {
+        const target = enroll16kPath(uploadId);
+        await transcode(enrollSourcePath(uploadId), target, `${target}.pcm`, state.enrollMs / 1000);
+        await removeFile(`${target}.pcm`);
+        await removeFile(enrollSourcePath(uploadId));
+        enroll16k = target;
+      } catch {
+        enroll16k = null; // 注册段处理不了就当没有，退回响度，不能让整条链路失败
+      }
+    }
+
     for (const plan of plans) {
       let file = out16k;
       if (plans.length > 1) {
         file = path.join(uploadDir(uploadId), `part${plan.partIndex}.m4a`);
         await cutPart(out16k, file, plan.offsetSec, plan.lengthSec);
       }
-      const ossUrl = await uploadToTempStorage(file);
+      let submit = file;
+      if (enroll16k) {
+        submit = path.join(uploadDir(uploadId), `part${plan.partIndex}-enroll.m4a`);
+        try {
+          await prependAudio(enroll16k, file, submit);
+        } catch {
+          submit = file; // 这一段拼不上就按原样提交，该段退回响度
+        }
+      }
+      const ossUrl = await uploadToTempStorage(submit);
       parts.push({ partIndex: plan.partIndex, ossUrl, offsetMs: Math.round(plan.offsetSec * 1000), durationMs: Math.round(plan.lengthSec * 1000) });
+      if (submit !== file) await removeFile(submit);
       if (plans.length > 1) await removeFile(file);
     }
+    if (enroll16k) await removeFile(enroll16k);
     await removeFile(out16k); // 已进百炼临时存储，本地不留
     timings.tempStorageMs = Date.now() - startedAt;
     await patchState(uploadId, { phase: "prepared", durationSec, channelsIn: channels ?? undefined, parts, timings });
@@ -254,6 +284,8 @@ export interface TranscribeStatus {
   speakers?: { key: string; meanDb: number | null; talkMs: number }[];
   /** 服务端临时文件已不在（例如结果已取过、被清理），算不出响度，前端需要让用户确认"我" */
   speakersDegraded?: boolean;
+  /** 用了声纹注册时，每个分段里注册段所属的 speakerKey —— 这些就是"我"。为空表示没识别出来 */
+  meSpeakerKeys?: string[];
   asrSeconds?: number;
   asrModel?: string;
   asrCostYuan?: number;
@@ -284,14 +316,36 @@ export async function transcribeStatus(input: { uploadId: string; deviceId: stri
   if (pending) return pending;
   const job = (async (): Promise<TranscribeStatus> => {
     const sentences: NonNullable<TranscribeStatus["sentences"]> = [];
+    // 声纹注册：每段开头那 enrollMs 毫秒是注册音频。它落在哪个 speakerId 上，那个就是这一段的"我"。
+    // 注册段本身必须从逐字稿里剥掉，剩下的句子整体减去 enrollMs 才回到真实录音的时间轴。
+    const enrollMs = state?.enrollMs ?? 0;
+    const meSpeakerKeys: string[] = [];
     let maxEnd = 0;
     for (let i = 0; i < statuses.length; i += 1) {
       const s = statuses[i];
       if (s.empty || !s.transcriptionUrl) continue;
       const result = await fetchTranscription(s.transcriptionUrl);
+
+      if (enrollMs > 0) {
+        // 注册段里说话时长最多的那个 speakerId 就是"我"（容忍 ASR 把边界切得略偏）
+        const talk = new Map<string, number>();
+        for (const sentence of result.sentences) {
+          if (sentence.beginMs >= enrollMs) continue;
+          const ms = Math.min(sentence.endMs, enrollMs) - sentence.beginMs;
+          if (ms > 0) talk.set(sentence.speakerId, (talk.get(sentence.speakerId) ?? 0) + ms);
+        }
+        let best: string | null = null;
+        let bestMs = 0;
+        for (const [id, ms] of talk) if (ms > bestMs) { best = id; bestMs = ms; }
+        if (best !== null) meSpeakerKeys.push(`${i}:${best}`);
+      }
+
       for (const sentence of result.sentences) {
-        const beginMs = sentence.beginMs + (offsets[i] ?? 0);
-        const endMs = sentence.endMs + (offsets[i] ?? 0);
+        // 整句落在注册段里 → 丢掉，它不是用户这次说的话
+        if (enrollMs > 0 && sentence.endMs <= enrollMs) continue;
+        const beginMs = Math.max(0, sentence.beginMs - enrollMs) + (offsets[i] ?? 0);
+        const endMs = Math.max(0, sentence.endMs - enrollMs) + (offsets[i] ?? 0);
+        if (endMs <= beginMs) continue;
         maxEnd = Math.max(maxEnd, endMs);
         sentences.push({ partIndex: i, beginMs, endMs, speakerId: sentence.speakerId, speakerKey: `${i}:${sentence.speakerId}`, text: sentence.text });
       }
@@ -314,7 +368,7 @@ export async function transcribeStatus(input: { uploadId: string; deviceId: stri
     const model = asrModel();
     // D11：拿到转写结果立即删除该会话所有服务端临时文件
     if (state) await removeUpload(input.uploadId);
-    return { status: "succeeded", sentences, speakers, speakersDegraded, asrSeconds, asrModel: model, asrCostYuan: asrCostYuan(model, asrSeconds).yuan };
+    return { status: "succeeded", sentences, speakers, speakersDegraded, ...(meSpeakerKeys.length ? { meSpeakerKeys } : {}), asrSeconds, asrModel: model, asrCostYuan: asrCostYuan(model, asrSeconds).yuan };
   })().finally(() => setTimeout(() => completing.delete(input.uploadId), 30_000));
   completing.set(input.uploadId, job);
   return job;

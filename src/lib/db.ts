@@ -9,6 +9,7 @@ import type {
   DiaryDay,
   FeedbackEvent,
   MemoAudio,
+  MemoVoiceprint,
   MemoChunk,
   MemoSession,
   MemoWindow,
@@ -40,6 +41,7 @@ class YujianjiDatabase extends Dexie {
   timeline!: Table<TimelineEvent, string>;
   memoChunks!: Table<MemoChunk, [string, number]>;
   memoAudio!: Table<MemoAudio, string>;
+  memoVoiceprint!: Table<MemoVoiceprint, string>;
   utterances!: Table<Utterance, string>;
   memoWindows!: Table<MemoWindow, string>;
   moments!: Table<Moment, string>;
@@ -68,6 +70,8 @@ class YujianjiDatabase extends Dexie {
       feedbackEvents: "id, momentId, consumedByVersion",
       agentTraces: "runId, scope, refId, sessionId, dayKey",
     });
+    // v7：声纹注册。只新增一张表，老用户的照片和手记都不动。
+    this.version(7).stores({ memoVoiceprint: "id" });
   }
 }
 

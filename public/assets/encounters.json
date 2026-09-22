@@ -1,0 +1,182 @@
+[
+  {
+    "id": "qinghai-basalt-2024-08",
+    "photoUrl": "/seed/basalt-real.jpg",
+    "capturedAt": "2024-08-20T10:18:00+08:00",
+    "geo": {
+      "lat": 36.79,
+      "lng": 99.08,
+      "place": "青海 · 茶卡"
+    },
+    "label": "黑色玄武岩",
+    "firstSeen": true,
+    "cutoutUrl": null,
+    "model": null,
+    "rarity": {
+      "tier": "legendary",
+      "score": 91,
+      "reason": "柱状玄武岩本就少见，盐湖边缘的更少有人停下来看"
+    },
+    "color": "#2B2B30",
+    "quote": {
+      "text": "这石头摸上去是温的，我一直以为火山的东西应该是冷硬的。",
+      "memoId": "mock_memo_qinghai-",
+      "at": "2024-08-20T10:18:00+08:00"
+    }
+  },
+  {
+    "id": "moganshan-pink-leaf-2025-10",
+    "photoUrl": "/seed/pink-leaf-real.jpg",
+    "capturedAt": "2025-10-12T16:32:00+08:00",
+    "geo": {
+      "lat": 30.61,
+      "lng": 119.87,
+      "place": "浙江 · 莫干山"
+    },
+    "label": "粉色叶子",
+    "firstSeen": true,
+    "cutoutUrl": null,
+    "model": null,
+    "rarity": {
+      "tier": "epic",
+      "score": 78,
+      "reason": "这个树种只在秋天转色的两周里是粉的，错过就要等一年"
+    },
+    "color": "#E8A0B4",
+    "quote": null
+  },
+  {
+    "id": "golden-retriever-2018-10",
+    "photoUrl": "/seed/dog.jpg",
+    "capturedAt": "2018-10-05T11:05:00+02:00",
+    "geo": {
+      "lat": 52.37,
+      "lng": 4.9,
+      "place": "荷兰 · 阿姆斯特丹"
+    },
+    "label": "叼着郁金香的金毛",
+    "firstSeen": true,
+    "cutoutUrl": null,
+    "model": null,
+    "rarity": {
+      "tier": "rare",
+      "score": 62,
+      "reason": "狗本身常见，但叼着郁金香走在运河边是这个城市独有的画面"
+    },
+    "color": "#D9A441",
+    "quote": {
+      "text": "它主人说这只狗每天自己叼一支花回家，我看了三分钟没舍得走。",
+      "memoId": "mock_memo_golden-r",
+      "at": "2018-10-05T11:05:00+02:00"
+    }
+  },
+  {
+    "id": "pizza-table-2019-06",
+    "photoUrl": "/seed/pizza.jpg",
+    "capturedAt": "2019-06-22T19:30:00+02:00",
+    "geo": {
+      "lat": 40.85,
+      "lng": 14.27,
+      "place": "意大利 · 那不勒斯"
+    },
+    "label": "玛格丽特披萨",
+    "firstSeen": true,
+    "cutoutUrl": null,
+    "model": null,
+    "rarity": {
+      "tier": "rare",
+      "score": 55,
+      "reason": "披萨到处都有，但在它的发源地第一次吃到算一次初见"
+    },
+    "color": "#C94A38",
+    "quote": null
+  },
+  {
+    "id": "whitby-harbor-2022-10",
+    "photoUrl": "/seed/whitby-harbor.jpg",
+    "capturedAt": "2022-10-15T12:16:00+01:00",
+    "geo": {
+      "lat": 54.49,
+      "lng": -0.61,
+      "place": "英国 · 惠特比"
+    },
+    "label": "海港上的海鸥",
+    "firstSeen": true,
+    "cutoutUrl": null,
+    "model": null,
+    "rarity": {
+      "tier": "uncommon",
+      "score": 38,
+      "reason": "海边常见，但这只停在缆绳上不动，像在等什么"
+    },
+    "color": "#A9B4BD",
+    "quote": {
+      "text": "我一直以为海鸥是吵的，这只一声都不出，就站在那儿看海。",
+      "memoId": "mock_memo_whitby-h",
+      "at": "2022-10-15T12:16:00+01:00"
+    }
+  },
+  {
+    "id": "ceramic-mug-2021-04",
+    "photoUrl": "/seed/ceramic-mug.jpg",
+    "capturedAt": "2021-04-08T09:20:00+09:00",
+    "geo": {
+      "lat": 35.01,
+      "lng": 135.77,
+      "place": "日本 · 京都"
+    },
+    "label": "白瓷咖啡杯",
+    "firstSeen": true,
+    "cutoutUrl": null,
+    "model": null,
+    "rarity": {
+      "tier": "uncommon",
+      "score": 31,
+      "reason": "器物本身常见，手作白瓷的釉面在这个价位不常遇到"
+    },
+    "color": "#EFE7DC",
+    "quote": null
+  },
+  {
+    "id": "tabby-cat-2017-03",
+    "photoUrl": "/seed/cat.jpg",
+    "capturedAt": "2017-03-18T16:45:00+00:00",
+    "geo": {
+      "lat": 51.51,
+      "lng": -0.13,
+      "place": "英国 · 伦敦"
+    },
+    "label": "窗边虎斑猫",
+    "firstSeen": true,
+    "cutoutUrl": null,
+    "model": null,
+    "rarity": {
+      "tier": "common",
+      "score": 18,
+      "reason": "城市里最常见的猫，胜在那束光"
+    },
+    "color": "#B07D4A",
+    "quote": null
+  },
+  {
+    "id": "coffee-table-2020-11",
+    "photoUrl": "/seed/coffee-cup.jpg",
+    "capturedAt": "2020-11-14T14:10:00+11:00",
+    "geo": {
+      "lat": -37.81,
+      "lng": 144.96,
+      "place": "澳大利亚 · 墨尔本"
+    },
+    "label": "一组咖啡杯",
+    "firstSeen": false,
+    "cutoutUrl": null,
+    "model": null,
+    "rarity": {
+      "tier": "common",
+      "score": 9,
+      "reason": "你已经记录过同类器物，这次是重逢"
+    },
+    "color": "#C8B8A6",
+    "quote": null
+  }
+]

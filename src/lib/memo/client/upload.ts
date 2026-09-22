@@ -10,6 +10,8 @@ export async function uploadBlob(opts: {
   uploadId: string;
   blob: Blob;
   mime: string;
+  /** 声纹注册音频，有就在合并前先传给服务端 */
+  enroll?: { blob: Blob; durationMs: number };
   onProgress?: (confirmed: number, total: number) => void;
   signal?: AbortSignal;
 }): Promise<{ totalChunks: number; sizeBytes: number }> {
@@ -45,14 +47,25 @@ export async function uploadBlob(opts: {
     opts.onProgress?.(confirmed, total);
   }
 
+  // 注册音频传失败不影响主链路，定"我"退回响度就是了
+  let enrollMs: number | undefined;
+  if (opts.enroll && opts.enroll.blob.size > 0) {
+    try {
+      await memoApi.uploadEnroll(opts.uploadId, opts.enroll.durationMs, opts.enroll.blob);
+      enrollMs = opts.enroll.durationMs;
+    } catch {
+      enrollMs = undefined;
+    }
+  }
+
   try {
-    const done = await memoApi.finishUpload(opts.uploadId, total, opts.mime);
+    const done = await memoApi.finishUpload(opts.uploadId, total, opts.mime, enrollMs);
     return { totalChunks: total, sizeBytes: done.sizeBytes };
   } catch (error) {
     // 服务端说还缺块（比如某块写盘失败）：补传一次再合并
     if (error instanceof MemoApiError && error.code === "MISSING_CHUNKS" && Array.isArray(error.payload.missing)) {
       for (const index of error.payload.missing as number[]) await send(index);
-      const done = await memoApi.finishUpload(opts.uploadId, total, opts.mime);
+      const done = await memoApi.finishUpload(opts.uploadId, total, opts.mime, enrollMs);
       return { totalChunks: total, sizeBytes: done.sizeBytes };
     }
     throw error;

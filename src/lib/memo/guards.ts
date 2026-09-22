@@ -19,7 +19,7 @@ export interface GuardUtterance {
 }
 
 export interface GuardEvent {
-  code: "G1" | "G2" | "G2U" | "G3" | "G5" | "G8" | "G9" | "LEN";
+  code: "G1" | "G2" | "G2U" | "G3" | "G5" | "G8" | "G9" | "G10" | "LEN";
   kind: "guard" | "error";
   momentIndex: number;
   detail: string;
@@ -35,6 +35,8 @@ export interface GuardedMoment {
   othersParaphrase?: string;
   facts?: { entity: string; fact: string }[];
   backfillTarget?: { dayKey: string; place?: string; confidence: number };
+  /** G10 校验过的配图；不合法或抢不到就没有 */
+  photoId?: string;
   myQuotes: string[];
   uncertainQuotes: string[];
   speakerUncertain: boolean;
@@ -68,8 +70,17 @@ function longestCommonRun(a: string, b: string): number {
 
 export function applyGuards(
   modelMoments: ModelMoment[],
-  input: { mode: "session" | "backfill"; utterances: GuardUtterance[] },
+  input: {
+    mode: "session" | "backfill";
+    utterances: GuardUtterance[];
+    /** 本窗口允许配的照片 id（find_photos 的候选）。不传＝这一轮不允许配图 */
+    photoCandidateIds?: string[];
+  },
 ): { moments: GuardedMoment[]; events: GuardEvent[] } {
+  // G10 配图：只能选候选里的；drop 不配图；一段最多一张（schema 已保证）；同一张图只给一段。
+  // 按 salience 从高到低抢，先到先得——下面的循环本来就是这个顺序。
+  const allowedPhotos = new Set(input.photoCandidateIds ?? []);
+  const takenPhotos = new Set<string>();
   const byId = new Map(input.utterances.map((u) => [u.id, u]));
   const othersNormalized = input.utterances
     .filter((u) => u.speaker !== "me")
@@ -157,6 +168,18 @@ export function applyGuards(
     }
 
     const isDrop = decision === "drop";
+    // G10：配图校验
+    let photoId: string | undefined;
+    if (m.photoId) {
+      if (isDrop) push("G10", `drop 的片段不配图 → 丢掉 ${m.photoId}`);
+      else if (!allowedPhotos.has(m.photoId)) push("G10", `${m.photoId} 不在 find_photos 的候选里 → 丢掉`);
+      else if (takenPhotos.has(m.photoId)) push("G10", `${m.photoId} 已经被更重要的片段用了 → 这段留白`);
+      else {
+        photoId = m.photoId;
+        takenPhotos.add(m.photoId);
+      }
+    }
+
     for (const id of ids) covered.add(id);
     kept.push({ index, moment: {
       sourceUtteranceIds: sources.map((u) => u.id),
@@ -168,6 +191,7 @@ export function applyGuards(
       othersParaphrase: isDrop ? undefined : othersParaphrase,
       facts: isDrop ? undefined : m.facts,
       backfillTarget: isDrop ? undefined : backfillTarget,
+      photoId,
       // G4（D8）：原话由代码按 id 取，模型不产出。drop 的片段不长期保存原话（隐私：只在 7 天内的逐字稿里可见）
       myQuotes: isDrop ? [] : mine.map((u) => u.text),
       uncertainQuotes: isDrop ? [] : uncertain.map((u) => u.text),

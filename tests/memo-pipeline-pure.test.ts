@@ -2,9 +2,10 @@ import { describe, expect, it } from "vitest";
 import { degradeFromQuotes, normalizeForMatch, stripFillers } from "../src/lib/memo/fillers";
 import { rmsDb, speakerLoudness } from "../src/lib/memo/loudness";
 import { placeAt } from "../src/lib/memo/place";
-import { applySpeakerCorrection, assignSpeakerRoles } from "../src/lib/memo/speaker";
+import { selectForDiary } from "../src/lib/memo/select";
+import { applySpeakerCorrection, assignSpeakerRoles, openingSpeakerKey } from "../src/lib/memo/speaker";
 import { dayKeyIn, tzOffsetMinutes } from "../src/lib/memo/time";
-import type { TimelineEvent, Utterance } from "../src/lib/memo/types";
+import type { Moment, TimelineEvent, Utterance } from "../src/lib/memo/types";
 import { chunkCount, chunkRange, pendingChunks } from "../src/lib/memo/upload-plan";
 import { shouldSkipWithoutModel, splitWindows } from "../src/lib/memo/windows";
 
@@ -66,14 +67,36 @@ describe("定我：说话人三态", () => {
     expect(r.meSource).toBe("loudness");
   });
 
-  it("差距 < 3dB → 前两名都是 uncertain，不猜", () => {
+  it("差距 < 3dB → 仍然认最响的是我，但标 loudness_weak 让 UI 提示可纠正", () => {
+    // 旧行为是全员 uncertain，结果 G2U 把所有 keep 降成 fold，手记永远是空的。
+    // 真实录音的音量差几乎总在 3dB 以内，所以宁可给一个可一键纠正的答案。
     const r = assignSpeakerRoles([
       { key: "0:0", meanDb: -25.0, talkMs: 9_000 },
       { key: "0:1", meanDb: -24.0, talkMs: 9_000 },
       { key: "0:2", meanDb: -40.0, talkMs: 2_000 },
     ]);
-    expect(r.speakers.map((s) => s.role)).toEqual(["uncertain", "uncertain", "other"]);
+    expect(r.speakers.map((s) => s.role)).toEqual(["other", "me", "other"]);
+    expect(r.meSource).toBe("loudness_weak");
     expect(r.meUncertain).toBe(true);
+  });
+
+  it("开头自报家门胜过响度：开头说得最多的是我，哪怕他更轻", () => {
+    const meKey = openingSpeakerKey([
+      { beginMs: 200, endMs: 6_200, speakerKey: "0:1" },
+      { beginMs: 6_500, endMs: 8_000, speakerKey: "0:0" },
+      { beginMs: 12_000, endMs: 40_000, speakerKey: "0:0" },
+    ]);
+    expect(meKey).toBe("0:1");
+    const r = assignSpeakerRoles(
+      [
+        { key: "0:0", meanDb: -24.0, talkMs: 29_500 },
+        { key: "0:1", meanDb: -27.5, talkMs: 6_000 },
+      ],
+      { meKeys: meKey ? [meKey] : [] },
+    );
+    expect(r.speakers.find((s) => s.key === "0:1")?.role).toBe("me");
+    expect(r.meSource).toBe("opening");
+    expect(r.meUncertain).toBe(false);
   });
 
   it("只有一个人说话 → me；响度算不出来 → 全部 uncertain", () => {
@@ -153,5 +176,30 @@ describe("时区与地点", () => {
     expect(placeAt(events, "2026-09-22T06:40:00Z")).toMatchObject({ name: "伦敦 · 大本钟", confidence: "medium" });
     expect(placeAt(events, "2026-09-22T09:00:00Z", { name: "伦敦", source: "manual" })).toMatchObject({ name: "伦敦", confidence: "low" });
     expect(placeAt(events, "2026-09-22T06:03:00Z", { name: "我确认的地点", source: "manual", locked: true })).toMatchObject({ name: "我确认的地点", confidence: "high" });
+  });
+});
+
+describe("当日选段的间隔规则", () => {
+  const at = (min: number) => new Date(Date.UTC(2026, 8, 21, 2, min)).toISOString();
+  const mk = (id: string, min: number, salience: number) => ({
+    id, at: at(min), decision: "keep" as const, salience, speakerUncertain: false,
+    user: { copiedCount: 0 } as Moment["user"],
+  });
+
+  it("跨度 < 30 分钟的集中对话：同一分钟内的三段全部进正文，不被稀释", () => {
+    const r = selectForDiary([mk("a", 0, 0.9), mk("b", 0, 0.6), mk("c", 1, 0.9)]);
+    expect(r.paragraphIds.sort()).toEqual(["a", "b", "c"]);
+    expect(r.foldedIds).toEqual([]);
+  });
+
+  it("跨度 4 小时时，15 分钟间隔规则照常生效", () => {
+    const r = selectForDiary([mk("a", 0, 0.9), mk("b", 5, 0.6), mk("c", 240, 0.9)]);
+    expect(r.paragraphIds).not.toContain("b");
+    expect(r.foldedIds).toContain("b");
+  });
+
+  it("间隔内 salience ≥ 0.8 仍然能挤进来", () => {
+    const r = selectForDiary([mk("a", 0, 0.9), mk("b", 5, 0.85), mk("c", 240, 0.9)]);
+    expect(r.paragraphIds).toContain("b");
   });
 });

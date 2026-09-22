@@ -612,3 +612,160 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── 今日手记：页面本身要像一页日记，调试信息全部移到过程页 ───────── */
+
+.diaryBody {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin-top: 28px;
+}
+
+.diaryEntry {
+  position: relative;
+}
+
+/* 时间戳 + 一条细线：手记的结构就是时间线 */
+.diaryStamp {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-family: var(--mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.diaryStamp::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.diaryPhoto {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 18px;
+  border-radius: 4px;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+.diaryText {
+  margin: 0;
+  color: var(--ink);
+  font-size: 15.5px;
+  line-height: 1.95;
+  text-wrap: pretty;
+}
+
+.diaryEnd {
+  margin: 44px 0 0;
+  color: var(--line);
+  font-size: 16px;
+  letter-spacing: 0.7em;
+  text-align: center;
+}
+
+/* 每段的次级操作：平时只有一个很淡的 ···，点开才是看原话/改写/删除 */
+.entryMore {
+  margin-top: 10px;
+}
+
+.entryMoreSummary {
+  width: 44px;
+  padding: 2px 0;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  list-style: none;
+  opacity: 0.5;
+}
+
+.entryMoreSummary::-webkit-details-marker {
+  display: none;
+}
+
+/*
+ * 关键：.actions{display:flex} / .why{display:block} 这些作者样式会盖掉浏览器
+ * 对关闭态 <details> 的默认隐藏，导致"为什么留下"和操作按钮直接漏在手记上。
+ * 必须显式收起来。
+ */
+.entryMore:not([open]) > *:not(summary) {
+  display: none;
+}
+
+.entryMore[open] .entryMoreSummary {
+  opacity: 1;
+}
+
+.entryMoreSummary:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid var(--accent, currentColor);
+  outline-offset: 3px;
+}
+
+/* ── 声纹注册 ──────────────────────────────────────────────────── */
+
+.enrollPrompt {
+  margin: 0 0 6px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-wrap: balance;
+}
+
+.enrollCountdown {
+  margin: 14px 0;
+  color: var(--accent, var(--ink));
+  font-family: var(--mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 44px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: center;
+}
+
+.enrollOk {
+  margin: 12px 0 0;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.enrollHint {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.enrollHint span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.enrollHint strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.enrollHint small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}

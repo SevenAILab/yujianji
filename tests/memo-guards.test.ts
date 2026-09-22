@@ -80,4 +80,43 @@ describe("代码守卫", () => {
     const r = applyGuards([m({ why: "一".repeat(50) })], { mode: "session", utterances: window });
     expect([...r.moments[0].why].length).toBe(30);
   });
+
+  describe("G10：配图", () => {
+    const photos = { mode: "session" as const, utterances: window, photoCandidateIds: ["item_a", "item_b"] };
+
+    it("候选里的图正常配上", () => {
+      const r = applyGuards([m({ photoId: "item_a" })], photos);
+      expect(r.moments[0].photoId).toBe("item_a");
+    });
+
+    it("不在候选里的图 → 丢掉并记 G10", () => {
+      const r = applyGuards([m({ photoId: "item_x" })], photos);
+      expect(r.moments[0].photoId).toBeUndefined();
+      expect(r.events.some((e) => e.code === "G10")).toBe(true);
+    });
+
+    it("drop 的片段不配图", () => {
+      const r = applyGuards([m({ decision: "drop", category: "others_only", photoId: "item_a" })], photos);
+      expect(r.moments[0].photoId).toBeUndefined();
+      expect(r.events.some((e) => e.code === "G10")).toBe(true);
+    });
+
+    it("同一张图只给 salience 更高的那段，另一段留白", () => {
+      const r = applyGuards(
+        [
+          m({ sourceUtteranceIds: ["s:2"], salience: 0.5, photoId: "item_a" }),
+          m({ sourceUtteranceIds: ["s:1"], salience: 0.9, photoId: "item_a", category: "observation" }),
+        ],
+        photos,
+      );
+      const withPhoto = r.moments.filter((x) => x.photoId === "item_a");
+      expect(withPhoto).toHaveLength(1);
+      expect(withPhoto[0].salience).toBe(0.9);
+    });
+
+    it("这一轮没有候选时，任何 photoId 都不生效", () => {
+      const r = applyGuards([m({ photoId: "item_a" })], { mode: "session", utterances: window });
+      expect(r.moments[0].photoId).toBeUndefined();
+    });
+  });
 });

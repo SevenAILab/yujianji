@@ -143,7 +143,11 @@ export async function judgeWindow(req: JudgeRequest, opts: JudgeOptions = {}): P
     ...m,
     sourceUtteranceIds: m.sourceUtteranceIds.map((id) => longIds.get(id.trim()) ?? id),
   }));
-  const guarded = applyGuards(mapped, { mode: req.mode, utterances: req.window.utterances });
+  const guarded = applyGuards(mapped, {
+    mode: req.mode,
+    utterances: req.window.utterances,
+    photoCandidateIds: req.nearbyItems?.map((item) => item.id),
+  });
   for (const event of guarded.events) {
     trace.push({ kind: event.kind, name: event.code, ms: 0, summary: `片段 #${event.momentIndex + 1}：${event.detail}` });
   }

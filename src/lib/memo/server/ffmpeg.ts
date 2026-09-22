@@ -1,5 +1,6 @@
 // 转码：统一转单声道 16kHz AAC 给语音识别（说话人分离只支持单声道，D2），另出一份 8kHz PCM 算响度。
 import { spawn } from "node:child_process";
+import { rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 /** 超过 110 分钟按时长切成多段分别提交（官方建议开说话人分离时 ≤ 2 小时） */
@@ -107,4 +108,19 @@ export function planParts(durationSec: number, maxSec = PART_MAX_SEC): { partInd
 
 export async function cutPart(input16k: string, output: string, offsetSec: number, lengthSec: number): Promise<void> {
   await run(ffmpegPath(), ["-y", "-hide_banner", "-loglevel", "error", "-ss", String(offsetSec), "-t", String(lengthSec), "-i", input16k, "-c", "copy", output], 120_000);
+}
+
+/**
+ * 把 prefix 拼到 input 前面。两个文件都由 transcode() 产出（16k 单声道 AAC），
+ * 参数一致才能 -c copy，不重新编码。用于给每个 ASR 分段都带上声纹注册段。
+ */
+export async function prependAudio(prefix: string, input: string, output: string): Promise<void> {
+  const list = `${output}.concat.txt`;
+  const esc = (p: string) => p.replace(/'/g, "'\\''");
+  await writeFile(list, `file '${esc(path.resolve(prefix))}'\nfile '${esc(path.resolve(input))}'\n`, "utf8");
+  try {
+    await run(ffmpegPath(), ["-y", "-hide_banner", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", list, "-c", "copy", output], 120_000);
+  } finally {
+    await rm(list, { force: true });
+  }
 }

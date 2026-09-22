@@ -9,7 +9,7 @@ import { db } from "../../db";
 import { degradeFromQuotes } from "../fillers";
 import { placeAt, placeLabel } from "../place";
 import { quotesForWriting, selectForDiary } from "../select";
-import { applySpeakerCorrection, assignSpeakerRoles } from "../speaker";
+import { applySpeakerCorrection, assignSpeakerRoles, openingSpeakerKey } from "../speaker";
 import { addMs, clockIn, dayKeyIn, deviceTimeZone, shortDay } from "../time";
 import type {
   AgentTrace,
@@ -247,10 +247,13 @@ async function doUpload(session: MemoSession, progress: (s: PipelineProgress["st
   if (!blob || blob.size === 0) throw new MemoApiError("NO_AUDIO", 0, "找不到这段录音的音频");
   const mime = audio?.mime ?? session.mime ?? blob.type ?? "audio/mp4";
   const uploadId = session.uploadId!;
+  // 声纹注册过就带上那段音频，服务端会拼到每个 ASR 分段前面用来定"我"
+  const voiceprint = await db.memoVoiceprint.get("me").catch(() => undefined);
   const result = await uploadBlob({
     uploadId,
     blob,
     mime,
+    ...(voiceprint?.blob ? { enroll: { blob: voiceprint.blob, durationMs: voiceprint.durationMs } } : {}),
     onProgress: (done, total) => progress("uploading", `上传录音 ${done}/${total} 块`, done, total),
   });
   await patchSession(session.id, { status: "preparing", totalChunks: result.totalChunks, confirmedChunks: result.totalChunks });
@@ -301,9 +304,16 @@ async function doTranscribe(session: MemoSession, progress: (s: PipelineProgress
 
 async function storeTranscript(session: MemoSession, status: Awaited<ReturnType<typeof memoApi.transcribeStatus>>, waitedMs: number): Promise<void> {
   const stats = status.speakers ?? [];
+  // 定"我"的优先级：
+  // 1) 声纹注册——服务端把注册音频拼在每个分段前，直接告诉我们每段哪个说话人是"我"，最可靠
+  // 2) App 内录音的"开头自报家门"——用户按下录音键后先开口
+  // 3) 都没有（比如导入的语音备忘录）→ 退回响度
+  const enrolled = status.meSpeakerKeys ?? [];
+  const opening = !enrolled.length && session.kind === "in_app" ? openingSpeakerKey(status.sentences ?? []) : null;
+  const meKeys = enrolled.length ? enrolled : opening ? [opening] : [];
   const assignment = status.speakersDegraded
     ? { speakers: stats.map((s) => ({ ...s, role: "uncertain" as const })), meSource: "unavailable" as const, meUncertain: true }
-    : assignSpeakerRoles(stats);
+    : assignSpeakerRoles(stats, { meKeys, meKeySource: enrolled.length ? "enrolled" : "opening" });
   const roleOf = new Map(assignment.speakers.map((s) => [s.key, s.role]));
   const expiresAt = new Date(Date.now() + UTTERANCE_TTL_MS).toISOString();
   const utterances: Utterance[] = (status.sentences ?? []).map((s, index) => ({
@@ -412,6 +422,7 @@ function toMoment(
     sourceUtteranceIds: m.sourceUtteranceIds,
     ...(m.othersParaphrase ? { othersParaphrase: m.othersParaphrase } : {}),
     ...(m.facts?.length ? { facts: m.facts } : {}),
+    ...(m.photoId ? { photoId: m.photoId } : {}),
     ...(backfill ? { backfill } : {}),
     guardNotes: m.guardNotes,
     user: { copiedCount: 0 },

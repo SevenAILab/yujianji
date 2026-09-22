@@ -28,9 +28,35 @@ function rulesPayload(profile: Profile) {
   return activeRules(profile).map(({ id, kind, text, origin, locked }) => ({ id, kind, text: text.slice(0, 80), origin, locked }));
 }
 
-async function nearbyItems(atIso: string): Promise<JudgeRequest["nearbyItems"]> {
+/** 同一地点的判定半径：GPS 在城市里误差不小，2km 足够把"同一个场馆/街区"圈进来 */
+const SAME_PLACE_KM = 2;
+
+function distanceKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const h =
+    Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+/**
+ * 配图候选：时间 ±90 分钟，且（有坐标时）离当时的位置 2km 以内。
+ * 时间和地点只负责缩小候选，**挑哪一张由 Agent 按内容判断**——时间最近 ≠ 内容对应。
+ */
+async function nearbyItems(atIso: string, here?: { lat: number; lng: number }): Promise<JudgeRequest["nearbyItems"]> {
   const at = new Date(atIso).getTime();
-  const items = await db.items.filter((item) => !item.isSeed && Math.abs(new Date(item.date).getTime() - at) <= 90 * 60_000).limit(40).toArray();
+  const items = await db.items
+    .filter((item) => {
+      if (item.isSeed) return false;
+      if (Math.abs(new Date(item.date).getTime() - at) > 90 * 60_000) return false;
+      // 两边都有坐标才按距离筛；缺坐标的照片不因此被排除，交给 Agent 看名字
+      if (!here || item.lat === null || item.lng === null) return true;
+      return distanceKm(here, { lat: item.lat, lng: item.lng }) <= SAME_PLACE_KM;
+    })
+    .limit(40)
+    .toArray();
   return items.length ? items.map((item) => ({ id: item.id, name: item.name.slice(0, 80), place: item.place.slice(0, 120), time: item.date.slice(0, 40) })) : undefined;
 }
 
@@ -81,7 +107,12 @@ export async function buildJudgeRequest(input: {
     learnedExamples,
     todayKept,
     memoryIndex,
-    nearbyItems: await nearbyItems(windowAt).catch(() => undefined),
+    nearbyItems: await nearbyItems(
+      windowAt,
+      session.place?.lat !== undefined && session.place?.lng !== undefined
+        ? { lat: session.place.lat, lng: session.place.lng }
+        : undefined,
+    ).catch(() => undefined),
   };
 }
 

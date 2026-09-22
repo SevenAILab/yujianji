@@ -41,7 +41,13 @@ function toolsSection(maxToolCalls: number, hasPhotos: boolean, hasMemory: boole
   return [
     ...(hasMemory ? ["- recall_memory：翻用户过去留下和折叠的片段索引。mode=backfill（补一段）时必须先调用，用它确定说的是哪天、哪个地方；判断时怀疑和今天或以前的内容重复，也可以调用。"] : []),
     "- lookup_fact：只在用户提到具体实体（地名、建筑、菜名、历史），补一句背景能让手记更好时调用；返回的事实会标「AI 补充，未经核实」。",
-    ...(hasPhotos ? ["- find_photos：感想指向一个看到的东西时，找同一时间拍的照片。"] : []),
+    ...(hasPhotos
+      ? [
+          "- find_photos：感想指向一个看到的东西时，找同一时间拍的照片。",
+          "  拿到候选后，**只有照片的名字和这段感想讲的确实是同一个事物时**，才把它的 id 填进该片段的 photoId。",
+          "  名字对不上就不要填——手记里留白远好过配错图。每段最多一张，决定 drop 的片段一律不填。",
+        ]
+      : []),
     `- 业务工具合计最多 ${maxToolCalls} 次，不需要就一次都不调。工具返回 {"error": ...} 时，自己决定换参数重试还是放弃。`,
     `- 最后必须调用 ${JUDGE_SUBMIT_NAME} 交卷。`,
   ].join("\n");

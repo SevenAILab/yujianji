@@ -110,6 +110,8 @@ export const modelMomentSchema = z.object({
   why: z.string().max(80),
   othersParaphrase: z.string().max(120).optional(),
   facts: z.array(z.object({ entity: z.string().max(40), fact: z.string().max(160) })).max(3).optional(),
+  /** 配图，最多一张。必须是 find_photos 返回过的候选 id，守卫会校验；内容对不上就不要填 */
+  photoId: idSchema.optional(),
   backfillTarget: z
     .object({ dayKey: z.string().max(20), place: z.string().max(80).optional(), confidence: z.number().min(0).max(1) })
     .optional(),

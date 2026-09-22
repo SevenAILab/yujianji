@@ -15,6 +15,12 @@ export function effectiveDecision(m: Pick<Moment, "decision" | "user">): Decisio
   return m.decision;
 }
 
+/**
+ * 当天所有片段的时间跨度短于它，就不做间隔稀释——那本来就是一段集中的对话，
+ * 按 15 分钟去稀释会把一段 3 分钟录音里的好内容全挤进折叠区。
+ */
+export const NO_SPACING_SPAN_MS = 30 * 60_000;
+
 export function selectForDiary<T extends Selectable>(moments: T[]): { paragraphIds: string[]; foldedIds: string[] } {
   const time = (m: T) => new Date(m.at).getTime();
   const restored = moments.filter((m) => m.user.decision === "keep");
@@ -22,10 +28,14 @@ export function selectForDiary<T extends Selectable>(moments: T[]): { paragraphI
     .filter((m) => m.user.decision === undefined && m.decision === "keep" && !m.speakerUncertain && m.salience >= MIN_SALIENCE)
     .sort((a, b) => b.salience - a.salience || time(a) - time(b));
 
+  const stamps = moments.map(time).filter(Number.isFinite);
+  const span = stamps.length ? Math.max(...stamps) - Math.min(...stamps) : 0;
+  const spacing = span < NO_SPACING_SPAN_MS ? 0 : SPACING_MS;
+
   const selected: T[] = [...restored];
   for (const m of candidates) {
     if (selected.length >= Math.max(DIARY_MAX_PARAGRAPHS, restored.length)) break;
-    const crowded = selected.some((s) => Math.abs(time(s) - time(m)) < SPACING_MS);
+    const crowded = spacing > 0 && selected.some((s) => Math.abs(time(s) - time(m)) < spacing);
     if (crowded && m.salience < SPACING_OVERRIDE_SALIENCE) continue;
     selected.push(m);
   }

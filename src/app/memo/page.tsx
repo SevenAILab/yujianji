@@ -25,6 +25,7 @@ export default function MemoHomePage() {
   const sessions = useLiveQuery(() => db.memoSessions.orderBy("startedAt").reverse().limit(30).toArray(), [], []);
   const todayMoments = useLiveQuery(() => (today ? db.moments.where("dayKey").equals(today).toArray() : []), [today], []);
   const diaries = useLiveQuery(() => db.diaryDays.orderBy("dayKey").reverse().limit(14).toArray(), [], []);
+  const voiceprint = useLiveQuery(() => db.memoVoiceprint.get("me"), [], undefined);
   const resumed = useRef(false);
 
   useEffect(() => {
@@ -77,6 +78,17 @@ export default function MemoHomePage() {
 
         {LOCAL_ONLY ? (
           <div className={styles.warning} style={{ marginTop: 16 }}>离线本地版不支持遇见手记：录音需要上传到服务器转文字。</div>
+        ) : null}
+
+        {/* 没认过声音就提示一次。可点可忽略，不挡住录音入口 */}
+        {voiceprint === undefined && !LOCAL_ONLY ? (
+          <Link className={styles.enrollHint} href="/memo/enroll">
+            <UserRound size={15} />
+            <span>
+              <strong>先让我认识你的声音</strong>
+              <small>录音里不止你一个人说话，认过之后我才知道哪几句是你说的</small>
+            </span>
+          </Link>
         ) : null}
 
         <nav className={styles.entries} aria-label="记录入口">

@@ -37,6 +37,8 @@ export interface UploadState {
   parts?: UploadPart[];
   /** 与 parts 按下标对齐；空串 = 该段还没提交 */
   taskIds?: string[];
+  /** 声纹注册音频的毫秒数。>0 表示每个 ASR 分段前都拼了这段，识别后要剥掉并回正时间轴 */
+  enrollMs?: number;
   /** 失败时停在哪一步，重试从这里继续 */
   failedAt?: "prepare" | "submit" | "asr";
   error?: { code: string; message: string };
@@ -64,6 +66,16 @@ export function chunksDir(uploadId: string): string {
 
 export function chunkPath(uploadId: string, index: number): string {
   return path.join(chunksDir(uploadId), `${String(index).padStart(5, "0")}.part`);
+}
+
+/** 声纹注册音频：用户首次录的那 8 秒，原始容器 */
+export function enrollSourcePath(uploadId: string): string {
+  return path.join(uploadDir(uploadId), "enroll.src");
+}
+
+/** 注册音频转码后的 16k 单声道，和正文分段参数一致，才能 -c copy 拼接 */
+export function enroll16kPath(uploadId: string): string {
+  return path.join(uploadDir(uploadId), "enroll16k.m4a");
 }
 
 export function statePath(uploadId: string): string {
