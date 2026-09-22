@@ -110,7 +110,8 @@ export default function MePage() {
       const summary = await importBackup(file);
       await refreshHealth();
       setNotice(
-        `导入完成：新增 ${summary.added} 条，更新 ${summary.updated} 条，已有且更新的跳过 ${summary.skipped} 条。`,
+        `导入完成：新增 ${summary.added} 条，更新 ${summary.updated} 条，已有且更新的跳过 ${summary.skipped} 条。` +
+          (summary.memo ? `另外恢复了 ${summary.memo} 条遇见手记记录（逐字稿按 7 天清理的约定不在备份里）。` : ""),
       );
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "导入失败，请确认文件正确。");

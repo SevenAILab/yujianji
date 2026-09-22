@@ -6,14 +6,35 @@ import { itemSchema, tripSchema } from "./schema";
 import type { Item, Trip } from "./types";
 import { markExported } from "./storage-health";
 
-export const BACKUP_VERSION = 1;
+export const BACKUP_VERSION = 2;
 
+/**
+ * v2 起备份包含遇见手记。
+ *
+ * 之前只备份照片，但隐私页明确告诉用户「定期导出备份」——用户照做、换了设备，
+ * 手记、片段、画像会全部丢失。手记数据只存在这台手机上，备份是唯一的出路。
+ *
+ * **逐字稿（utterances）故意不备份**：它有 7 天 TTL，含同伴的原话，
+ * 产品承诺到期清理。备份里带上它等于绕过这个承诺。
+ * 手记里"我"的原话存在 moment.myQuotes 上，随片段一起备份，不受影响。
+ */
 const backupSchema = z.object({
   format: z.literal("yujianji-backup"),
   version: z.number().int().positive(),
   exportedAt: z.string(),
   items: itemSchema.array(),
   trips: tripSchema.array().optional(),
+  memo: z
+    .object({
+      sessions: z.array(z.unknown()),
+      moments: z.array(z.unknown()),
+      diaryDays: z.array(z.unknown()),
+      profiles: z.array(z.unknown()),
+      feedbackEvents: z.array(z.unknown()),
+      timeline: z.array(z.unknown()),
+      traces: z.array(z.unknown()),
+    })
+    .optional(),
 });
 
 export type BackupFile = z.infer<typeof backupSchema>;
@@ -23,6 +44,8 @@ export interface ImportSummary {
   updated: number;
   skipped: number;
   trips: number;
+  /** v2：恢复的手记相关记录条数（会话 + 片段 + 手记 + 画像 + 反馈 + 时间轴 + 过程） */
+  memo: number;
 }
 
 /**
@@ -32,9 +55,17 @@ export interface ImportSummary {
  * 它不是合规摆设，是核心功能 —— 别为了文件小把 photo 删掉。
  */
 export async function buildBackup(): Promise<BackupFile> {
-  const [items, trips] = await Promise.all([
+  const empty = <T>() => [] as T[];
+  const [items, trips, sessions, moments, diaryDays, profiles, feedbackEvents, timeline, traces] = await Promise.all([
     db.items.toArray(),
-    db.trips.toArray().catch(() => [] as Trip[]),
+    db.trips.toArray().catch(() => empty<Trip>()),
+    db.memoSessions.toArray().catch(empty),
+    db.moments.toArray().catch(empty),
+    db.diaryDays.toArray().catch(empty),
+    db.profiles.toArray().catch(empty),
+    db.feedbackEvents.toArray().catch(empty),
+    db.timeline.toArray().catch(empty),
+    db.agentTraces.toArray().catch(empty),
   ]);
   return {
     format: "yujianji-backup",
@@ -43,6 +74,8 @@ export async function buildBackup(): Promise<BackupFile> {
     // 示例数据不属于用户，不进备份，免得导入后越滚越多。
     items: items.filter((item) => !item.isSeed),
     trips,
+    // 逐字稿不在这里：7 天 TTL 是对同伴原话的承诺，备份不能绕过它
+    memo: { sessions, moments, diaryDays, profiles, feedbackEvents, timeline, traces },
   };
 }
 
@@ -134,7 +167,25 @@ export async function importBackup(file: File): Promise<ImportSummary> {
     trips = parsed.data.trips.length;
   }
 
-  return { added, updated, skipped, trips };
+  // v2：手记。整表覆盖式写入，同 id 以备份为准；逐字稿不在备份里，恢复后过程页看不到原句，这是有意的。
+  let memo = 0;
+  const m = parsed.data.memo;
+  if (m) {
+    const put = async (table: { bulkPut: (rows: never[]) => Promise<unknown> }, rows: unknown[]) => {
+      if (!rows.length) return;
+      await table.bulkPut(rows as never[]);
+      memo += rows.length;
+    };
+    await put(db.memoSessions, m.sessions);
+    await put(db.moments, m.moments);
+    await put(db.diaryDays, m.diaryDays);
+    await put(db.profiles, m.profiles);
+    await put(db.feedbackEvents, m.feedbackEvents);
+    await put(db.timeline, m.timeline);
+    await put(db.agentTraces, m.traces);
+  }
+
+  return { added, updated, skipped, trips, memo };
 }
 
 /** 删除本机全部用户数据。示例数据一并清掉，回到全新状态。 */

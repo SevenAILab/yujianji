@@ -1,5 +1,6 @@
+import "fake-indexeddb/auto";
 import { describe, expect, it } from "vitest";
-import { mergeBackupItems } from "../src/lib/backup";
+import { buildBackup, BACKUP_VERSION, mergeBackupItems } from "../src/lib/backup";
 import { itemSchema } from "../src/lib/schema";
 import type { Item } from "../src/lib/types";
 
@@ -70,5 +71,17 @@ describe("备份合并", () => {
     ];
     const result = mergeBackupItems(incoming, existing);
     expect(result).toMatchObject({ added: 1, updated: 1, skipped: 1 });
+  });
+});
+
+describe("备份包含遇见手记（v2）", () => {
+  it("手记数据进备份，但逐字稿不进——7 天 TTL 是对同伴原话的承诺", async () => {
+    expect(BACKUP_VERSION).toBe(2);
+    const backup = await buildBackup();
+    expect(backup.memo).toBeDefined();
+    expect(Object.keys(backup.memo!).sort()).toEqual(
+      ["diaryDays", "feedbackEvents", "moments", "profiles", "sessions", "timeline", "traces"],
+    );
+    expect(Object.keys(backup.memo!)).not.toContain("utterances");
   });
 });
