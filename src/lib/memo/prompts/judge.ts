@@ -43,9 +43,7 @@ function toolsSection(maxToolCalls: number, hasPhotos: boolean, hasMemory: boole
     "- lookup_fact：只在用户提到具体实体（地名、建筑、菜名、历史），补一句背景能让手记更好时调用；返回的事实会标「AI 补充，未经核实」。",
     ...(hasPhotos
       ? [
-          "- find_photos：感想指向一个看到的东西时，找同一时间拍的照片。",
-          "  拿到候选后，**只有照片的名字和这段感想讲的确实是同一个事物时**，才把它的 id 填进该片段的 photoId。",
-          "  名字对不上就不要填——手记里留白远好过配错图。每段最多一张，决定 drop 的片段一律不填。",
+          "- find_photos：**配图用不着它**——候选照片已经列在下面了，直接挑。只有 mode=backfill 要推断是哪天、哪个地方时才调用。",
         ]
       : []),
     `- 业务工具合计最多 ${maxToolCalls} 次，不需要就一次都不调。工具返回 {"error": ...} 时，自己决定换参数重试还是放弃。`,
@@ -61,6 +59,7 @@ function outputRules(mode: JudgeRequest["mode"]): string {
     "- salience 0–1：keep 越具体、越打动人越高（0.5–1）；fold 0.2–0.5；drop 0–0.2。",
     "- othersParaphrase（可选）：同伴的话引出了用户的感想时填，写成转述 + 署名，如「朋友说他们四点就下班」，≤ 40 字，不加引号，不照抄原话。",
     "- facts（可选）：只能填 lookup_fact 这一轮真实返回过的内容，entity 与调用时一致。",
+    "- photoId（可选）：**只有照片的名字和这段讲的确实是同一个事物时**才填，从上面给的候选里抄 id。名字对不上就别填——留白远好过配错图。每段最多一张，drop 的片段一律不填，同一张图不要给两段。",
     "- 不要复述用户原话（代码会按 id 取原文）；任何字段里都不要出现「说话人 0 / 1」「speaker」「[me]」这类标记。",
     "- 拿不准就用 fold，并在 why 写原因。",
     ...(mode === "backfill"
@@ -134,7 +133,15 @@ export function buildJudgeUserPrompt(req: JudgeRequest, shortIds: Map<string, st
     `本场笔记（上一个窗口留下的）：${req.sessionNotes || "（这是第一个窗口）"}`,
     `今天已经留下的片段（避免重复）：${req.todayKept.length ? `\n${req.todayKept.map((line) => `- ${line}`).join("\n")}` : "（还没有）"}`,
     `记忆索引：共 ${req.memoryIndex.length} 条，需要时用 recall_memory 查。`,
-    ...(req.nearbyItems?.length ? [`附近照片：${req.nearbyItems.length} 张，需要时用 find_photos 查。`] : []),
+    ...(req.nearbyItems?.length
+      ? [
+          "",
+          "## 这段时间前后你拍的照片（配图只能从这里选）",
+          ...req.nearbyItems
+            .slice(0, 10)
+            .map((item) => `- ${item.id} ｜ ${item.name} ｜ ${clockIn(item.time, req.session.timeZone)}${item.place ? ` ｜ ${item.place}` : ""}`),
+        ]
+      : []),
     "",
     `## 窗口（按时间顺序，[mm:ss] 是相对录音开始的时间）`,
     ...lines,

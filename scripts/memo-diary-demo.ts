@@ -159,6 +159,20 @@ async function main() {
     if (d.foldedMomentIds.length) console.log(`   折叠区 ${d.foldedMomentIds.length} 条`);
   }
 
+  // Agent 到底做了什么：步数、工具调用、结局。judge 超预算时靠它定位
+  const traces = await db.agentTraces.toArray();
+  console.log(`\nAgent 过程：`);
+  for (const t of traces.sort((a, b) => a.startedAt.localeCompare(b.startedAt))) {
+    const tools = t.steps.filter((x) => x.kind === "tool");
+    const byTool = new Map<string, number>();
+    for (const x of tools) byTool.set(x.name, (byTool.get(x.name) ?? 0) + 1);
+    const toolText = byTool.size ? [...byTool].map(([n, c]) => `${n}×${c}`).join(" ") : "没调工具";
+    console.log(`  ${t.scope.padEnd(9)} ${String(t.outcome ?? "?").padEnd(8)} ${String(Math.round((t.ms ?? 0) / 100) / 10).padStart(6)}s  步数 ${String(t.steps.length).padStart(2)}  ${toolText}${t.limitHit ? `  撞了上限=${t.limitHit}` : ""}`);
+    for (const x of t.steps.filter((y) => y.kind === "error" || y.kind === "degrade")) {
+      console.log(`      ${x.kind}: ${x.summary.slice(0, 110)}`);
+    }
+  }
+
   // 配图自检：只报事实，不替 Agent 做匹配
   const keeps = moments.filter((m) => m.decision !== "drop");
   const withPhoto = keeps.filter((m) => m.photoId);
