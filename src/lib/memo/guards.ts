@@ -11,6 +11,15 @@ export const BACKFILL_AUTO_CONFIDENCE = 0.6;
 /** 转述里和他人原话连续相同的字数达到它，视为照抄原话 */
 export const PARAPHRASE_VERBATIM_RUN = 12;
 
+/**
+ * 只有"说的就是眼前这个东西"的类别才配图。
+ * reflection / memory / retold_fact 讲的是心里的事，不是眼前的物；
+ * 同时段恰好拍了张照片，不代表那张照片就是这段话在讲的东西。
+ * 实测踩过：用户拍了盆植物、口述的是别处的悬崖，模型把"要经历时间冲刷才能长成
+ * 特别的样子"这句反思配到了那盆植物上——时间接近，内容无关。
+ */
+export const PHOTO_CATEGORIES = new Set<MomentCategory>(["observation", "first_experience", "difference"]);
+
 export interface GuardUtterance {
   id: string;
   offsetMs: number;
@@ -172,7 +181,8 @@ export function applyGuards(
     let photoId: string | undefined;
     if (m.photoId) {
       if (isDrop) push("G10", `drop 的片段不配图 → 丢掉 ${m.photoId}`);
-      else if (!allowedPhotos.has(m.photoId)) push("G10", `${m.photoId} 不在 find_photos 的候选里 → 丢掉`);
+      else if (!PHOTO_CATEGORIES.has(category)) push("G10", `${category} 讲的不是眼前的东西 → 不配图`);
+      else if (!allowedPhotos.has(m.photoId)) push("G10", `${m.photoId} 不在候选里 → 丢掉`);
       else if (takenPhotos.has(m.photoId)) push("G10", `${m.photoId} 已经被更重要的片段用了 → 这段留白`);
       else {
         photoId = m.photoId;

@@ -116,7 +116,10 @@ export default function MemoHomePage() {
         <h2 className={styles.sectionTitle}>今天的录音</h2>
         <section className={styles.card}>
           {todaySessions.length === 0 ? (
-            <p className={`${styles.muted} ${styles.small}`}>今天还没有录音。</p>
+            <p className={`${styles.muted} ${styles.small}`}>
+              今天还没有录音。
+              {diaries[0] ? <> 昨天以前的都在下面的「这些天」里，<Link href={`/memo/day/${diaries[0].dayKey}`}>去看 {shortDay(diaries[0].dayKey)} 的手记</Link>。</> : null}
+            </p>
           ) : (
             todaySessions.map((s) => {
               const p = progress[s.id];

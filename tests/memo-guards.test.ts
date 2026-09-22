@@ -118,5 +118,25 @@ describe("代码守卫", () => {
       const r = applyGuards([m({ photoId: "item_a" })], { mode: "session", utterances: window });
       expect(r.moments[0].photoId).toBeUndefined();
     });
+
+    it("reflection 讲的是心里的事，不配图（实测踩过：植物照片配到了悬崖的反思上）", () => {
+      const r = applyGuards([m({ category: "reflection", photoId: "item_a" })], photos);
+      expect(r.moments[0].photoId).toBeUndefined();
+      expect(r.events.some((e) => e.code === "G10")).toBe(true);
+    });
+
+    it("memory / retold_fact 同样不配图", () => {
+      for (const category of ["memory", "retold_fact"] as const) {
+        const r = applyGuards([m({ category, photoId: "item_a" })], photos);
+        expect(r.moments[0].photoId).toBeUndefined();
+      }
+    });
+
+    it("observation / first_experience / difference 才配图", () => {
+      for (const category of ["observation", "first_experience", "difference"] as const) {
+        const r = applyGuards([m({ category, photoId: "item_a" })], photos);
+        expect(r.moments[0].photoId).toBe("item_a");
+      }
+    });
   });
 });

@@ -17,6 +17,17 @@ import { clockIn, dayKeyIn } from "@/lib/memo/time";
 import type { MemoSession } from "@/lib/memo/types";
 import styles from "../../memo.module.css";
 
+/** 每种定"我"的方式对应一句人话。少了哪一种，UI 就会说出不符合实际的解释。 */
+const ME_SOURCE_TEXT: Record<string, string> = {
+  enrolled: "认出了你注册过的声音。",
+  opening: "录音一开始说话的是你。",
+  loudness: "按音量判断：手机在你身上，最响的通常是你。",
+  loudness_weak: "几位说话人音量接近，先按最响的当你——认错了就改。",
+  single_speaker: "只有一位说话人，默认是你。",
+  user: "你手动指定过。",
+  unavailable: "这次算不出响度。",
+};
+
 const STAGE_LABEL = { upload: "上传", prepare: "转码+临时存储", transcribe: "转文字", triage: "粗筛", judge: "判断", write: "写作" } as const;
 
 function mmss(ms: number): string {
@@ -67,6 +78,38 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         await runPipeline(s.id, { retry: true, onProgress: setProgress });
       }
     });
+
+  // 说话人选择器：认准了的时候收在「认错了？」里，拿不准时直接展开
+  const speakerPicker = (
+    <>
+      {(session?.speakers ?? []).map((s) => {
+        const sample = utterances.find((u) => u.speakerKey === s.key)?.text ?? "";
+        return (
+          <label key={s.key} className={styles.listItem} style={{ gridTemplateColumns: "auto 1fr", alignItems: "start", columnGap: 10 }}>
+            <input
+              type="checkbox"
+              checked={selectedMe.includes(s.key)}
+              onChange={(e) => setMeKeys(e.target.checked ? [...selectedMe, s.key] : selectedMe.filter((k) => k !== s.key))}
+            />
+            <span className={styles.small}>
+              <span className={`${styles.badge} ${s.role === "me" ? styles.keep : s.role === "uncertain" ? styles.badgeWarn : styles.badgeMuted}`}>{SPEAKER_LABEL[s.role]}</span> 说话人 {s.key} · {s.meanDb === null ? "响度未知" : `${s.meanDb} dB`} · 说了 {Math.round(s.talkMs / 1000)} 秒
+              <br />
+              <span className={styles.muted}>「{sample.slice(0, 32)}{sample.length > 32 ? "…" : ""}」</span>
+            </span>
+          </label>
+        );
+      })}
+      <button
+        type="button"
+        className={`${styles.button} ${styles.buttonPrimary}`}
+        style={{ marginTop: 8 }}
+        disabled={busy || !selectedMe.length || !utterances.length}
+        onClick={() => void act(() => correctSpeakers(id, selectedMe, { onProgress: setProgress }))}
+      >
+        按勾选的"我"重新判断这场
+      </button>
+    </>
+  );
 
   return (
     <Shell>
@@ -135,39 +178,20 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
           <section className={styles.card}>
             {session.meUncertain ? (
               <div className={styles.warning} style={{ marginBottom: 10 }}>
-                {session.meSource === "unavailable" ? "这次算不出响度，" : "几位说话人的音量差不多，"}拿不准哪位是你。拿不准的话只会进折叠区，不会写进手记正文。勾选你自己，再重新判断这场。
+                {session.meSource === "unavailable" ? "这次算不出响度，" : "几位说话人的音量差不多，"}拿不准哪位是你。勾选你自己，再重新判断这场。
               </div>
             ) : (
-              <p className={`${styles.small} ${styles.muted}`} style={{ marginTop: 0 }}>
-                {session.meSource === "user" ? "你手动指定过。" : session.meSource === "single_speaker" ? "只有一位说话人，默认是你。" : "按音量判断：手机在你身上，最响的通常是你。认错了就在下面改。"}
-              </p>
+              <p className={`${styles.small} ${styles.muted}`} style={{ marginTop: 0 }}>{ME_SOURCE_TEXT[session.meSource ?? "loudness"]}</p>
             )}
-            {session.speakers.map((s) => {
-              const sample = utterances.find((u) => u.speakerKey === s.key)?.text ?? "";
-              return (
-                <label key={s.key} className={styles.listItem} style={{ gridTemplateColumns: "auto 1fr", alignItems: "start", columnGap: 10 }}>
-                  <input
-                    type="checkbox"
-                    checked={selectedMe.includes(s.key)}
-                    onChange={(e) => setMeKeys(e.target.checked ? [...selectedMe, s.key] : selectedMe.filter((k) => k !== s.key))}
-                  />
-                  <span className={styles.small}>
-                    <span className={`${styles.badge} ${s.role === "me" ? styles.keep : s.role === "uncertain" ? styles.badgeWarn : styles.badgeMuted}`}>{SPEAKER_LABEL[s.role]}</span> 说话人 {s.key} · {s.meanDb === null ? "响度未知" : `${s.meanDb} dB`} · 说了 {Math.round(s.talkMs / 1000)} 秒
-                    <br />
-                    <span className={styles.muted}>「{sample.slice(0, 32)}{sample.length > 32 ? "…" : ""}」</span>
-                  </span>
-                </label>
-              );
-            })}
-            <button
-              type="button"
-              className={`${styles.button} ${styles.buttonPrimary}`}
-              style={{ marginTop: 8 }}
-              disabled={busy || !selectedMe.length || !utterances.length}
-              onClick={() => void act(() => correctSpeakers(id, selectedMe, { onProgress: setProgress }))}
-            >
-              按勾选的"我"重新判断这场
-            </button>
+            {/* 认准了就不铺开：说话人列表会把每个人说的原话摊出来，看着尴尬。要改再展开 */}
+            {!session.meUncertain ? (
+              <details className={styles.entryMore} style={{ marginTop: 6 }}>
+                <summary className={`${styles.small} ${styles.muted}`} style={{ cursor: "pointer" }}>认错了？点这里改</summary>
+                <div style={{ marginTop: 10 }}>{speakerPicker}</div>
+              </details>
+            ) : (
+              speakerPicker
+            )}
           </section>
         </>
       ) : null}
