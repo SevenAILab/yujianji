@@ -5,6 +5,7 @@
 //   npx tsx scripts/memo-diary-demo.ts --mode import
 //   npx tsx scripts/memo-diary-demo.ts --mode in-app --base http://localhost:3100
 //   npx tsx scripts/memo-diary-demo.ts --mode import --fixture spikes/memo/fixtures/expo-3min.m4a --no-photos
+//   npx tsx scripts/memo-diary-demo.ts --mode import --enroll spikes/memo/fixtures/enroll-me.m4a
 //
 // --no-photos 时不写入任何照片，用来单独验"定我 + 筛选"这一段。
 // 写入的照片是本仓库 public/seed 下的真实图片，但**名字是为了跑通流程编的**，
@@ -24,6 +25,8 @@ const mode = (arg("mode", "import") as Mode);
 const base = arg("base", "https://yujianji.mcs-eco.com")!;
 const fixture = arg("fixture", "spikes/memo/fixtures/expo-3min.m4a")!;
 const withPhotos = !has("no-photos");
+/** 声纹注册音频：给了就走"每个分段拼注册前缀"的定我路径 */
+const enrollFile = arg("enroll");
 const out = arg("out", "/tmp/diary-demo.json")!;
 
 if (mode !== "in-app" && mode !== "import") {
@@ -82,6 +85,20 @@ async function main() {
       } as Parameters<typeof db.items.put>[0]);
       console.log(`  照片 ${at.slice(11, 19)}　${p.name}`);
     }
+  }
+
+  if (enrollFile) {
+    const enrollBytes = readFileSync(enrollFile);
+    const probe = await readMvhdFromBlob(new Blob([enrollBytes], { type: "audio/mp4" }));
+    const durationMs = Math.round((probe?.durationSec ?? 8) * 1000);
+    await db.memoVoiceprint.put({
+      id: "me",
+      blob: new Blob([enrollBytes], { type: "audio/mp4" }),
+      mime: "audio/mp4",
+      durationMs,
+      createdAt: new Date().toISOString(),
+    });
+    console.log(`  声纹注册 ${enrollFile.split("/").pop()}　${durationMs} ms`);
   }
 
   const session = await createSession({
