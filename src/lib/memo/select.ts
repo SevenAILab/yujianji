@@ -57,3 +57,28 @@ export function selectForDiary<T extends Selectable>(moments: T[]): { paragraphI
 export function quotesForWriting(m: Pick<Moment, "myQuotes" | "uncertainQuotes" | "user">): string[] {
   return m.user.speakerConfirmed ? [...m.myQuotes, ...(m.uncertainQuotes ?? [])] : m.myQuotes;
 }
+
+
+/**
+ * 跨窗口的配图去重。G10 守卫只能管住单个窗口内的重复——一场录音会切成多个窗口、
+ * 走多次 judge，每次守卫都拿到全新的"已占用"集合，所以同一张照片仍可能被两段拿到。
+ * 这里按天做最终仲裁：salience 高的留住，其余留白（留白远好过两段配同一张图）。
+ *
+ * 返回 momentId → photoId，只包含真正该显示配图的片段。
+ */
+export function dedupePhotos<T extends Pick<Moment, "id" | "at" | "salience" | "photoId" | "decision">>(
+  moments: T[],
+): Map<string, string> {
+  const taken = new Map<string, string>(); // photoId -> momentId
+  const result = new Map<string, string>();
+  const ordered = [...moments]
+    .filter((m) => m.photoId && m.decision !== "drop")
+    .sort((a, b) => b.salience - a.salience || new Date(a.at).getTime() - new Date(b.at).getTime());
+  for (const m of ordered) {
+    const photoId = m.photoId!;
+    if (taken.has(photoId)) continue; // 已经给了更重要的那段
+    taken.set(photoId, m.id);
+    result.set(m.id, photoId);
+  }
+  return result;
+}

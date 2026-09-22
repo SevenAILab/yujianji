@@ -42,15 +42,33 @@ const PHOTOS = [
   { offsetSec: 74, name: "排队的人群", category: "landscape", photo: "/seed/whitby-harbor.jpg" },
   { offsetSec: 138, name: "穿动漫服装的参观者", category: "artifact", photo: "/seed/dog.jpg" },
 ];
-const PLACE = "深圳 · 会展中心";
-const LAT = 22.5431;
-const LNG = 114.0579;
-const TZ = "Asia/Shanghai";
+
+/**
+ * --real-photos：用 Seven 相册里的真实照片（public/seed-real），名字就是文件名。
+ * 配合 --fixture spikes/memo/fixtures/cliff-2min.m4a，录音里真的在讲这几张。
+ * 三张白崖互为干扰项；反思那段故意没有对应照片，用来验"留白"。
+ */
+const REAL_PHOTOS = [
+  { offsetSec: -240, name: "伦敦大本钟", category: "landscape", photo: "/seed-real/伦敦大本钟.jpg" },
+  { offsetSec: -180, name: "牛津圆形教堂", category: "landscape", photo: "/seed-real/牛津圆形教堂.jpg" },
+  { offsetSec: -120, name: "爱丁堡城堡", category: "landscape", photo: "/seed-real/爱丁堡城堡.jpg" },
+  { offsetSec: 20, name: "白崖", category: "landscape", photo: "/seed-real/白崖.jpg" },
+  { offsetSec: 34, name: "白崖灯塔", category: "landscape", photo: "/seed-real/白崖灯塔.jpg" },
+  { offsetSec: 48, name: "白崖红箱子", category: "artifact", photo: "/seed-real/白崖红箱子.jpg" },
+  { offsetSec: 62, name: "惠特比鸽子", category: "animal", photo: "/seed-real/惠特比鸽子.jpg" },
+];
+
+const REAL = has("real-photos");
+const PLACE = REAL ? "英国 · 七姐妹白崖" : "深圳 · 会展中心";
+const LAT = REAL ? 50.7413 : 22.5431;
+const LNG = REAL ? 0.2385 : 114.0579;
+const TZ = REAL ? "Europe/London" : "Asia/Shanghai";
 
 async function main() {
   await import("fake-indexeddb/auto");
   const { db } = await import("../src/lib/db");
   const { createSession, finalizeAudio, runPipeline } = await import("../src/lib/memo/client/orchestrator");
+  const { dedupePhotos } = await import("../src/lib/memo/select");
   const { readMvhdFromBlob } = await import("../src/lib/memo/mvhd");
 
   const bytes = readFileSync(fixture);
@@ -62,7 +80,7 @@ async function main() {
   console.log(`模式 ${mode}　素材 ${fixture.split("/").pop()}　${durationSec} 秒　开始于 ${startedAt}`);
 
   if (withPhotos) {
-    for (const p of PHOTOS) {
+    for (const p of REAL ? REAL_PHOTOS : PHOTOS) {
       const at = new Date(startMs + p.offsetSec * 1000).toISOString();
       await db.items.put({
         id: `demo_${p.offsetSec}`,
@@ -140,10 +158,15 @@ async function main() {
   for (const u of utterances) counts[u.speaker] += 1;
   console.log(`\n逐字稿 ${utterances.length} 句　我 ${counts.me} / 别人 ${counts.other} / 拿不准 ${counts.uncertain}`);
 
+  // 跨窗口去重后才是手记页真正会显示的配图
+  const shownPhoto = dedupePhotos(moments);
+
   console.log(`\n片段：`);
   for (const m of moments) {
-    const photo = m.photoId ? photoById.get(m.photoId) : undefined;
-    const tag = photo ? `📷 ${photo.name}` : m.decision === "drop" ? "" : "（留白）";
+    const shown = shownPhoto.get(m.id);
+    const photo = shown ? photoById.get(shown) : undefined;
+    const suppressed = m.photoId && !shown ? `（抢不到 ${m.photoId}，留白）` : "";
+    const tag = photo ? `📷 ${photo.name}` : m.decision === "drop" ? "" : suppressed || "（留白）";
     console.log(`  ${m.decision.padEnd(4)} ${String(m.category).padEnd(17)} ${m.at.slice(11, 19)} ${String(m.trigger ?? "").slice(0, 20).padEnd(22)} ${tag}`);
   }
 
@@ -151,8 +174,8 @@ async function main() {
     console.log(`\n== 手记 ${d.dayKey}：${d.title}（${d.status}）==`);
     for (const q of d.quotes) console.log(`   金句　${q.text}`);
     for (const p of d.paragraphs) {
-      const m = moments.find((x) => x.id === p.momentId);
-      const photo = m?.photoId ? photoById.get(m.photoId) : undefined;
+      const shown = shownPhoto.get(p.momentId);
+      const photo = shown ? photoById.get(shown) : undefined;
       console.log(`   ${p.heading}${photo ? `　📷 ${photo.name}` : ""}`);
       console.log(`   ${p.text}`);
     }
@@ -175,8 +198,8 @@ async function main() {
 
   // 配图自检：只报事实，不替 Agent 做匹配
   const keeps = moments.filter((m) => m.decision !== "drop");
-  const withPhoto = keeps.filter((m) => m.photoId);
-  const usedPhotoIds = withPhoto.map((m) => m.photoId!);
+  const withPhoto = keeps.filter((m) => shownPhoto.has(m.id));
+  const usedPhotoIds = withPhoto.map((m) => shownPhoto.get(m.id)!);
   const duplicated = usedPhotoIds.filter((id, i) => usedPhotoIds.indexOf(id) !== i);
   const droppedWithPhoto = moments.filter((m) => m.decision === "drop" && m.photoId);
   console.log(`\n配图自检：`);

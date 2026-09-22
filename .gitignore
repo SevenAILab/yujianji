@@ -58,3 +58,6 @@ ios/**/.build/
 /spikes/memo/results/asr/*.pcm
 /spikes/memo/results/asr/*-16k.m4a
 /spikes/memo/fixtures/*-parts
+
+# Seven 的私人照片，只在本机做配图测试用，绝不入库（仓库是公开的）
+/public/seed-real/

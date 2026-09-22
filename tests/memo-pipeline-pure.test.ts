@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { degradeFromQuotes, normalizeForMatch, stripFillers } from "../src/lib/memo/fillers";
 import { rmsDb, speakerLoudness } from "../src/lib/memo/loudness";
 import { placeAt } from "../src/lib/memo/place";
-import { selectForDiary } from "../src/lib/memo/select";
+import { dedupePhotos, selectForDiary } from "../src/lib/memo/select";
 import { applySpeakerCorrection, assignSpeakerRoles, openingSpeakerKey } from "../src/lib/memo/speaker";
 import { dayKeyIn, tzOffsetMinutes } from "../src/lib/memo/time";
 import type { Moment, TimelineEvent, Utterance } from "../src/lib/memo/types";
@@ -201,5 +201,34 @@ describe("当日选段的间隔规则", () => {
   it("间隔内 salience ≥ 0.8 仍然能挤进来", () => {
     const r = selectForDiary([mk("a", 0, 0.9), mk("b", 5, 0.85), mk("c", 240, 0.9)]);
     expect(r.paragraphIds).toContain("b");
+  });
+});
+
+describe("跨窗口配图去重", () => {
+  const mk = (id: string, min: number, salience: number, photoId?: string, decision: "keep" | "drop" = "keep") => ({
+    id, at: new Date(Date.UTC(2026, 8, 4, 9, min)).toISOString(), salience, decision, ...(photoId ? { photoId } : {}),
+  });
+
+  it("两段抢同一张图：salience 高的留住，另一段留白", () => {
+    const r = dedupePhotos([mk("a", 0, 0.9, "p1"), mk("b", 5, 0.6, "p1")]);
+    expect(r.get("a")).toBe("p1");
+    expect(r.has("b")).toBe(false);
+  });
+
+  it("salience 相同时给时间更早的那段", () => {
+    const r = dedupePhotos([mk("late", 9, 0.8, "p1"), mk("early", 1, 0.8, "p1")]);
+    expect(r.get("early")).toBe("p1");
+    expect(r.has("late")).toBe(false);
+  });
+
+  it("不同图互不影响", () => {
+    const r = dedupePhotos([mk("a", 0, 0.9, "p1"), mk("b", 5, 0.6, "p2")]);
+    expect([r.get("a"), r.get("b")]).toEqual(["p1", "p2"]);
+  });
+
+  it("drop 的片段不参与，也不占位", () => {
+    const r = dedupePhotos([mk("dropped", 0, 0.9, "p1", "drop"), mk("kept", 5, 0.6, "p1")]);
+    expect(r.has("dropped")).toBe(false);
+    expect(r.get("kept")).toBe("p1");
   });
 });

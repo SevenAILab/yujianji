@@ -12,7 +12,7 @@ import { copyFeedback, deleteMoment, editParagraph, restoreMoment, runReflect, s
 import { confirmBackfill, generateDiary } from "@/lib/memo/client/orchestrator";
 import { placeLabel } from "@/lib/memo/place";
 import { CATEGORY_LABELS } from "@/lib/memo/schema";
-import { effectiveDecision, quotesForWriting, selectForDiary } from "@/lib/memo/select";
+import { dedupePhotos, effectiveDecision, quotesForWriting, selectForDiary } from "@/lib/memo/select";
 import { isDayKey, shortDay } from "@/lib/memo/time";
 import type { DiaryParagraph, MemoSession, Moment } from "@/lib/memo/types";
 import styles from "../../memo.module.css";
@@ -43,6 +43,8 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
     [photoIds.join(",")],
     new Map(),
   );
+  // 跨窗口去重：同一张照片只给 salience 最高的那一段，其余留白
+  const photoByMoment = useMemo(() => dedupePhotos(moments), [moments]);
   const [showFolded, setShowFolded] = useState(false);
   const folded = useMemo(() => {
     const ids = diary?.foldedMomentIds ?? selectForDiary(moments).foldedIds;
@@ -132,7 +134,7 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
             paragraph={p}
             moment={byId.get(p.momentId)}
             photo={(() => {
-              const id = byId.get(p.momentId)?.photoId;
+              const id = photoByMoment.get(p.momentId);
               return id ? photos.get(id) : undefined;
             })()}
             editing={editing?.momentId === p.momentId ? editing : null}
