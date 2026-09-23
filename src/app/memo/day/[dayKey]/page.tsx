@@ -3,27 +3,31 @@
 import Link from "next/link";
 import { use, useEffect, useMemo, useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { ChevronLeft, Eye, Pencil, RefreshCw, Trash2, Undo2 } from "lucide-react";
+import { ArrowRight, ChevronLeft, Eye, Pencil, RefreshCw, Trash2, Undo2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { AppNav } from "@/components/AppNav";
 import { JourneyCollageMap } from "@/components/JourneyCollageMap";
 import { CopyButton } from "@/components/memo/CopyButton";
+import { DiaryReceipt } from "@/components/memo/DiaryReceipt";
+import { AGENT_NAME } from "@/lib/agent-persona";
 import { db } from "@/lib/db";
 import { buildDayStops, dayCollage, journalDay, routeKm } from "@/lib/journey-days";
 import { describeMemoError } from "@/lib/memo/client/api";
 import { copyFeedback, deleteMoment, editParagraph, restoreMoment, runReflect, shouldAutoReflect, undoDeleteMoment } from "@/lib/memo/client/learn";
 import { confirmBackfill, generateDiary } from "@/lib/memo/client/orchestrator";
 import { placeLabel } from "@/lib/memo/place";
+import { diaryReceipt } from "@/lib/memo/receipt";
 import { CATEGORY_LABELS } from "@/lib/memo/schema";
 import { dayItemRange, itemDayKey } from "@/lib/memo/day-match";
 import { dedupePhotos, effectiveDecision, quotesForWriting, selectForDiary } from "@/lib/memo/select";
-import { clockIn, deviceTimeZone, isDayKey, shortDay } from "@/lib/memo/time";
+import { clockIn, dayKeyIn, deviceTimeZone, isDayKey, shortDay } from "@/lib/memo/time";
 import { buildDiaryTimeline, isFirstEncounter, momentAnchor, photoAnchor } from "@/lib/memo/timeline";
 import type { DiaryParagraph, MemoSession, Moment } from "@/lib/memo/types";
 import styles from "../../memo.module.css";
 
 interface Toast {
   message: string;
-  action?: { label: string; run: () => Promise<void> | void };
+  action?: { label: string; run: () => Promise<void> | void; kind?: "undo" | "go" };
 }
 
 export default function DayPage({ params }: { params: Promise<{ dayKey: string }> }) {
@@ -109,6 +113,11 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
     return ids.map((id) => byId.get(id)).filter((m): m is Moment => Boolean(m) && effectiveDecision(m!) !== "drop");
   }, [diary, moments, byId]);
   const uncertainSessions = sessions.filter((s) => s.meUncertain);
+  const failedSession = sessions.find((s) => s.status === "failed");
+  // 小遇的整理回执：数字全来自本机记录，不调模型、不写因果
+  const receipt = useMemo(() => (diary ? diaryReceipt({ diary, moments, sessions }) : null), [diary, moments, sessions]);
+  const router = useRouter();
+  const isToday = dayKeyIn(new Date().toISOString(), timeZone) === dayKey;
   const drawerMoment = drawer ? byId.get(drawer) : undefined;
   const drawerParagraph = drawer ? diary?.paragraphs.find((p) => p.momentId === drawer) : undefined;
 
@@ -121,9 +130,15 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
   async function maybeLearn() {
     try {
       if (!(await shouldAutoReflect())) return;
-      showToast({ message: "攒够 3 次操作了，它在从中学习…" }, 20_000);
+      showToast({ message: `${AGENT_NAME}正在整理你的新偏好…` }, 20_000);
       const result = await runReflect();
-      showToast({ message: result.changed ? `它学到了：${result.summary}` : `证据还不够，先不改规则：${result.summary}` }, 6000);
+      // 只有反思真的改了画像才说"学会了"；否则照实说还没形成规则
+      showToast(
+        result.changed
+          ? { message: `${AGENT_NAME}学会了：${result.summary}`, action: { label: "去看看", kind: "go", run: () => router.push("/memo/me") } }
+          : { message: `这次还没有形成新规则：${result.summary}` },
+        8000,
+      );
     } catch (cause) {
       showToast({ message: `学习没成功：${describeMemoError(cause)}` });
     }
@@ -143,7 +158,7 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
 
   async function onDelete(momentId: string) {
     const event = await deleteMoment(momentId);
-    showToast({ message: "已删除这段", action: { label: "撤销", run: () => undoDeleteMoment(event.id, momentId) } }, 5000);
+    showToast({ message: `${AGENT_NAME}收到你的反馈：这段已移除`, action: { label: "撤销", run: () => undoDeleteMoment(event.id, momentId) } }, 5000);
     void maybeLearn();
   }
 
@@ -152,9 +167,13 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
   return (
     <Shell>
       <p className={`${styles.small} ${styles.muted}`} style={{ margin: "8px 0 0" }}>
-        {shortDay(dayKey)} · 今日手记
+        {isToday ? "今天的手帐" : `${Number(dayKey.slice(5, 7))}月${Number(dayKey.slice(8, 10))}日 · 手帐`}
       </p>
-      <h1 className={styles.diaryTitle}>{diary?.title ?? `${shortDay(dayKey)} 的手记`}</h1>
+      <h1 className={styles.diaryTitle}>{diary?.title ?? `${shortDay(dayKey)} 的手帐`}</h1>
+
+      {receipt && (receipt.kept || receipt.folded || receipt.dropped || receipt.minutes !== null) ? (
+        <DiaryReceipt receipt={receipt} dayKey={dayKey} timeZone={timeZone} demo={hasDemoMaterial} />
+      ) : null}
 
       {route ? (
         <div style={{ marginTop: 14 }}>
@@ -164,7 +183,7 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
 
       {diary?.status === "partial" ? (
         <div className={styles.warning} style={{ marginTop: 8 }}>
-          有录音或片段处理失败，这篇手记只包含成功的部分。<Link href="/memo">去首页重试</Link>
+          有录音或片段处理失败，这篇手帐只包含成功的部分。{failedSession ? <Link href={`/memo/session/${failedSession.id}`}>去重试</Link> : null}
         </div>
       ) : null}
       {uncertainSessions.map((s) => (
@@ -237,7 +256,7 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
             onCopied={() => void copyFeedback(p.momentId, "paragraph").then(maybeLearn)}
             onPickBackfill={async (target) => {
               await confirmBackfill(p.momentId, target);
-              showToast({ message: `已挂回 ${shortDay(target.dayKey)}${target.place ? ` · ${target.place}` : ""}，去那天重新生成手记` });
+              showToast({ message: `已挂回 ${shortDay(target.dayKey)}${target.place ? ` · ${target.place}` : ""}，去那天重新生成手帐` });
             }}
           />
           );
@@ -247,7 +266,7 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
       {timeline.length ? <p className={styles.diaryEnd}>· · ·</p> : null}
       {diary && !timeline.length ? <div className={styles.notice} style={{ marginTop: 12 }}>这天没有留下的话，也没有第一次拍下的照片。</div> : null}
 
-      {/* 以下都是次级入口：手记本身要干净，但删改捞回是它学习的唯一来源，不能没有 */}
+      {/* 以下都是次级入口：手帐本身要干净，但删改捞回是它学习的唯一来源，不能没有 */}
       <div className={styles.row} style={{ marginTop: 28 }}>
         {diary && hasMaterial && !hasDemoMaterial ? (
           <button type="button" className={styles.button} onClick={() => void regenerate()} disabled={busy}>
@@ -279,7 +298,7 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
                       className={styles.button}
                     onClick={() =>
                       void restoreMoment(m.id).then(() => {
-                        showToast({ message: "已捞回，先显示整理后的原话，重新生成时再写" });
+                        showToast({ message: `${AGENT_NAME}收到你的反馈：这段应该留下（先显示原话，重新生成时再写）` });
                         void maybeLearn();
                       })
                     }
@@ -365,7 +384,7 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
                 setToast(null);
               }}
             >
-              <Undo2 size={13} /> {toast.action.label}
+              {toast.action.kind === "go" ? <ArrowRight size={13} /> : <Undo2 size={13} />} {toast.action.label}
             </button>
           ) : null}
         </div>
@@ -408,7 +427,7 @@ function ParagraphCard(props: {
       ) : null}
       {backfill?.candidates?.length && !backfill.confirmedByUser ? (
         <div className={styles.row} style={{ marginBottom: 8 }}>
-          <span className={`${styles.small} ${styles.muted}`}>它拿不准挂回哪里，选一个：</span>
+          <span className={`${styles.small} ${styles.muted}`}>{AGENT_NAME}拿不准挂回哪里，选一个：</span>
           {backfill.candidates.map((c) => (
             <button key={`${c.dayKey}-${c.place}`} type="button" className={styles.badge} onClick={() => void props.onPickBackfill({ dayKey: c.dayKey, place: c.place })}>
               {c.label}
@@ -431,6 +450,8 @@ function ParagraphCard(props: {
       ) : (
         <p className={styles.diaryText}>{p.text}</p>
       )}
+      {/* 示例天只读：不给任何操作（不写反馈事件），但把"为什么留下"直接露出来，让人看到小遇在判断 */}
+      {props.readOnly && m?.why ? <p className={styles.why}>为什么留下：{m.why}</p> : null}
       {/* 原话、改写、删除、复制全部收在这里：页面要干净，但这些操作是它学习的唯一来源 */}
       {!props.editing && !props.readOnly ? (
         <details className={styles.entryMore}>

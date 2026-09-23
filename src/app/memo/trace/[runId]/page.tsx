@@ -29,7 +29,7 @@ export default function TracePage({ params }: { params: Promise<{ runId: string 
     <main className="app-shell">
       <div className="phone-page">
         <div className={styles.top}>
-          <Link className={styles.back} href={trace?.sessionId ? `/memo/session/${trace.sessionId}` : trace?.dayKey ? `/memo/day/${trace.dayKey}` : "/memo"}>
+          <Link className={styles.back} href={trace?.sessionId ? `/memo/session/${trace.sessionId}` : trace?.dayKey ? `/memo/day/${trace.dayKey}` : "/journeys"}>
             <ChevronLeft size={16} /> 返回
           </Link>
           <span className={`${styles.small} ${styles.muted}`}>过程页</span>

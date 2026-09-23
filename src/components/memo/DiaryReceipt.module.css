@@ -1,0 +1,52 @@
+.receipt {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border: 1px solid rgba(47, 111, 106, 0.16);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(220, 239, 235, 0.72), rgba(251, 253, 252, 0.95));
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--teal-dark);
+  font-size: 13px;
+}
+
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--teal);
+  color: #fff;
+  font-family: var(--serif);
+  font-size: 13px;
+}
+
+.tag {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(185, 111, 47, 0.12);
+  color: var(--warning);
+  font-size: 11px;
+}
+
+.sentence {
+  margin: 8px 0 0;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.meta {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}

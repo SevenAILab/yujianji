@@ -277,7 +277,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         style={{ marginTop: 20 }}
         onClick={() => {
           if (!window.confirm("删除这段录音的逐字稿和所有片段？手记里对应的段落也会消失。")) return;
-          void deleteSession(id).then(() => router.push("/memo"));
+          void deleteSession(id).then(() => router.push("/journeys"));
         }}
       >
         <Trash2 size={13} /> 删除这段录音的数据
@@ -291,8 +291,8 @@ function Shell({ children }: { children: React.ReactNode }) {
     <main className="app-shell">
       <div className="phone-page">
         <div className={styles.top}>
-          <Link className={styles.back} href="/memo">
-            <ChevronLeft size={16} /> 遇见手记
+          <Link className={styles.back} href="/journeys">
+            <ChevronLeft size={16} /> 旅途
           </Link>
         </div>
         {children}

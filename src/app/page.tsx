@@ -152,24 +152,26 @@ export default function Home() {
     };
   }, []);
 
+  // 统计和洞察只算你自己的记录，和「我的」页同一个口径；示例单独说明
+  const mine = useMemo(() => items.filter((item) => !item.isSeed), [items]);
   const stats = useMemo(() => {
-    const firsts = items.filter((item) => item.ai?.verdict === "first");
+    const firsts = mine.filter((item) => item.ai?.verdict === "first");
     const locations = new Set(
-      items
+      mine
         .filter((item) => item.lat !== null && item.lng !== null)
         .map((item) => `${item.country}:${item.place.trim()}:${item.lat}:${item.lng}`),
     );
     return {
-      discovered: items.length,
+      discovered: mine.length,
       countries: new Set(
-        items
+        mine
           .filter((item) => item.country !== "UNK" && item.country !== "OTHER")
           .map((item) => item.country),
       ).size,
       firsts: firsts.length,
       locations: locations.size,
     };
-  }, [items]);
+  }, [mine]);
 
   return (
     <main className={`app-shell ${styles.homeShell}`}>
@@ -228,6 +230,10 @@ export default function Home() {
               <span>导入</span>
             </label>
           </div>
+          {/* 没有照片时的兜底：保留能力，只降一级 */}
+          <Link className={styles.textEntry} href="/encounter?mode=text">
+            没有照片？写几句也行
+          </Link>
           <div className={styles.captureInputs}>
             <input
               id="home-camera-input"
@@ -276,6 +282,11 @@ export default function Home() {
                 {loadingDemo ? "正在载入…" : "还是先看看别人的遇见集"}
               </button>
             </div>
+          ) : !mine.length ? (
+            <div className={styles.demoNote}>
+              正在看示例：英国 5 天和深圳两个周末。拍下你的第一次后，这里只算你自己的。
+              <Link href="/me">移除示例</Link>
+            </div>
           ) : (
             <>
               <div className={styles.stats} aria-label="遇见统计">
@@ -285,7 +296,7 @@ export default function Home() {
                 <div><strong>{stats.locations}</strong><span>地点</span></div>
               </div>
 
-              <div className={styles.insight}><InsightLine items={items} /></div>
+              <div className={styles.insight}><InsightLine items={mine} /></div>
             </>
           )}
         </section>

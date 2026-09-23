@@ -9,8 +9,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ChevronRight, Mic, RotateCcw } from "lucide-react";
 import { AppNav } from "@/components/AppNav";
+import { AGENT_NAME } from "@/lib/agent-persona";
 import { JourneyCollageMap } from "@/components/JourneyCollageMap";
-import { LegacyJourneys } from "@/components/LegacyJourneys";
 import { KIND_LABEL, STATUS_LABEL } from "@/components/memo/labels";
 import { useRecorder } from "@/components/memo/RecorderProvider";
 import { useCountryShapes } from "@/components/useCountryShapes";
@@ -45,7 +45,6 @@ function rangeLabel(trip: JournalTrip): string {
 export default function JourneysPage() {
   const [timeZone, setTimeZone] = useState("Asia/Shanghai");
   const [today, setToday] = useState("");
-  const [legacyOpen, setLegacyOpen] = useState(false);
   useEffect(() => {
     const tz = deviceTimeZone();
     setTimeZone(tz);
@@ -88,17 +87,13 @@ export default function JourneysPage() {
         {!trips.length ? (
           <div className={styles.empty}>
             <strong>还没有往日的手帐</strong>
-            <span>白天在首页拍照、录音，一天结束时它会把照片和你说的话整理成一页，串成一条路线。</span>
+            <span>白天在首页拍照、录音，一天结束时小遇会把照片和你说的话整理成一页，串成一条路线。</span>
             <Link href="/" className={styles.ghostButton}>
               去首页记录
             </Link>
           </div>
         ) : null}
 
-        <details className={styles.legacy} onToggle={(event) => setLegacyOpen((event.currentTarget as HTMLDetailsElement).open)}>
-          <summary>旧版旅途（按年份拼贴）</summary>
-          {legacyOpen ? <LegacyJourneys /> : null}
-        </details>
       </div>
       <AppNav />
     </main>
@@ -186,6 +181,14 @@ function TodayCard({ today, timeZone, hasDiary }: { today: string; timeZone: str
   const firstPhotos = items.filter((item) => isFirstEncounter(item) && itemDayKey(item, timeZone) === today).length;
   const processing = todaySessions.filter((s) => PROCESSING.includes(s.status) || recorder.jobs.some((j) => j.sessionId === s.id && j.status === "processing")).length;
   const hasMaterial = kept > 0 || firstPhotos > 0;
+  // 小遇的一句状态：只说能从本机记录确认的事
+  const agentLine = hasDiary
+    ? `${AGENT_NAME}已经把今天整理成一页手帐`
+    : processing
+      ? `${AGENT_NAME}还在听 ${processing} 段录音，听完就能整理`
+      : hasMaterial
+        ? `过了零点再打开，${AGENT_NAME}会自动整理今天；也可以现在就生成`
+        : "";
 
   async function generate() {
     setBusy(true);
@@ -205,6 +208,7 @@ function TodayCard({ today, timeZone, hasDiary }: { today: string; timeZone: str
         <div>
           <small>今天 · {shortDay(today)}</small>
           <h2>{hasMaterial ? `${firstPhotos} 张第一次 · ${kept} 段留下的话` : "今天还没有记录"}</h2>
+          {agentLine ? <p className={styles.agentLine}>{agentLine}</p> : null}
         </div>
         {hasDiary ? (
           <Link href={`/memo/day/${today}`} className={styles.ghostButton}>

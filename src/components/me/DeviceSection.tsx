@@ -2,11 +2,10 @@
 
 // 「我的」里的可接入设备（工单 Gate 5.1）：只列支持的类型，没接入就只有名字和「接入」，
 // 接入之后才显示详情。录音豆、眼镜还不能直连，「接入」= 一句说明 + 去首页导入。
+// 声音注册和「小遇眼中的你」挪到了「我的」第一张卡（XiaoyuCard）。
 import Link from "next/link";
 import { useState } from "react";
-import { useLiveQuery } from "dexie-react-hooks";
-import { Camera, ChevronRight, Glasses, HeartPulse, Mic, Sparkles, UserRound } from "lucide-react";
-import { db } from "@/lib/db";
+import { Camera, Glasses, HeartPulse, Mic } from "lucide-react";
 import { useInsta360 } from "@/lib/insta360";
 import styles from "./DeviceSection.module.css";
 
@@ -15,7 +14,6 @@ type Expandable = "bean" | "glasses" | null;
 export function DeviceSection() {
   const insta360 = useInsta360();
   const [open, setOpen] = useState<Expandable>(null);
-  const enrolled = useLiveQuery(async () => (await db.memoVoiceprint.count()) > 0, [], false);
 
   return (
     <>
@@ -67,31 +65,6 @@ export function DeviceSection() {
         </ul>
       </section>
 
-      <section className={styles.card} aria-label="遇见手记">
-        <p className="eyebrow">遇见手记</p>
-        <ul className={styles.rows}>
-          <li>
-            <UserRound size={18} aria-hidden />
-            <span className={styles.name}>
-              声音注册
-              <small>{enrolled ? "已注册，录音时它认得你" : "花 8 秒，让它分清哪句是你说的"}</small>
-            </span>
-            <Link href="/memo/enroll" className={styles.action}>
-              {enrolled ? "重录" : "去注册"} <ChevronRight size={14} />
-            </Link>
-          </li>
-          <li>
-            <Sparkles size={18} aria-hidden />
-            <span className={styles.name}>
-              它学到了什么
-              <small>你删过、改过的，它都记着</small>
-            </span>
-            <Link href="/memo/me" className={styles.action}>
-              看看 <ChevronRight size={14} />
-            </Link>
-          </li>
-        </ul>
-      </section>
     </>
   );
 }

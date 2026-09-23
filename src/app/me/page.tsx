@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { AppNav } from "@/components/AppNav";
 import { DeviceSection } from "@/components/me/DeviceSection";
+import { XiaoyuCard } from "@/components/me/XiaoyuCard";
 import { useRecorder } from "@/components/memo/RecorderProvider";
 import { db, hasDemoData, loadDemoData, removeDemoData } from "@/lib/db";
 import { downloadBackup, importBackup, wipeLocalData } from "@/lib/backup";
@@ -114,7 +115,7 @@ export default function MePage() {
       await refreshHealth();
       setNotice(
         `导入完成：新增 ${summary.added} 条，更新 ${summary.updated} 条，已有且更新的跳过 ${summary.skipped} 条。` +
-          (summary.memo ? `另外恢复了 ${summary.memo} 条遇见手记记录（逐字稿按 7 天清理的约定不在备份里）。` : ""),
+          (summary.memo ? `另外恢复了 ${summary.memo} 条录音和手帐记录（逐字稿按 7 天清理的约定不在备份里）。` : ""),
       );
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "导入失败，请确认文件正确。");
@@ -168,6 +169,8 @@ export default function MePage() {
         <header className="page-header">
           <h1 className="page-title">我的</h1>
         </header>
+
+        <XiaoyuCard />
 
         <section className={styles.stats}>
           <div>
