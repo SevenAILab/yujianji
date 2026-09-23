@@ -78,6 +78,13 @@ const countryBorders = mesh(world as never, world.objects.countries as never, (a
 const palette = ["#e9ad69", "#79bd76", "#40aaa1", "#b7ca59"];
 const panoramaPinColor = "#5b8fc2";
 const MAX_GLOBE_ZOOM = 24;
+const MIN_GLOBE_ZOOM = 0.42;
+/**
+ * 缩到最小以后还在继续缩：捏合比例再小到下限的这个倍数、或滚轮再累计这么多，就进记忆宇宙。
+ * 对称于"放大到 1.55 进全景"——越往里越真实（360 全景），越往外越抽象（宇宙）。
+ */
+const UNIVERSE_PINCH_RATIO = 0.72;
+const UNIVERSE_WHEEL_OVERSHOOT = 260;
 type PreviewItem = MemoryGlobeLocation["preview"][number];
 type Hover = {
   pin: MemoryGlobePin;
@@ -95,6 +102,8 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
   const [hover, setHover] = useState<Hover>(null);
   const hoverRef = useRef<Hover>(null);
   const zoomEntryLockRef = useRef(false);
+  const universeLockRef = useRef(false);
+  const [atMinZoom, setAtMinZoom] = useState(false);
 
   function showHover(next: Hover) {
     hoverRef.current = next;
@@ -121,7 +130,20 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
     let dragging = false, pointerX = -999, pointerY = -999, frame = 0;
     let previous = performance.now(), hoverId = "", hoverVisibleUntil = 0, candidateId = "", moved = false;
     let rotationPausedUntil = 0;
-    let zoom = 1, pinchStartDistance = 0, pinchStartZoom = 1;
+    let zoom = 1, pinchStartDistance = 0, pinchStartZoom = 1, wheelOvershoot = 0, minShown = false;
+    function markMin() {
+      const atMin = zoom <= MIN_GLOBE_ZOOM + 0.001;
+      if (atMin !== minShown) {
+        minShown = atMin;
+        setAtMinZoom(atMin);
+      }
+      if (!atMin) wheelOvershoot = 0;
+    }
+    function enterUniverse() {
+      if (universeLockRef.current) return;
+      universeLockRef.current = true;
+      router.push("/universe");
+    }
     const activePointers = new Map<number, { x: number; y: number }>();
     let hitTargets: Array<NonNullable<Hover>> = [];
     const projection = geoOrthographic().clipAngle(90).precision(0.4);
@@ -348,7 +370,10 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
         if (!first || !second) return;
         const distance = Math.hypot(second.x - first.x, second.y - first.y);
         if (pinchStartDistance > 0) {
-          zoom = Math.max(0.42, Math.min(MAX_GLOBE_ZOOM, pinchStartZoom * distance / pinchStartDistance));
+          const rawZoom = pinchStartZoom * distance / pinchStartDistance;
+          zoom = Math.max(MIN_GLOBE_ZOOM, Math.min(MAX_GLOBE_ZOOM, rawZoom));
+          markMin();
+          if (rawZoom < MIN_GLOBE_ZOOM * UNIVERSE_PINCH_RATIO) enterUniverse();
           if (zoom < 1.42) zoomEntryLockRef.current = false;
           if (
             zoom >= 1.55 &&
@@ -379,7 +404,13 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
     }
     function wheel(event: WheelEvent) {
       event.preventDefault();
-      zoom = Math.max(0.42, Math.min(MAX_GLOBE_ZOOM, zoom * Math.exp(-event.deltaY * 0.0015)));
+      const wasAtMin = zoom <= MIN_GLOBE_ZOOM + 0.001;
+      zoom = Math.max(MIN_GLOBE_ZOOM, Math.min(MAX_GLOBE_ZOOM, zoom * Math.exp(-event.deltaY * 0.0015)));
+      markMin();
+      if (wasAtMin && event.deltaY > 0) {
+        wheelOvershoot += event.deltaY;
+        if (wheelOvershoot > UNIVERSE_WHEEL_OVERSHOOT) enterUniverse();
+      }
       if (zoom < 1.42) zoomEntryLockRef.current = false;
       if (
         zoom >= 1.55 &&
@@ -408,7 +439,7 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
   return (
     <div ref={wrapRef} className={styles.globeWrap}>
       <canvas ref={canvasRef} style={{ display: "block", cursor: "grab", touchAction: "none" }} />
-      <div className={styles.globeHint}>拖动旋转 · 双指缩放 · 悬停查看</div>
+      <div className={styles.globeHint}>{atMinZoom ? "继续缩小，进入记忆宇宙" : "拖动旋转 · 双指缩放 · 悬停查看"}</div>
       {hover?.item.mediaKind === "panorama" ? (
         <button
           ref={setBubbleElement}
