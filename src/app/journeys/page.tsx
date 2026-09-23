@@ -72,7 +72,7 @@ export default function JourneysPage() {
   }, [diaries, moments, items, timeZone]);
 
   return (
-    <main className="app-shell">
+    <main className="app-shell narrative-shell">
       <div className={`phone-page ${styles.page}`}>
         <header className={styles.header}>
           <h1>旅途</h1>

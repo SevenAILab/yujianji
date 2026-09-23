@@ -16,6 +16,7 @@ import { ShareCard } from "@/components/ShareCard";
 import { db, ensureSeeded } from "@/lib/db";
 import { toHistoryEntry } from "@/lib/history";
 import { CATEGORY_LABELS } from "@/lib/types";
+import { AGENT_AVATAR, AGENT_NAME } from "@/lib/agent-persona";
 import type { Item } from "@/lib/types";
 import { formatDate, formatMonth } from "@/lib/format";
 import { recognizeResultSchema } from "@/lib/schema";
@@ -381,9 +382,9 @@ export default function ItemPage() {
               <p className="eyebrow"><MessageCircle size={13} /> 评论</p>
               <div className="comment-thread">
                 <div className="comment-row">
-                  <div className="comment-avatar comment-avatar-ai">集</div>
+                  <div className="comment-avatar comment-avatar-ai">{AGENT_AVATAR}</div>
                   <div className="comment-body">
-                    <div className="comment-name">遇见集</div>
+                    <div className="comment-name">{AGENT_NAME}</div>
                     <div className="comment-text">{currentItem.ai.question}</div>
                     <div className="comment-time">刚刚</div>
                   </div>
@@ -402,15 +403,15 @@ export default function ItemPage() {
                   <div className="comment-row comment-reply">
                     <div className="comment-avatar comment-avatar-ai"><MessageCircle size={15} /></div>
                     <div className="comment-body">
-                      <div className="comment-name">遇见集</div>
+                      <div className="comment-name">{AGENT_NAME}</div>
                       <div className="comment-text comment-pending">正在回应…</div>
                     </div>
                   </div>
                 ) : currentItem.reply ? (
                   <div className="comment-row comment-reply">
-                    <div className="comment-avatar comment-avatar-ai">集</div>
+                    <div className="comment-avatar comment-avatar-ai">{AGENT_AVATAR}</div>
                     <div className="comment-body">
-                      <div className="comment-name">遇见集</div>
+                      <div className="comment-name">{AGENT_NAME}</div>
                       <div className="comment-text">{currentItem.reply}</div>
                       <div className="comment-time">刚刚</div>
                     </div>

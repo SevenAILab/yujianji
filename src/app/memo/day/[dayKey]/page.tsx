@@ -9,6 +9,7 @@ import { AppNav } from "@/components/AppNav";
 import { JourneyCollageMap } from "@/components/JourneyCollageMap";
 import { CopyButton } from "@/components/memo/CopyButton";
 import { DiaryReceipt } from "@/components/memo/DiaryReceipt";
+import { useModelIds } from "@/components/universe/useModelIds";
 import { AGENT_NAME } from "@/lib/agent-persona";
 import { db } from "@/lib/db";
 import { buildDayStops, dayCollage, journalDay, routeKm } from "@/lib/journey-days";
@@ -118,6 +119,8 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
   const receipt = useMemo(() => (diary ? diaryReceipt({ diary, moments, sessions }) : null), [diary, moments, sessions]);
   const router = useRouter();
   const isToday = dayKeyIn(new Date().toISOString(), timeZone) === dayKey;
+  // 手帐 → 精神图景：这张照片已经长成 3D 模型的，给一个去看它的入口
+  const modelIds = useModelIds();
   const drawerMoment = drawer ? byId.get(drawer) : undefined;
   const drawerParagraph = drawer ? diary?.paragraphs.find((p) => p.momentId === drawer) : undefined;
 
@@ -235,6 +238,10 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
           key={p.momentId}
           anchorId={momentAnchor(p.momentId)}
           readOnly={hasDemoMaterial}
+          inUniverse={(() => {
+            const id = photoByMoment.get(p.momentId);
+            return id && modelIds.has(id) ? id : undefined;
+          })()}
           paragraph={p}
             moment={byId.get(p.momentId)}
             photo={(() => {
@@ -396,6 +403,8 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
 function ParagraphCard(props: {
   anchorId: string;
   readOnly: boolean;
+  /** 这段配图已经有 3D 模型时，它的 itemId */
+  inUniverse?: string;
   paragraph: DiaryParagraph;
   moment?: Moment;
   photo?: { id: string; name: string; photo: string };
@@ -450,6 +459,11 @@ function ParagraphCard(props: {
       ) : (
         <p className={styles.diaryText}>{p.text}</p>
       )}
+      {props.inUniverse ? (
+        <Link className={styles.universeLink} href={`/universe?focus=${encodeURIComponent(props.inUniverse)}`}>
+          在精神图景里看它 ✦
+        </Link>
+      ) : null}
       {/* 示例天只读：不给任何操作（不写反馈事件），但把"为什么留下"直接露出来，让人看到小遇在判断 */}
       {props.readOnly && m?.why ? <p className={styles.why}>为什么留下：{m.why}</p> : null}
       {/* 原话、改写、删除、复制全部收在这里：页面要干净，但这些操作是它学习的唯一来源 */}
@@ -482,7 +496,7 @@ function ParagraphCard(props: {
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <main className="app-shell">
+    <main className="app-shell narrative-shell">
       <div className="phone-page">
         <div className={styles.top}>
           <Link className={styles.back} href="/journeys">
