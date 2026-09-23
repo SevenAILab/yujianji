@@ -563,7 +563,7 @@ export default function EncounterPage() {
                 <span>
                   {geocodeLoading
                     ? "正在自动识别地点…"
-                    : `${location.text}${place ? ` · ${place}` : ""}`}
+                    : `${location.text}${place && !location.text.includes(place) ? ` · ${place}` : ""}`}
                 </span>
               </div>
             ) : !locationLoading ? (
