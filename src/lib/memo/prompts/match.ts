@@ -14,7 +14,7 @@ export const MATCH_SYSTEM = `你是「遇见手记」的配图员。用户一天
 4. reason 用一句话说明两者为什么是同一个东西，不超过 30 字。
 5. 没有任何能配上的，就交一个空的 matches。
 
-最后调用 ${MATCH_SUBMIT_NAME} 交卷。`;
+最后调用 ${MATCH_SUBMIT_NAME} 交卷，只输出 JSON：{"matches":[{"momentId":"片段 id","photoId":"照片 id","reason":"一句话"}]}`;
 
 export function buildMatchPrompt(req: MatchRequest): string {
   return [

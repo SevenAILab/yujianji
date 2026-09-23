@@ -6,6 +6,10 @@
 //   npx tsx scripts/memo-diary-demo.ts --mode in-app --base http://localhost:3100
 //   npx tsx scripts/memo-diary-demo.ts --mode import --fixture spikes/memo/fixtures/expo-3min.m4a --no-photos
 //   npx tsx scripts/memo-diary-demo.ts --mode import --enroll spikes/memo/fixtures/enroll-me.m4a
+//   npx tsx scripts/memo-diary-demo.ts --mode import --fixture spikes/memo/fixtures/cliff-2min.m4a --real-photos --photos-after
+//
+// --photos-after：先录后拍。录音先处理到 ready（不写手帐），之后才写入照片（时间排在录音结束以后），
+// 再按日终方式 generateDiary——验的是 9/23 新增的"日终补配图"，judge 阶段根本看不到这些照片。
 //
 // --no-photos 时不写入任何照片，用来单独验"定我 + 筛选"这一段。
 // 写入的照片是本仓库 public/seed 下的真实图片，但**名字是为了跑通流程编的**，
@@ -25,6 +29,7 @@ const mode = (arg("mode", "import") as Mode);
 const base = arg("base", "https://yujianji.mcs-eco.com")!;
 const fixture = arg("fixture", "spikes/memo/fixtures/expo-3min.m4a")!;
 const withPhotos = !has("no-photos");
+const photosAfter = has("photos-after");
 /** 声纹注册音频：给了就走"每个分段拼注册前缀"的定我路径 */
 const enrollFile = arg("enroll");
 const out = arg("out", "/tmp/diary-demo.json")!;
@@ -67,7 +72,7 @@ const TZ = REAL ? "Europe/London" : "Asia/Shanghai";
 async function main() {
   await import("fake-indexeddb/auto");
   const { db } = await import("../src/lib/db");
-  const { createSession, finalizeAudio, runPipeline } = await import("../src/lib/memo/client/orchestrator");
+  const { createSession, finalizeAudio, generateDiary, runPipeline } = await import("../src/lib/memo/client/orchestrator");
   const { dedupePhotos } = await import("../src/lib/memo/select");
   const { readMvhdFromBlob } = await import("../src/lib/memo/mvhd");
 
@@ -79,9 +84,9 @@ async function main() {
   const durationSec = Math.round(info?.durationSec ?? 0);
   console.log(`模式 ${mode}　素材 ${fixture.split("/").pop()}　${durationSec} 秒　开始于 ${startedAt}`);
 
-  if (withPhotos) {
+  async function writePhotos(shiftSec: number) {
     for (const p of REAL ? REAL_PHOTOS : PHOTOS) {
-      const at = new Date(startMs + p.offsetSec * 1000).toISOString();
+      const at = new Date(startMs + (p.offsetSec + shiftSec) * 1000).toISOString();
       await db.items.put({
         id: `demo_${p.offsetSec}`,
         name: p.name,
@@ -97,13 +102,15 @@ async function main() {
         date: at,
         dateSource: "exif",
         userNote: "",
-        ai: null,
+        ai: { cognition: "", fun: "", luck: "", question: "", verdict: "first", relatedItemId: null, memorySentence: "" },
         isSeed: false,
         createdAt: at,
-      } as Parameters<typeof db.items.put>[0]);
+      } as unknown as Parameters<typeof db.items.put>[0]);
       console.log(`  照片 ${at.slice(11, 19)}　${p.name}`);
     }
   }
+  // 先录后拍：照片整体挪到录音结束 1 分钟之后，judge 阶段 ±90 分钟之外的"之后"也照样是当天
+  if (withPhotos && !photosAfter) await writePhotos(0);
 
   if (enrollFile) {
     const enrollBytes = readFileSync(enrollFile);
@@ -132,8 +139,8 @@ async function main() {
   const t0 = Date.now();
   let last = "";
   const final = await runPipeline(session.id, {
-    // 演示整条链路：录完直接写手帐（产品默认是日终统一生成）
-    autoDiary: true,
+    // 演示整条链路：录完直接写手帐（产品默认是日终统一生成）；--photos-after 时只跑到 ready
+    autoDiary: !photosAfter,
     onProgress: (p) => {
       const line = `${p.status}: ${p.message}`;
       if (line !== last) {
@@ -142,6 +149,17 @@ async function main() {
       }
     },
   });
+  if (photosAfter && withPhotos && final.status === "ready") {
+    const dayKeys = [...new Set((await db.moments.where("sessionId").equals(session.id).toArray()).map((m) => m.dayKey))];
+    console.log(`\n录音处理完（没写手帐），judge 阶段配到的图：${(await db.moments.where("sessionId").equals(session.id).toArray()).filter((m) => m.photoId).length} 张`);
+    console.log(`现在才拍照（录音结束 1 分钟后）：`);
+    await writePhotos(durationSec + 60 + 240);
+    for (const dayKey of dayKeys) {
+      const t1 = Date.now();
+      const diary = await generateDiary(dayKey);
+      console.log(`  日终生成 ${dayKey}：配图 ${diary.photoMatch?.outcome}，${((Date.now() - t1) / 1000).toFixed(1)} 秒`);
+    }
+  }
   const wallMs = Date.now() - t0;
 
   console.log(`\n状态 ${final.status}${final.error ? `　${final.error.message}` : ""}`);
@@ -168,7 +186,7 @@ async function main() {
     const shown = shownPhoto.get(m.id);
     const photo = shown ? photoById.get(shown) : undefined;
     const suppressed = m.photoId && !shown ? `（抢不到 ${m.photoId}，留白）` : "";
-    const tag = photo ? `📷 ${photo.name}` : m.decision === "drop" ? "" : suppressed || "（留白）";
+    const tag = photo ? `📷 ${photo.name}${m.photoSource === "day_match" ? "（日终补配）" : ""}` : m.decision === "drop" ? "" : suppressed || "（留白）";
     console.log(`  ${m.decision.padEnd(4)} ${String(m.category).padEnd(17)} ${m.at.slice(11, 19)} ${String(m.trigger ?? "").slice(0, 20).padEnd(22)} ${tag}`);
   }
 

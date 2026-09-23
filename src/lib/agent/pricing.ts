@@ -23,8 +23,12 @@ export const ASR_PRICE_PER_SEC: Record<string, number> = {
   "paraformer-v2": 0.00008,
 };
 
+/**
+ * 带日期的快照（如 qwen3.5-plus-2026-04-20）和通用名同价。
+ * 通用名免费额度用完、换用还有额度的快照时，费用统计不至于按兜底价多算三倍。
+ */
 export function priceFor(modelId: string): ModelPrice & { known: boolean } {
-  const price = PRICES[modelId];
+  const price = PRICES[modelId] ?? PRICES[modelId.replace(/-\d{4}-\d{2}-\d{2}$/, "")];
   return price ? { ...price, known: true } : { ...FALLBACK, known: false };
 }
 

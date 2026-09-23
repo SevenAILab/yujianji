@@ -222,3 +222,10 @@ describe("日终生成手帐（本地库 + 接口隔离）", () => {
     expect(api.write).not.toHaveBeenCalled();
   });
 });
+
+describe("日终补配图 · 提示词", () => {
+  it("百炼的 JSON 输出模式要求提示词里出现 json 字样（真实调用踩过：InvalidParameter）", async () => {
+    const { MATCH_SYSTEM } = await import("../src/lib/memo/prompts/match");
+    expect(MATCH_SYSTEM.toLowerCase()).toContain("json");
+  });
+});
