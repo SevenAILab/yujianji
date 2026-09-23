@@ -34,7 +34,7 @@ export default function DevicesPage() {
 
   return <main className={`app-shell ${styles.deviceShell}`}>
     <div className={`phone-page ${styles.devicePage}`}>
-      <header className={styles.deviceHeader}><div><h1>设备集</h1><p>连接健康数据，收藏旅途影像</p></div></header>
+      <header className={styles.deviceHeader}><div><h1>设备集</h1><p>全景相机和蓝牙心率</p></div></header>
       <section className={styles.deviceCard} aria-label="Insta360 设备">
         <div className={styles.deviceSummary}>
           <div className={styles.cameraIllustration} aria-hidden="true"><Camera size={46} strokeWidth={1.25} /><span /></div>

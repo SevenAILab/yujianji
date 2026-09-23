@@ -16,6 +16,7 @@ import { createSession, finalizeAudio, runPipeline } from "@/lib/memo/client/orc
 import { MemoRecorder, recordingSupported } from "@/lib/memo/client/recorder";
 import { deleteSession, patchSession } from "@/lib/memo/client/repo";
 import { effectiveDecision } from "@/lib/memo/select";
+import { DiaryAutoGenerator } from "./DiaryAutoGenerator";
 import { RecordingPill } from "./RecordingPill";
 
 export type RecorderKind = "in_app" | "backfill";
@@ -254,6 +255,7 @@ export function RecorderProvider({ children }: { children: ReactNode }) {
     <RecorderContext.Provider value={api}>
       {children}
       {enabled ? <RecordingPill /> : null}
+      {enabled ? <DiaryAutoGenerator /> : null}
     </RecorderContext.Provider>
   );
 }

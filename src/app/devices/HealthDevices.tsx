@@ -165,28 +165,7 @@ export function HealthDevices() {
     : status.granted.length === 3 ? "已授权" : status.granted.length ? "部分授权" : "未授权";
 
   return <>
-    <section className={styles.hardwareCard} aria-label="手机健康数据" aria-busy={healthBusy}>
-      <div className={styles.hardwareHeader}><div><span className={styles.deviceEyebrow}>HEALTH</span><h2>{status?.available ? status.provider === "healthkit" ? "Apple Health · HealthKit" : "Android · Health Connect" : "手机健康数据"}</h2></div><Heart size={24} /></div>
-      <p className={styles.hardwareNote} role="status">{healthBusy ? "正在处理健康数据…" : status ? `授权状态：${authorization}` : "尚未取得健康服务状态"}</p>
-      {status && !status.available && <p className={styles.hardwareNote}>{status.reason || "此设备的健康服务不可用。"}</p>}
-      {status?.available && <>
-        <div className={styles.healthMetrics}>
-          {metrics.map(({ key, label, unit }) => {
-            const sample = latestSample(samples, key);
-            return <div key={key}><span>{label}</span><strong>{sample ? `${sample.value} ${unit}` : "—"}</strong><small>{status.granted ? status.granted.includes(key) ? "已授权" : "未授权" : "读取权限由系统管理"}</small>{sample && <small>{timeText(sample.timestamp)}{sample.endTimestamp ? ` 至 ${timeText(sample.endTimestamp)}` : ""}<br />{sample.originName}</small>}</div>;
-          })}
-        </div>
-        <p className={styles.hardwareNote}>显示各项最新记录；步数为单条记录的区间步数，不是今日总步数。空值不代表 0。</p>
-        {status.provider === "healthkit" && <p className={styles.hardwareNote}>iOS 不披露读取权限是否获准；无数据也可能是未授权。请在系统健康设置中查看或撤销权限。</p>}
-        <div className={styles.hardwareActions}>
-          <button className={styles.hardwareButton} disabled={healthBusy} onClick={() => void readHealth(true)}>授权并读取</button>
-          <button className={styles.hardwareButton} disabled={healthBusy} onClick={() => void readHealth(false)}>刷新数据</button>
-        </div>
-      </>}
-      <button className={styles.statusButton} disabled={healthBusy} onClick={() => void checkStatus()}>重新检查状态</button>
-      {healthNote && <p className={styles.hardwareNote} role="status">{healthNote}</p>}
-      {healthError && <p className={styles.hardwareError} role="alert">{healthError}</p>}
-    </section>
+    {/* 9/23：手机健康数据卡从界面上撤掉（太像支付宝、没有说法），读取逻辑保留在 health-sync */}
     <section className={styles.hardwareCard} aria-label="蓝牙心率设备" aria-busy={bluetoothBusy}>
       <div className={styles.hardwareHeader}><div><span className={styles.deviceEyebrow}>BLUETOOTH</span><h2>{deviceName || "蓝牙心率设备"}</h2></div><Bluetooth size={24} /></div>
       <p className={styles.hardwareNote} role="status">{bluetoothState}</p>

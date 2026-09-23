@@ -15,6 +15,7 @@ import {
   Upload,
 } from "lucide-react";
 import { AppNav } from "@/components/AppNav";
+import { DeviceSection } from "@/components/me/DeviceSection";
 import { db, hasDemoData, loadDemoData, removeDemoData } from "@/lib/db";
 import { downloadBackup, importBackup, wipeLocalData } from "@/lib/backup";
 import {
@@ -189,6 +190,8 @@ export default function MePage() {
             </p>
           </div>
         ) : null}
+
+        <DeviceSection />
 
         <section className={styles.card}>
           <p className="eyebrow">本机存储</p>

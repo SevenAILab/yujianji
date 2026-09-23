@@ -1,0 +1,83 @@
+.card {
+  margin-bottom: 14px;
+  padding: 17px;
+  border: 1px solid var(--line);
+  border-radius: 19px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.card h2 {
+  margin: 0 0 6px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 750;
+}
+
+.rows {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rows li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--teal-dark);
+}
+
+.rows li:last-child {
+  border-bottom: 0;
+}
+
+.name {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.name small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.name .connected {
+  color: var(--teal);
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--teal-dark);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.rows li.note {
+  display: block;
+  padding: 0 0 11px 28px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.note a {
+  color: var(--teal);
+  font-weight: 600;
+}
