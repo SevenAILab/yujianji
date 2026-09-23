@@ -228,12 +228,13 @@ function memoTables() {
 
 /** 删除本机全部用户数据。示例数据一并清掉，回到全新状态。 */
 export async function wipeLocalData(): Promise<void> {
-  const tables = [db.items, db.trips, db.meta, db.healthSamples, db.pendingEncounters, ...memoTables()];
+  const tables = [db.items, db.trips, db.meta, db.healthSamples, db.pendingEncounters, db.models3d, ...memoTables()];
   await db.transaction("rw", tables, async () => {
     await db.items.clear();
     await db.trips.clear();
     await db.healthSamples.clear();
     await db.pendingEncounters.clear();
+    await db.models3d.clear();
     await Promise.all(memoTables().map((table) => table.clear()));
     // meta 里除了设备标识都清掉：设备标识留着，否则配额会被绕过。
     const rows = await db.meta.toArray();

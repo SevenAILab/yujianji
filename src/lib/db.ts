@@ -23,6 +23,18 @@ import type {
 
 type SeedMeta = { key: string; value: boolean | string };
 
+/** 照片建成的 3D 模型：任务状态 + 压缩好的 GLB，只存在本机（服务器 2 小时后删） */
+export type Model3dRow = {
+  itemId: string;
+  taskId: string;
+  state: "submitted" | "running" | "processing" | "ready" | "failed";
+  progress: number;
+  error?: string;
+  glb?: Blob;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type PendingEncounterRow = {
   /** current：交给 /encounter 的照片；memo-import：首页「导入」选中、交给 /memo/import 的录音 */
   key: "current" | "memo-import";
@@ -52,6 +64,7 @@ class YujianjiDatabase extends Dexie {
   profiles!: Table<Profile, number>;
   feedbackEvents!: Table<FeedbackEvent, string>;
   agentTraces!: Table<AgentTrace, string>;
+  models3d!: Table<Model3dRow, string>;
 
   constructor() {
     super("yujianji");
@@ -75,6 +88,8 @@ class YujianjiDatabase extends Dexie {
     });
     // v7：声纹注册。只新增一张表，老用户的照片和手记都不动。
     this.version(7).stores({ memoVoiceprint: "id" });
+    // v8：照片建成的 3D 模型。只新增一张表，老数据不动。
+    this.version(8).stores({ models3d: "itemId, state" });
   }
 }
 

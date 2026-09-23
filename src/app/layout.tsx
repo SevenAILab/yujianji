@@ -4,6 +4,7 @@ import "./globals.css";
 import { LOCAL_ONLY } from "@/lib/app-mode";
 import { ConsentGate } from "@/components/ConsentGate";
 import { RecorderProvider } from "@/components/memo/RecorderProvider";
+import { ModelJobRunner } from "@/components/universe/ModelJobRunner";
 
 export const metadata: Metadata = {
   title: "遇见集 · 遇见世界，收藏第一次",
@@ -38,6 +39,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* 录音器挂在这里：切页面不断，才能录着音去首页拍照 */}
         <RecorderProvider>{children}</RecorderProvider>
         <ConsentGate />
+        {/* 刚拍的第一次在后台建成 3D，建好存本机，精神图景里就会出现 */}
+        <ModelJobRunner />
       </body>
     </html>
   );

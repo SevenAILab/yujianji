@@ -7,7 +7,7 @@ import { db, hasDemoData } from "@/lib/db";
 import { itemDayKey } from "@/lib/memo/day-match";
 import { deviceTimeZone } from "@/lib/memo/time";
 import { buildUniverseNodes, sampleNodes, type UniverseNode } from "@/lib/universe/nodes";
-import { useModelManifest } from "./useModelIds";
+import { useLocalModels, useModelManifest } from "./useModelIds";
 
 const SAMPLE_URL = "/assets/encounters.json";
 
@@ -22,7 +22,10 @@ async function fetchJson(url: string): Promise<unknown> {
 
 export function useUniverseNodes(): { nodes: UniverseNode[]; loading: boolean; sample: boolean; demo: boolean } {
   const [timeZone] = useState(() => (typeof window === "undefined" ? "Asia/Shanghai" : deviceTimeZone()));
-  const manifest = useModelManifest();
+  const shared = useModelManifest();
+  const local = useLocalModels();
+  // 本机建成的模型优先：同一件藏品自己拍的那张建出来的，就用它
+  const manifest = useMemo(() => (shared ? new Map([...shared, ...local]) : null), [shared, local]);
   const [samples, setSamples] = useState<UniverseNode[] | null>(null);
 
   const demoLoaded = useLiveQuery(() => hasDemoData(), [], false);
