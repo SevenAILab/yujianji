@@ -82,6 +82,41 @@ function isVideoFile(file: File): boolean {
   return file.type.startsWith("video/") || /\.(mp4|mov|m4v|webm)$/i.test(file.name);
 }
 
+const UNIVERSE_TOKEN_KEY = "memory-universe-capability-v1";
+
+function universeToken(): string {
+  const saved = localStorage.getItem(UNIVERSE_TOKEN_KEY);
+  if (/^[a-f0-9]{64}$/.test(saved ?? "")) return saved!;
+  const token = [...crypto.getRandomValues(new Uint8Array(32))]
+    .map((value) => value.toString(16).padStart(2, "0"))
+    .join("");
+  localStorage.setItem(UNIVERSE_TOKEN_KEY, token);
+  return token;
+}
+
+async function enqueueMemoryModel(item: Item): Promise<void> {
+  const environment = item.category === "landscape" || item.category === "sky";
+  const category = item.category === "animal"
+    ? "creature"
+    : item.category === "plant"
+      ? "plant"
+      : environment
+        ? "building"
+        : "prop";
+  const blob = await fetch(item.photo).then((response) => response.blob());
+  const body = new FormData();
+  body.set("file", blob, `${item.id}.jpg`);
+  body.set("name", item.name);
+  body.set("category", category);
+  body.set("input_mode", environment ? "environment" : "object");
+  const response = await fetch("/api/memory-3d/jobs", {
+    method: "POST",
+    headers: { "X-Universe-ID": universeToken(), "Idempotency-Key": item.id },
+    body,
+  });
+  if (!response.ok) throw new Error("MEMORY_3D_ERROR");
+}
+
 export default function EncounterPage() {
   const router = useRouter();
   const [preview, setPreview] = useState("");
@@ -344,6 +379,7 @@ export default function EncounterPage() {
       } catch {
         throw new Error("LOCAL_STORAGE_ERROR");
       }
+      await enqueueMemoryModel(item);
       router.push(`/item/${item.id}`);
     } catch (caught) {
       const code = caught instanceof Error ? caught.message : "MODEL_ERROR";
@@ -474,6 +510,7 @@ export default function EncounterPage() {
         createdAt: now,
       };
       await db.items.put(item);
+      await enqueueMemoryModel(item);
       router.push(`/item/${item.id}`);
     } catch {
       setError(errorMessage("LOCAL_STORAGE_ERROR"));

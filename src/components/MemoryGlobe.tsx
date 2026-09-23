@@ -111,7 +111,11 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
   }
 
   function activateTarget(target: NonNullable<Hover>) {
-    if (target.item.mediaKind === "panorama") router.push(panoramaHref(target.item.id));
+    router.push(
+      target.item.mediaKind === "panorama"
+        ? panoramaHref(target.item.id)
+        : `/item/${target.item.id}`,
+    );
   }
 
   function setBubbleElement(node: HTMLElement | null) {
@@ -459,15 +463,16 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
           <span>360°</span>
         </button>
       ) : hover ? (
-        <div
+        <button
           ref={setBubbleElement}
+          type="button"
+          onClick={() => activateTarget(hover)}
           className={`${styles.photoBubble} ${styles.standardBubble}`}
           style={{ left: hover.x, top: hover.y - 38 }}
-          role="img"
-          aria-label={`${hover.item.name}的地图缩略图`}
+          aria-label={`查看${hover.item.name}的详细记录`}
         >
           <img src={hover.item.photo || hover.location.coverPhoto} alt="" />
-        </div>
+        </button>
       ) : null}
     </div>
   );

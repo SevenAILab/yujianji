@@ -68,8 +68,7 @@
 .panoramaBubble span { background: #5b8fc2; }
 
 .standardBubble {
-  pointer-events: none;
-  cursor: default;
+  cursor: pointer;
 }
 
 @keyframes bubble-in {

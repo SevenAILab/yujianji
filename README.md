@@ -14,6 +14,7 @@
 - 由视觉模型识别内容，生成分类、介绍、趣闻、判断依据及“初见 / 重逢”关系；
 - 在记录详情页继续追问 AI，查看个人旅行博物志；
 - 在世界地图查看足迹，按时间范围生成旅程总结；
+- 保存遇见后自动提交图片到 3D 服务，并在记忆图景中加载生成的模型；
 - 在 `/journeys` 按区域串联记录，生成旅程拼贴与成长轨迹；
 - 数据保存在浏览器 IndexedDB，本地生成竖版分享卡，并可生成带缩略图的网页分享链接；
 - 在「我的」页开启持久化存储、查看空间用量、导出/导入备份（含原图）、一键删除全部数据；
@@ -47,6 +48,24 @@ npm run dev
 ```
 
 环境变量见 `.env.example`，逐项都有注释。最少需要 `DASHSCOPE_API_KEY`。
+
+### 图片到 3D 服务
+
+独立后端源码位于 `services/image-to-3d`。前端通过 `MEMORY_3D_API_URL`
+连接该服务；服务端需配置 `TRIPO_API_KEY`，生产环境还应同时配置
+`SERVICE_API_KEY`，并让前端服务使用相同的 `MEMORY_3D_SERVICE_KEY`。
+完整启动和接口说明见 `services/image-to-3d/README.md`。密钥、上传图片、SQLite
+数据库及生成模型均在忽略列表中，不进入 Git。
+
+全新检出后，`npm ci && npm run build` 可按根目录 `package-lock.json` 安装并构建
+Web 应用；这只保证 Web 端依赖完整。要跑通“上传 → 识别 → 3D → 记忆图景”，还需：
+
+1. Web 服务配置 `DASHSCOPE_API_KEY`、`MEMORY_3D_API_URL`，以及可选但推荐的
+   `MEMORY_3D_SERVICE_KEY`；
+2. 启动 `services/image-to-3d`，配置 `TRIPO_API_KEY`；若设置了
+   `SERVICE_API_KEY`，其值须与 Web 端的 `MEMORY_3D_SERVICE_KEY` 一致；
+3. 确保 Web 服务端能够访问 `MEMORY_3D_API_URL`。浏览器只调用同源的
+   `/api/memory-3d/*` 代理，不直接接触 Tripo 密钥。
 
 ### 用量护栏
 

@@ -1,0 +1,13 @@
+.venv/
+.env
+.env.*
+node_modules/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+data/
+.pipeline/
+output/
+examples/*.glb
+examples/encounters/*-normalized.glb
+examples/encounters/*-optimized*.glb
