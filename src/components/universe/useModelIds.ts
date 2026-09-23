@@ -55,7 +55,7 @@ export function useLocalModels(): Map<string, ModelEntry> {
     const next = new Map<string, ModelEntry>();
     for (const row of rows) {
       if (!row.glb) continue;
-      const url = URL.createObjectURL(row.glb);
+      const url = URL.createObjectURL(new Blob([row.glb], { type: "model/gltf-binary" }));
       urls.push(url);
       next.set(row.itemId, { glbUrl: url });
     }

@@ -26,7 +26,7 @@ const csp = [
   "img-src 'self' data: blob:",
   "media-src 'self' data: blob:",
   "font-src 'self' data:",
-  "connect-src 'self' https:",
+  "connect-src 'self' https: blob:",
   "worker-src 'self' blob:",
   "object-src 'none'",
   "frame-ancestors 'none'",

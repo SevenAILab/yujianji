@@ -30,7 +30,8 @@ export type Model3dRow = {
   state: "submitted" | "running" | "processing" | "ready" | "failed";
   progress: number;
   error?: string;
-  glb?: Blob;
+  /** 存 ArrayBuffer 不存 Blob：Safari 无痕模式的 IndexedDB 拒收 Blob（WebKit 实测） */
+  glb?: ArrayBuffer;
   createdAt: string;
   updatedAt: string;
 };

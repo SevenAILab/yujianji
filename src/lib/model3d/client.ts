@@ -43,7 +43,7 @@ export async function syncModelJobs(): Promise<number> {
     if (job.state === "ready") {
       const model = await apiFetch("/api/model3d/model", { taskId: job.taskId });
       if (model.ok) {
-        const glb = await model.blob();
+        const glb = await model.arrayBuffer();
         await db.models3d.put({ ...row, state: "ready", progress: 100, glb, updatedAt: new Date().toISOString() });
         continue;
       }
