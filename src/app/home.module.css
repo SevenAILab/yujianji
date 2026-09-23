@@ -71,6 +71,19 @@
 
 .globeReset:hover { background: #fff; transform: rotate(12deg); }
 
+.headerActions {
+  display: flex;
+  gap: 10px;
+}
+
+.universeEntry {
+  background: rgba(10, 18, 52, .86);
+  color: #cfe3ff;
+  text-decoration: none;
+}
+
+.universeEntry:hover { background: #0a1234; }
+
 .globeStage {
   position: relative;
   z-index: 1;
