@@ -1,390 +1,192 @@
 "use client";
 
-import { CalendarDays, LoaderCircle, WandSparkles, X } from "lucide-react";
+// 旅途 = 每日手帐（工单 Gate 3）：顶上是「今天」卡（今天的录音处理到哪了、生成今天的手帐），
+// 下面是一天一页的手帐列表。旧版"按年份拼贴"收在最底下的折叠区，展开才挂载。
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
+import { ChevronRight, Mic, RotateCcw } from "lucide-react";
 import { AppNav } from "@/components/AppNav";
-import { JourneyCollageMap } from "@/components/JourneyCollageMap";
-import { db, ensureSeeded } from "@/lib/db";
-import { countryName } from "@/lib/iso";
-import type { JourneyCollageData } from "@/lib/journey-collage";
-import type { GeneratedJourney } from "@/lib/journey-generator";
-import type { Item } from "@/lib/types";
-import "./journeys.css";
-import { apiFetch } from "@/lib/api-client";
+import { LegacyJourneys } from "@/components/LegacyJourneys";
+import { KIND_LABEL, STATUS_LABEL } from "@/components/memo/labels";
+import { useRecorder } from "@/components/memo/RecorderProvider";
+import { db } from "@/lib/db";
+import { describeMemoError } from "@/lib/memo/client/api";
+import { generateDiary } from "@/lib/memo/client/orchestrator";
+import { dayItemRange, itemDayKey } from "@/lib/memo/day-match";
+import { effectiveDecision } from "@/lib/memo/select";
+import { clockIn, dayKeyIn, deviceTimeZone, shortDay } from "@/lib/memo/time";
+import { buildDiaryTimeline, diaryCoverItemId, isFirstEncounter } from "@/lib/memo/timeline";
+import type { DiaryDay, MemoSession } from "@/lib/memo/types";
+import styles from "./diary.module.css";
 
-type SavedJourney = {
-  meta: GeneratedJourney;
-  createdAt: string;
-  /** 按年份自动生成的拼贴：默认展示，不入库、不可删。 */
-  isAuto?: boolean;
-};
-
-const JOURNEY_ARCHIVE_KEY = "journey-archive-v1";
-
-function previousJourneyEnd(journey: SavedJourney | undefined) {
-  const candidate = journey?.meta.dateRange.split("—").at(-1)?.trim() ?? "";
-  return /^\d{4}-\d{2}-\d{2}$/.test(candidate) ? candidate : "";
-}
-
-function validJourneyItems(items: Item[]) {
-  return items.filter(
-    (item): item is Item & { lat: number; lng: number } =>
-      typeof item.lat === "number" && typeof item.lng === "number",
-  );
-}
+const PROCESSING: MemoSession["status"][] = ["recorded", "uploading", "preparing", "transcribing", "judging"];
 
 export default function JourneysPage() {
-  const [seedReady, setSeedReady] = useState(false);
-  const [creatorOpen, setCreatorOpen] = useState(false);
-  const [journeyName, setJourneyName] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [generating, setGenerating] = useState(false);
-  const [generationError, setGenerationError] = useState("");
-  const [activeCountry, setActiveCountry] = useState("ALL");
-  const [savedJourneys, setSavedJourneys] = useState<SavedJourney[]>([]);
-  const [autoJourneys, setAutoJourneys] = useState<SavedJourney[]>([]);
-  const [autoLoading, setAutoLoading] = useState(true);
-  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
-  const items = useLiveQuery(
-    () => (seedReady ? db.items.orderBy("date").toArray() : Promise.resolve([] as Item[])),
-    [seedReady],
-    [],
-  );
-
+  const [timeZone, setTimeZone] = useState("Asia/Shanghai");
+  const [today, setToday] = useState("");
+  const [legacyOpen, setLegacyOpen] = useState(false);
   useEffect(() => {
-    let active = true;
-    void ensureSeeded()
-      .catch(() => undefined)
-      .finally(() => {
-        if (active) setSeedReady(true);
-      });
-    return () => {
-      active = false;
-    };
+    const tz = deviceTimeZone();
+    setTimeZone(tz);
+    setToday(dayKeyIn(new Date().toISOString(), tz));
   }, []);
 
-  useEffect(() => {
-    if (!seedReady) return;
-    let active = true;
-    void db.meta.get(JOURNEY_ARCHIVE_KEY).then((stored) => {
-      if (!active || typeof stored?.value !== "string") return;
-      try {
-        const parsed = JSON.parse(stored.value) as SavedJourney[];
-        if (Array.isArray(parsed)) setSavedJourneys(parsed);
-      } catch {
-        // Ignore an unreadable local archive and let the next save replace it.
-      }
-    });
-    return () => {
-      active = false;
-    };
-  }, [seedReady]);
+  const diaries = useLiveQuery(() => db.diaryDays.orderBy("dayKey").reverse().limit(60).toArray(), [], []);
 
-  const dateBounds = useMemo(() => {
-    if (!items.length) return null;
-    return {
-      first: items[0].date.slice(0, 10),
-      last: items[items.length - 1].date.slice(0, 10),
-    };
-  }, [items]);
+  return (
+    <main className="app-shell">
+      <div className={`phone-page ${styles.page}`}>
+        <header className={styles.header}>
+          <h1>旅途</h1>
+          <p>一天一页手帐：你当天拍下的第一次，和你当时说的话</p>
+        </header>
 
-  // 自己创建的排在前面，按年份自动生成的跟在后面，评委一进来就有内容可看。
-  const allJourneys = useMemo(
-    () => [...savedJourneys, ...autoJourneys],
-    [savedJourneys, autoJourneys],
+        {today ? <TodayCard today={today} timeZone={timeZone} hasDiary={diaries.some((d) => d.dayKey === today)} /> : null}
+
+        <section className={styles.list} aria-label="每日手帐">
+          {diaries.filter((d) => d.dayKey !== today).map((diary) => (
+            <DiaryCard key={diary.dayKey} diary={diary} timeZone={timeZone} />
+          ))}
+          {!diaries.filter((d) => d.dayKey !== today).length ? (
+            <div className={styles.empty}>
+              <strong>还没有往日的手帐</strong>
+              <span>白天在首页拍照、录音，一天结束时它会把照片和你说的话整理成一页。</span>
+              <Link href="/" className={styles.ghostButton}>
+                去首页记录
+              </Link>
+            </div>
+          ) : null}
+        </section>
+
+        <details className={styles.legacy} onToggle={(event) => setLegacyOpen((event.currentTarget as HTMLDetailsElement).open)}>
+          <summary>旧版旅途（按时间拼贴）</summary>
+          {legacyOpen ? <LegacyJourneys /> : null}
+        </details>
+      </div>
+      <AppNav />
+    </main>
   );
+}
 
-  const countries = useMemo(
-    () => [...new Set(allJourneys.flatMap((journey) => journey.meta.regions.map((region) => region.country)))],
-    [allJourneys],
+function TodayCard({ today, timeZone, hasDiary }: { today: string; timeZone: string; hasDiary: boolean }) {
+  const router = useRouter();
+  const recorder = useRecorder();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const sessions = useLiveQuery(() => db.memoSessions.orderBy("startedAt").reverse().limit(30).toArray(), [], []);
+  const moments = useLiveQuery(() => db.moments.where("dayKey").equals(today).toArray(), [today], []);
+  const items = useLiveQuery(() => db.items.where("date").between(...dayItemRange(today), true, true).toArray(), [today], []);
+
+  // 今天的录音；以前没正常结束的也放进来，否则用户找不到入口处理
+  const todaySessions = useMemo(
+    () => sessions.filter((s) => dayKeyIn(s.startedAt, s.timeZone) === today || (s.status === "recording" && !recorder.isActive(s.id))),
+    [sessions, today, recorder],
   );
+  const kept = moments.filter((m) => effectiveDecision(m) === "keep").length;
+  const firstPhotos = items.filter((item) => isFirstEncounter(item) && itemDayKey(item, timeZone) === today).length;
+  const processing = todaySessions.filter((s) => PROCESSING.includes(s.status) || recorder.jobs.some((j) => j.sessionId === s.id && j.status === "processing")).length;
+  const hasMaterial = kept > 0 || firstPhotos > 0;
 
-  const visibleJourneys = useMemo(
-    () => activeCountry === "ALL"
-      ? allJourneys
-      : allJourneys.filter((journey) => journey.meta.regions.some((region) => region.country === activeCountry)),
-    [activeCountry, allJourneys],
-  );
-
-  const itemById = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
-
-  // 打开就有内容：按「每一年」自动生成拼贴，不需要用户先手填日期。
-  // 只读展示，不写进 journey-archive，所以不会污染用户自己建的旅程。
-  useEffect(() => {
-    const sourceItems = validJourneyItems(items);
-    if (!sourceItems.length) {
-      setAutoJourneys([]);
-      setAutoLoading(false);
-      return;
-    }
-    let active = true;
-    setAutoLoading(true);
-    const years = [...new Set(sourceItems.map((item) => item.date.slice(0, 4)))]
-      .filter((year) => /^\d{4}$/.test(year))
-      .sort((a, b) => Number(b) - Number(a));
-
-    const payloadFor = (year: string) => ({
-      startDate: `${year}-01-01`,
-      endDate: `${year}-12-31`,
-      items: sourceItems
-        .filter((item) => item.date.slice(0, 4) === year)
-        .map((item) => ({
-          id: item.id,
-          name: item.name,
-          category: item.category,
-          place: item.place,
-          country: item.country,
-          lat: item.lat,
-          lng: item.lng,
-          date: item.date,
-          userNote: item.userNote,
-          memorySentence: item.ai?.memorySentence ?? "",
-          verdict: item.ai?.verdict ?? null,
-          cognition: item.ai?.cognition ?? "",
-        })),
-    });
-
-    void Promise.all(
-      years.map(async (year): Promise<SavedJourney | null> => {
-        try {
-          const response = await apiFetch("/api/journeys/generate", payloadFor(year));
-          if (!response.ok) return null;
-          const payload = await response.json() as { journey?: GeneratedJourney };
-          if (!payload.journey) return null;
-          return {
-            meta: {
-              ...payload.journey,
-              id: `auto-${year}`,
-              title: `${year} 年 · ${payload.journey.title}`,
-            },
-            createdAt: `${year}-12-31T00:00:00.000Z`,
-            isAuto: true,
-          };
-        } catch {
-          // 单独某一年失败不影响其它年份，失败的那年就是不出现。
-          return null;
-        }
-      }),
-    ).then((results) => {
-      if (!active) return;
-      // 只有一个落点的年份（2017/2018/2025 各一条记录，2026 三条全在深圳同一处）
-      // 拼出来是一张没有路径的空图，不如不出。照片本身不动，
-      // 地图、藏品、全景演示里都还在。
-      setAutoJourneys(
-        results.filter(
-          (entry): entry is SavedJourney =>
-            entry !== null && entry.meta.stops.length >= 2,
-        ),
-      );
-      setAutoLoading(false);
-    });
-
-    return () => {
-      active = false;
-    };
-  }, [items]);
-
-  function openCreator() {
-    setGenerationError("");
-    if (dateBounds) {
-      const previousEnd = previousJourneyEnd(savedJourneys[0]);
-      const nextStart = previousEnd || dateBounds.first;
-      setStartDate(nextStart);
-      setEndDate(nextStart > dateBounds.last ? nextStart : dateBounds.last);
-    }
-    setJourneyName("");
-    setCreatorOpen(true);
-  }
-
-  function toCollage(journey: GeneratedJourney): JourneyCollageData {
-    return {
-      id: journey.id,
-      regions: journey.regions,
-      mapLabel: journey.mapLabel,
-      stops: journey.stops.flatMap((stop) => {
-        const source = itemById.get(stop.itemId);
-        return source ? [{ ...stop, photo: source.photo }] : [];
-      }),
-    };
-  }
-
-  async function createJourney() {
-    setGenerating(true);
-    setGenerationError("");
+  async function generate() {
+    setBusy(true);
+    setError("");
     try {
-      const sourceItems = validJourneyItems(items);
-      const response = await apiFetch("/api/journeys/generate", {
-          startDate,
-          endDate,
-          items: sourceItems.map((item) => ({
-            id: item.id,
-            name: item.name,
-            category: item.category,
-            place: item.place,
-            country: item.country,
-            lat: item.lat,
-            lng: item.lng,
-            date: item.date,
-            userNote: item.userNote,
-            memorySentence: item.ai?.memorySentence ?? "",
-            verdict: item.ai?.verdict ?? null,
-            cognition: item.ai?.cognition ?? "",
-          })),
-      });
-      const payload = await response.json() as { journey?: GeneratedJourney; error?: string };
-      if (!response.ok || !payload.journey) {
-        throw new Error(payload.error ?? "旅程生成失败");
-      }
-
-      const createdAt = new Date().toISOString();
-      const meta: GeneratedJourney = {
-        ...payload.journey,
-        id: `${payload.journey.id}-${Date.now()}`,
-        title: journeyName.trim() || payload.journey.title,
-      };
-      const next = [{ meta, createdAt }, ...savedJourneys];
-      await db.meta.put({ key: JOURNEY_ARCHIVE_KEY, value: JSON.stringify(next) });
-      setSavedJourneys(next);
-      setActiveCountry("ALL");
-      setCreatorOpen(false);
-    } catch (error) {
-      setGenerationError(error instanceof Error ? error.message : "旅程生成失败");
-    } finally {
-      setGenerating(false);
+      await generateDiary(today);
+      router.push(`/memo/day/${today}`);
+    } catch (cause) {
+      setError(describeMemoError(cause));
+      setBusy(false);
     }
-  }
-
-  async function deleteJourney() {
-    if (!pendingDeleteId) return;
-    const next = savedJourneys.filter((journey) => journey.meta.id !== pendingDeleteId);
-    await db.meta.put({ key: JOURNEY_ARCHIVE_KEY, value: JSON.stringify(next) });
-    setSavedJourneys(next);
-    setPendingDeleteId(null);
   }
 
   return (
-    <main className="app-shell journey-shell">
-      <div className="phone-page journey-page">
-        <header className="journey-header">
-          <div>
-            <h1>我的旅程</h1>
-            <p>用时间，串起所有的遇见</p>
-          </div>
-          <button className="journey-calendar" onClick={openCreator} title="创建一段旅程">
-            <CalendarDays size={16} strokeWidth={1.8} />
-            创建一段旅程
-          </button>
-        </header>
-
-        <div className="journey-filters" role="group" aria-label="按国家筛选旅程">
-          <button className={activeCountry === "ALL" ? "active" : ""} onClick={() => setActiveCountry("ALL")}>全部</button>
-          {countries.map((code) => (
-            <button className={activeCountry === code ? "active" : ""} onClick={() => setActiveCountry(code)} key={code}>
-              {countryName(code).replace("中国", "国内")}
-            </button>
-          ))}
+    <section className={styles.today} aria-label="今天">
+      <div className={styles.todayHead}>
+        <div>
+          <small>今天 · {shortDay(today)}</small>
+          <h2>{hasMaterial ? `${firstPhotos} 张第一次 · ${kept} 段留下的话` : "今天还没有记录"}</h2>
         </div>
+        {hasDiary ? (
+          <Link href={`/memo/day/${today}`} className={styles.ghostButton}>
+            看今天的手帐 <ChevronRight size={14} />
+          </Link>
+        ) : null}
+      </div>
 
-        <div className="journey-collage-list">
-          {visibleJourneys.map((journey) => {
-            const collage = toCollage(journey.meta);
+      {todaySessions.length ? (
+        <ul className={styles.sessions}>
+          {todaySessions.map((s) => {
+            const job = recorder.jobs.find((j) => j.sessionId === s.id);
+            const orphan = s.status === "recording" && !recorder.isActive(s.id);
+            const retryable = s.status === "failed" && s.error?.retryable && s.error.code !== "ASR_SUBMIT_UNKNOWN";
             return (
-              <article className="journey-collage-entry" key={journey.meta.id}>
-                <header className="journey-collage-heading">
-                  <div>
-                    <small>{journey.meta.dateRange}</small>
-                    <h2>{journey.meta.title}</h2>
-                    <p>{journey.meta.stops.length} 个地点 · {journey.meta.recordCount} 条记录</p>
-                  </div>
-                  {journey.isAuto ? null : (
-                    <button className="journey-delete-button" onClick={() => setPendingDeleteId(journey.meta.id)} aria-label={`删除${journey.meta.title}`} title="删除旅程">
-                      <X size={18} strokeWidth={1.7} />
-                    </button>
-                  )}
-                </header>
-                <JourneyCollageMap journey={collage} />
-              </article>
+              <li key={s.id}>
+                <Mic size={14} aria-hidden />
+                <span className={styles.sessionMeta}>
+                  {clockIn(s.startedAt, s.timeZone)} · {KIND_LABEL[s.kind]}
+                </span>
+                <span className={styles.sessionStatus}>
+                  {orphan ? "没有正常结束" : job?.status === "processing" ? job.message : recorder.isActive(s.id) && s.status === "recording" ? "录音中" : STATUS_LABEL[s.status]}
+                </span>
+                {orphan ? (
+                  <button type="button" className={styles.linkButton} onClick={() => void recorder.process(s.id)}>
+                    处理已录下的部分
+                  </button>
+                ) : retryable ? (
+                  <button type="button" className={styles.linkButton} onClick={() => void recorder.process(s.id)}>
+                    <RotateCcw size={12} /> 重试
+                  </button>
+                ) : s.status === "failed" ? (
+                  <Link className={styles.linkButton} href={`/memo/session/${s.id}`}>
+                    查看
+                  </Link>
+                ) : null}
+              </li>
             );
           })}
+        </ul>
+      ) : null}
 
-          {!visibleJourneys.length && autoLoading ? (
-            <div className="journey-empty" aria-live="polite">
-              <LoaderCircle className="journey-spin" size={22} />
-              <strong>正在按年份整理你的旅程…</strong>
-              <span>照片、地点和路线会自动拼成一张旅行手帐。</span>
-            </div>
-          ) : null}
+      {hasMaterial ? (
+        <button type="button" className={styles.primaryButton} onClick={() => void generate()} disabled={busy}>
+          {busy ? "正在整理…" : processing ? `还有 ${processing} 段在处理，先生成已完成的` : hasDiary ? "重新生成今天的手帐" : "生成今天的手帐"}
+        </button>
+      ) : (
+        <p className={styles.hint}>
+          去<Link href="/">首页</Link>拍一张第一次见到的东西，或者录一段此刻的感受。
+        </p>
+      )}
+      {error ? <p className={styles.error}>{error}</p> : null}
+    </section>
+  );
+}
 
-          {!visibleJourneys.length && !autoLoading ? (
-            <button className="journey-empty" onClick={openCreator}>
-              <CalendarDays size={22} strokeWidth={1.6} />
-              <strong>{allJourneys.length ? "这里还没有对应的旅程" : "创建你的第一张旅程拼贴"}</strong>
-              <span>选择一段时间，照片、地点和路线会自动拼成一张旅行手帐。</span>
-            </button>
-          ) : null}
-        </div>
+function DiaryCard({ diary, timeZone }: { diary: DiaryDay; timeZone: string }) {
+  const moments = useLiveQuery(() => db.moments.where("dayKey").equals(diary.dayKey).toArray(), [diary.dayKey], []);
+  const items = useLiveQuery(() => db.items.where("date").between(...dayItemRange(diary.dayKey), true, true).toArray(), [diary.dayKey], []);
+  const timeline = useMemo(
+    () => buildDiaryTimeline({ dayKey: diary.dayKey, paragraphs: diary.paragraphs, moments, items, timeZone }),
+    [diary, moments, items, timeZone],
+  );
+  const coverId = diaryCoverItemId(timeline);
+  const cover = useLiveQuery(async () => (coverId ? (items.find((i) => i.id === coverId) ?? (await db.items.get(coverId))) : undefined), [coverId, items]);
+  const paragraphs = timeline.filter((e) => e.kind === "moment").length;
+  const photos = timeline.filter((e) => e.kind === "photo" || (e.kind === "moment" && e.photoId)).length;
+
+  return (
+    <Link href={`/memo/day/${diary.dayKey}`} className={styles.card}>
+      {cover ? <img src={cover.photo} alt={cover.name} className={styles.cover} loading="lazy" /> : <div className={styles.coverEmpty} aria-hidden />}
+      <div className={styles.cardBody}>
+        <small>{shortDay(diary.dayKey)}</small>
+        <h3>{diary.title}</h3>
+        <p>
+          {paragraphs ? `${paragraphs} 段` : "没有留下的话"}
+          {photos ? ` · ${photos} 张照片` : ""}
+        </p>
       </div>
-      <AppNav />
-
-      {creatorOpen ? (
-        <div className="journey-modal-backdrop" role="presentation" onMouseDown={(event) => {
-          if (event.target === event.currentTarget && !generating) setCreatorOpen(false);
-        }}>
-          <section className="journey-creator" role="dialog" aria-modal="true" aria-labelledby="journey-creator-title">
-            <div className="journey-creator-head">
-              <div>
-                <span>NEW JOURNEY</span>
-                <h2 id="journey-creator-title">创建一段旅程</h2>
-              </div>
-              <button onClick={() => setCreatorOpen(false)} disabled={generating} aria-label="关闭创建旅程">
-                <X size={18} />
-              </button>
-            </div>
-
-            <label className="journey-name-field">
-              <span>旅程名称</span>
-              <input value={journeyName} onChange={(event) => setJourneyName(event.target.value)} placeholder="例如：冰岛之旅" maxLength={36} />
-            </label>
-
-            <div className="journey-date-range">
-              <label>
-                <span>开始日期</span>
-                <input type="date" min={dateBounds?.first} max={endDate || dateBounds?.last} value={startDate} onChange={(event) => setStartDate(event.target.value)} />
-              </label>
-              <i>—</i>
-              <label>
-                <span>结束日期</span>
-                <input type="date" min={startDate || dateBounds?.first} max={dateBounds?.last} value={endDate} onChange={(event) => setEndDate(event.target.value)} />
-              </label>
-            </div>
-
-            {generationError ? <div className="journey-error">{generationError}</div> : null}
-
-            <button className="journey-create-action" disabled={!startDate || !endDate || generating || !items.length} onClick={() => void createJourney()}>
-              {generating ? <LoaderCircle className="journey-spin" size={17} /> : <WandSparkles size={17} />}
-              {generating ? "正在整理这段旅程…" : "生成旅程拼贴"}
-            </button>
-          </section>
-        </div>
-      ) : null}
-
-      {pendingDeleteId ? (
-        <div className="journey-modal-backdrop" role="presentation" onMouseDown={(event) => {
-          if (event.target === event.currentTarget) setPendingDeleteId(null);
-        }}>
-          <section className="journey-delete-dialog" role="alertdialog" aria-modal="true" aria-labelledby="journey-delete-title">
-            <span>DELETE JOURNEY</span>
-            <h2 id="journey-delete-title">删除这张旅程拼贴？</h2>
-            <p>只会删除这张拼贴，原始照片和遇见记录都会保留。</p>
-            <div>
-              <button onClick={() => setPendingDeleteId(null)}>取消</button>
-              <button className="confirm" onClick={() => void deleteJourney()}>删除旅程</button>
-            </div>
-          </section>
-        </div>
-      ) : null}
-    </main>
+      <ChevronRight size={16} className={styles.chevron} aria-hidden />
+    </Link>
   );
 }

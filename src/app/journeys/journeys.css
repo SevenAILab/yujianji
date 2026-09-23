@@ -714,3 +714,24 @@
   }
   .journey-date-range i { display: none; }
 }
+
+/* 旧版旅途收进每日手帐页底部的折叠区里 */
+.legacy-journeys {
+  overflow: visible;
+  padding: 0;
+  background: transparent;
+}
+
+.legacy-journeys .journey-page {
+  width: 100%;
+  padding: 10px 0 0;
+}
+
+.legacy-journeys .journey-header h2 {
+  margin: 0;
+  color: #0d5558;
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -.04em;
+}
