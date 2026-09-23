@@ -62,3 +62,49 @@
   text-align: center;
   pointer-events: none;
 }
+
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.printButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 214, 170, 0.55);
+  border-radius: 999px;
+  background: rgba(255, 196, 140, 0.16);
+  color: #ffe2c4;
+  font-size: 13px;
+  font-weight: 700;
+  pointer-events: auto;
+  backdrop-filter: blur(6px);
+}
+
+.printButtonActive {
+  background: #ffd3a8;
+  color: #3a2415;
+}
+
+.pickHint {
+  position: absolute;
+  right: 16px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 96px);
+  left: 16px;
+  z-index: 2;
+  margin: 0 auto;
+  max-width: 340px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 214, 170, 0.45);
+  border-radius: 999px;
+  background: rgba(58, 36, 21, 0.72);
+  color: #ffe2c4;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  pointer-events: none;
+}

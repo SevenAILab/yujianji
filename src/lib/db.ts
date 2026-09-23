@@ -1,10 +1,11 @@
-﻿"use client";
+"use client";
 
 import Dexie, { type Table } from "dexie";
 import type { Item, Trip } from "./types";
 import { itemSchema } from "./schema";
 import type { NativeHealthSample } from "./native-bridge";
-import { dayKeyIn, deviceTimeZone, tzOffsetMinutes } from "./memo/time";
+import { deviceTimeZone, tzOffsetMinutes } from "./memo/time";
+import { DEMO_DAYS, DEMO_VERSION, placeTail, type DemoStop } from "./demo/journal-demo";
 import type {
   AgentTrace,
   DiaryDay,
@@ -130,101 +131,165 @@ export async function clearLegacySeeds(): Promise<number> {
   }
 }
 
-export async function loadDemoData(): Promise<number> {
-  if (await hasDemoData()) return db.items.filter((item) => item.isSeed && item.ai?.verdict === "first").count();
-  const seedItems = await fetchSeedItems();
-  const items = seedItems.filter((item) => item.ai?.verdict === "first");
-  const timeZone = deviceTimeZone();
-  const usedDays = new Set([
-    ...(await db.diaryDays.toCollection().primaryKeys()).map(String),
-    ...(await db.items.toArray()).map((item) => dayKeyIn(item.date, timeZone)),
-  ]);
-  let firstDay = Date.UTC(2026, 7, 1);
-  while (Array.from({ length: items.length }, (_, index) => new Date(firstDay + index * 86_400_000).toISOString().slice(0, 10)).some((day) => usedDays.has(day))) {
-    firstDay -= items.length * 86_400_000;
-  }
+const DEMO_VERSION_KEY = "demo-version";
 
+/** HH:MM（当地钟点）在设备时区里的那一刻 */
+function wallClockIso(dayKey: string, time: string, timeZone: string): string {
+  const [y, m, d] = dayKey.split("-").map(Number);
+  const [hh, mm] = time.split(":").map(Number);
+  const guess = Date.UTC(y, m - 1, d, hh, mm);
+  return new Date(guess - tzOffsetMinutes(new Date(guess).toISOString(), timeZone) * 60_000).toISOString();
+}
+
+/** 全景示例（地球放大后的 360° 入口）仍然来自 seed-data.json；其余示例都来自 DEMO_DAYS */
+async function fetchPanoramaSeeds(): Promise<Item[]> {
+  try {
+    return (await fetchSeedItems()).filter((item) => item.mediaKind === "panorama");
+  } catch {
+    return [];
+  }
+}
+
+function demoItem(stop: DemoStop, at: string): Item {
+  return {
+    id: stop.id,
+    name: stop.name,
+    category: stop.category,
+    photo: stop.photo,
+    place: stop.place,
+    country: stop.country,
+    lat: stop.lat,
+    lng: stop.lng,
+    locationSource: "exif",
+    placeSource: "exif",
+    date: at,
+    dateSource: "exif",
+    userNote: stop.quote,
+    ai: {
+      cognition: stop.cognition,
+      fun: stop.fun,
+      luck: stop.luck,
+      question: stop.question,
+      verdict: "first",
+      relatedItemId: null,
+      memorySentence: stop.memorySentence,
+    },
+    isSeed: true,
+    createdAt: at,
+  };
+}
+
+/**
+ * 载入示例：每天一条路线，每个点一张照片、一段录音里的原话、一段手帐。
+ * 用户自己那天已经有手帐的，跳过那一天，不覆盖。已经载入过旧版示例的，先整套换掉。
+ */
+let demoLoading: Promise<number> | null = null;
+
+export function loadDemoData(): Promise<number> {
+  // 首页和其他页会同时触发换新，只让一次真正执行
+  demoLoading ??= loadDemoDataOnce().finally(() => {
+    demoLoading = null;
+  });
+  return demoLoading;
+}
+
+async function loadDemoDataOnce(): Promise<number> {
+  if (await hasDemoData()) {
+    const version = await db.meta.get(DEMO_VERSION_KEY);
+    if (version?.value === DEMO_VERSION) return db.items.filter((item) => item.isSeed && item.ai?.verdict === "first").count();
+    await removeDemoData();
+  }
+  const timeZone = deviceTimeZone();
+  const taken = new Set((await db.diaryDays.toCollection().primaryKeys()).map(String));
+  const panoramas = await fetchPanoramaSeeds();
+
+  const items: Item[] = [];
   const sessions: MemoSession[] = [];
   const utterances: Utterance[] = [];
   const windows: MemoWindow[] = [];
   const moments: Moment[] = [];
   const diaryDays: DiaryDay[] = [];
-  items.forEach((source, index) => {
-    const day = new Date(firstDay + index * 86_400_000);
-    const localNoon = Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate(), 12, 0);
-    const startedAt = new Date(localNoon - tzOffsetMinutes(new Date(localNoon).toISOString(), timeZone) * 60_000).toISOString();
-    const endedAt = new Date(Date.parse(startedAt) + 45_000).toISOString();
-    const dayKey = dayKeyIn(startedAt, timeZone);
-    const item: Item = { ...source, date: startedAt, createdAt: startedAt };
-    const sessionId = `demo-session-${item.id}`;
-    const momentId = `demo-moment-${item.id}`;
-    const utteranceId = `${sessionId}:0`;
-    const windowId = `${sessionId}:w0`;
-    const quote = item.userNote || `我第一次注意到${item.name}。`;
-    const text = `${quote} ${item.ai?.memorySentence ?? "這一刻值得留在今天的手記裡。"}`.trim();
-    const session: MemoSession = {
-      id: sessionId,
-      kind: "import",
-      startedAt,
-      endedAt,
-      durationSec: 45,
-      timeZone,
-      tzOffsetMin: tzOffsetMinutes(startedAt, timeZone),
-      startedAtSource: "user",
-      status: "ready",
-      speakers: [{ key: "0:0", meanDb: null, talkMs: 45_000, role: "me" }],
-      meSource: "user",
-      meUncertain: false,
-      createdAt: startedAt,
-      updatedAt: startedAt,
-    };
-    const moment: Moment = {
-      id: momentId,
-      sessionId,
-      windowId,
-      dayKey,
-      at: startedAt,
-      place: { name: item.place, source: "backfill", confidence: "high", locked: true },
-      decision: "keep",
-      salience: 0.82,
-      category: "first_experience",
-      trigger: item.name,
-      why: "模拟演示内容：用示例照片和编写的旁白展示从录音到手帐的结构。",
-      myQuotes: [quote],
-      sourceUtteranceIds: [utteranceId],
-      photoId: item.id,
-      linkedItemIds: [item.id],
-      user: { copiedCount: 0 },
-      runId: `demo-run-${item.id}`,
+  for (const day of DEMO_DAYS) {
+    if (taken.has(day.dayKey)) continue;
+    const runId = `demo-run-${day.dayKey}`;
+    const paragraphs: DiaryDay["paragraphs"] = [];
+    const quotes: DiaryDay["quotes"] = [];
+    let lastAt = "";
+    for (const stop of day.stops) {
+      const at = wallClockIso(day.dayKey, stop.time, timeZone);
+      lastAt = at;
+      const sessionId = `demo-session-${stop.id}`;
+      const momentId = `demo-moment-${stop.id}`;
+      const utteranceId = `${sessionId}:0`;
+      const windowId = `${sessionId}:w0`;
+      const endedAt = new Date(Date.parse(at) + 45_000).toISOString();
+      items.push(demoItem(stop, at));
+      sessions.push({
+        id: sessionId,
+        kind: "import",
+        startedAt: at,
+        endedAt,
+        durationSec: 45,
+        timeZone,
+        tzOffsetMin: tzOffsetMinutes(at, timeZone),
+        startedAtSource: "user",
+        status: "ready",
+        speakers: [{ key: "0:0", meanDb: null, talkMs: 45_000, role: "me" }],
+        meSource: "user",
+        meUncertain: false,
+        createdAt: at,
+        updatedAt: at,
+      });
+      utterances.push({ id: utteranceId, sessionId, index: 0, beginMs: 0, endMs: 45_000, speakerKey: "0:0", speaker: "me", text: stop.quote, expiresAt: new Date(Date.parse(at) + 7 * 86_400_000).toISOString() });
+      windows.push({ id: windowId, sessionId, index: 0, utteranceIds: [utteranceId], beginMs: 0, endMs: 45_000, meChars: stop.quote.length, uncertainChars: 0, triage: { action: "judge", reason: "示例内容", runId }, judge: { status: "done", runId } });
+      moments.push({
+        id: momentId,
+        sessionId,
+        windowId,
+        dayKey: day.dayKey,
+        at,
+        place: { name: placeTail(stop.place), source: "backfill", confidence: "high", locked: true },
+        decision: "keep",
+        salience: 0.82,
+        category: "first_experience",
+        trigger: stop.name,
+        why: "第一次见到，而且说了自己的感受",
+        myQuotes: [stop.quote],
+        sourceUtteranceIds: [utteranceId],
+        photoId: stop.id,
+        linkedItemIds: [stop.id],
+        user: { copiedCount: 0 },
+        runId,
+        profileVersion: 1,
+        createdAt: at,
+      });
+      paragraphs.push({ momentId, heading: `${stop.time} · ${placeTail(stop.place)}`, text: stop.text, verified: true, degraded: false, retries: 0 });
+      // 金句挑一头一尾：出发时的第一句，收尾时的最后一句
+      if (stop === day.stops[0] || stop === day.stops.at(-1)) quotes.push({ momentId, text: stop.quote });
+    }
+    diaryDays.push({
+      dayKey: day.dayKey,
+      title: day.title,
+      quotes,
+      paragraphs,
+      foldedMomentIds: [],
       profileVersion: 1,
-      createdAt: startedAt,
-    };
-    const paragraph = {
-      momentId,
-      heading: `${item.name} · ${item.place}`,
-      text: item.ai?.memorySentence || item.userNote || `第一次遇见${item.name}，我把它和当时的光线一起记了下来。`,
-      verified: false,
-      degraded: false,
-      retries: 0,
-    };
-    sessions.push(session);
-    utterances.push({ id: utteranceId, sessionId, index: 0, beginMs: 0, endMs: 45_000, speakerKey: "0:0", speaker: "me", text, expiresAt: new Date(Date.parse(startedAt) + 7 * 86_400_000).toISOString() });
-    windows.push({ id: windowId, sessionId, index: 0, utteranceIds: [utteranceId], beginMs: 0, endMs: 45_000, meChars: text.length, uncertainChars: 0, triage: { action: "judge", reason: "模拟演示数据", runId: `demo-run-${item.id}` }, judge: { status: "done", runId: `demo-run-${item.id}` } });
-    moments.push(moment);
-    diaryDays.push({ dayKey, title: `演示 · ${item.name} · 那天的手记`, quotes: [{ momentId, text: quote }], paragraphs: [paragraph], foldedMomentIds: [], profileVersion: 1, generatedAt: startedAt, runId: `demo-run-${item.id}`, status: "ready" });
-    items[index] = item;
-  });
+      generatedAt: new Date(Date.parse(lastAt) + 3 * 3600_000).toISOString(),
+      runId,
+      status: "ready",
+    });
+  }
 
   const tables = [db.items, db.memoSessions, db.utterances, db.memoWindows, db.moments, db.diaryDays, db.timeline, db.meta];
   await db.transaction("rw", tables, async () => {
-    await db.items.bulkPut(seedItems);
-    await db.items.bulkPut(items);
+    await db.items.bulkPut([...panoramas, ...items]);
     await db.memoSessions.bulkPut(sessions);
     await db.utterances.bulkPut(utterances);
     await db.memoWindows.bulkPut(windows);
     await db.moments.bulkPut(moments);
     await db.diaryDays.bulkPut(diaryDays);
     await db.meta.put({ key: DEMO_FLAG_KEY, value: true });
+    await db.meta.put({ key: DEMO_VERSION_KEY, value: DEMO_VERSION });
   });
   return items.length;
 }
@@ -268,13 +333,15 @@ export async function removeDemoData(): Promise<number> {
 export async function ensureSeeded(): Promise<boolean> {
   if (!(await hasDemoData())) return false;
   try {
-    const items = await fetchSeedItems();
-    const existing = await db.items.bulkGet(items.map((item) => item.id));
-    const missingOrRefreshable = items.filter(
-      (item, index) => !existing[index] || item.mediaKind === "panorama",
-    );
-    if (missingOrRefreshable.length) await db.items.bulkPut(missingOrRefreshable);
-    return missingOrRefreshable.length > 0;
+    // 旧版示例（25 张散落的照片、一天一张）整套换成按路线组织的新示例
+    const version = await db.meta.get(DEMO_VERSION_KEY);
+    if (version?.value !== DEMO_VERSION) {
+      await loadDemoData();
+      return true;
+    }
+    const panoramas = await fetchPanoramaSeeds();
+    if (panoramas.length) await db.items.bulkPut(panoramas);
+    return false;
   } catch {
     // 示例刷新失败不该拦住任何页面。
     return false;

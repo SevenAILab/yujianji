@@ -21,6 +21,12 @@ export interface JourneyCollageStop {
   photo: string;
   coordinates: [number, number];
   hasDetectedSubject: boolean;
+  /** 点照片去哪；不给就是藏品详情页 */
+  href?: string;
+  /** 便签左上角那一行；不给就是 FIRST TIME · 日期 */
+  label?: string;
+  /** 路线上的序号（第几站）；不给就画一个圆点 */
+  order?: number;
 }
 
 export interface JourneyCollageData {

@@ -5,8 +5,10 @@ import { use, useEffect, useMemo, useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ChevronLeft, Eye, Pencil, RefreshCw, Trash2, Undo2 } from "lucide-react";
 import { AppNav } from "@/components/AppNav";
+import { JourneyCollageMap } from "@/components/JourneyCollageMap";
 import { CopyButton } from "@/components/memo/CopyButton";
 import { db } from "@/lib/db";
+import { buildDayStops, dayCollage, journalDay, routeKm } from "@/lib/journey-days";
 import { describeMemoError } from "@/lib/memo/client/api";
 import { copyFeedback, deleteMoment, editParagraph, restoreMoment, runReflect, shouldAutoReflect, undoDeleteMoment } from "@/lib/memo/client/learn";
 import { confirmBackfill, generateDiary } from "@/lib/memo/client/orchestrator";
@@ -55,6 +57,14 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
     [diary, dayKey, moments, dayItems, timeZone],
   );
   const itemById = useMemo(() => new Map(dayItems.map((item) => [item.id, item])), [dayItems]);
+  // 这一天的路线：带照片的条目按时间连起来，照片点进去就是下面对应的那一段
+  const route = useMemo(() => {
+    if (!diary) return null;
+    const stops = buildDayStops({ timeline, moments, items: [...dayItems, ...photos.values()] });
+    const collage = dayCollage(journalDay(diary, stops), timeZone);
+    const points = stops.filter((stop) => typeof stop.lat === "number" && typeof stop.lng === "number") as { lat: number; lng: number }[];
+    return collage ? { collage, count: stops.length, km: routeKm(points) } : null;
+  }, [diary, timeline, moments, dayItems, photos, timeZone]);
   const firstPhotoCount = useMemo(() => {
     const used = new Set(photoByMoment.values());
     return dayItems.filter((item) => isFirstEncounter(item) && !used.has(item.id) && itemDayKey(item, timeZone) === dayKey).length;
@@ -75,20 +85,23 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
     el.scrollIntoView({ block: "start" });
     el.classList.add(styles.entryFocus);
     window.setTimeout(() => el.classList.remove(styles.entryFocus), 2400);
-    // 上面的照片加载完会把它往下推，等图片都到了再对齐一次（最多等 2 秒）
-    const pending = [...document.images].filter((img) => !img.complete);
-    if (pending.length) {
-      const settle = Promise.all(
-        pending.map(
-          (img) =>
-            new Promise((resolve) => {
-              img.addEventListener("load", resolve, { once: true });
-              img.addEventListener("error", resolve, { once: true });
-            }),
-        ),
-      );
-      void Promise.race([settle, new Promise((resolve) => window.setTimeout(resolve, 2000))]).then(() => el.scrollIntoView({ block: "start" }));
-    }
+    // 上面的路线图和照片陆续加载，会把它往下推：3 秒内布局每变一次就重新对齐；用户自己一滑就停
+    const started = performance.now();
+    let stopped = false;
+    const stop = () => {
+      stopped = true;
+    };
+    window.addEventListener("touchstart", stop, { once: true, passive: true });
+    window.addEventListener("wheel", stop, { once: true, passive: true });
+    const observer = new ResizeObserver(() => {
+      if (!stopped && performance.now() - started < 3000) el.scrollIntoView({ block: "start" });
+    });
+    observer.observe(document.body);
+    window.setTimeout(() => {
+      observer.disconnect();
+      window.removeEventListener("touchstart", stop);
+      window.removeEventListener("wheel", stop);
+    }, 3000);
   }, [timeline]);
   const [showFolded, setShowFolded] = useState(false);
   const folded = useMemo(() => {
@@ -143,7 +156,11 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
       </p>
       <h1 className={styles.diaryTitle}>{diary?.title ?? `${shortDay(dayKey)} 的手记`}</h1>
 
-      {hasDemoMaterial ? <div className={styles.notice} style={{ marginTop: 8 }}>演示数据 · 以下旁白和转写为模拟文案，不含真实录音。</div> : null}
+      {route ? (
+        <div style={{ marginTop: 14 }}>
+          <JourneyCollageMap journey={route.collage} fit="stops" caption={`${route.count} 个地点 · ${route.km >= 1 ? `约 ${Math.round(route.km)} km` : "步行可达"}`} />
+        </div>
+      ) : null}
 
       {diary?.status === "partial" ? (
         <div className={styles.warning} style={{ marginTop: 8 }}>

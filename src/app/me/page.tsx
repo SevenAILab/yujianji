@@ -302,9 +302,10 @@ export default function MePage() {
 
         <section className={styles.card}>
           <p className="eyebrow">示例内容</p>
-          <h2>演示展厅</h2>
+          <h2>别人的遇见集</h2>
           <p className={styles.hint}>
-            25 张示例照片、25 段明确标记的模拟转写和对应手帐，可展示记忆宇宙。模拟内容不含真实录音，不属于你的记录，也不会进入备份。
+            一趟英国 5 天的旅行和两个深圳周末：每天一条路线，照片、当时说的话和手帐都在，也能在精神图景里看到对应的 3D 物件。示例不属于你的记录，不会进入备份，随时可以移除。
+            <a href="/demo/CREDITS.md" target="_blank" rel="noreferrer">照片出处</a>
           </p>
           <button
             className="secondary-action"

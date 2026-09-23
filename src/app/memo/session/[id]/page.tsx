@@ -117,7 +117,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
       <h1 className={styles.title}>
         {KIND_LABEL[session.kind]}{demoSession ? " · 模拟" : ""} · {dayKeyIn(session.startedAt, session.timeZone).slice(5)} {clockIn(session.startedAt, session.timeZone)}
       </h1>
-      {demoSession ? <div className={styles.notice} style={{ marginTop: 8 }}>模拟录音演示 · 以下为编写的模拟转写，不含真实音频。</div> : null}
+      {demoSession ? <div className={styles.notice} style={{ marginTop: 8 }}>示例内容 · 以下为整理好的转写，不含原始音频。</div> : null}
       <p className={styles.subtitle}>
         {placeLabel(session.place)} · {formatDuration(session.durationSec)} · 时间来源：{session.startedAtSource === "recorder" ? "录音时钟" : session.startedAtSource === "file_metadata" ? "文件里的录制时间" : "你确认的时间"} · {session.timeZone}
       </p>

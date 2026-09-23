@@ -735,3 +735,29 @@
   font-weight: 800;
   letter-spacing: -.04em;
 }
+
+/* ── 每天一条路线：按地点取景，没有行政区底图时铺一层纸面点阵 ── */
+.journey-paper-texture { opacity: .7; }
+
+.map-location-order {
+  display: grid;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  place-items: center;
+  border: 2px solid #fffaf0;
+  border-radius: 50%;
+  background: #e2896a;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 900;
+  box-shadow: 0 0 0 2px #2f7770;
+}
+
+.real-journey-map.compact { min-height: 560px; }
+.real-journey-map.compact .photo-west { width: 176px; height: 164px; }
+.real-journey-map.compact .map-photo-cutout.photo-south { width: 150px; height: 140px; }
+.real-journey-map.compact .map-photo-cutout.photo-east { width: 146px; height: 152px; }
+.real-journey-map.compact .map-photo-cutout.photo-extra-one,
+.real-journey-map.compact .map-photo-cutout.photo-extra-two { width: 140px; height: 132px; }
+.real-journey-map.compact .map-sticky-note { max-width: 150px; }

@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { MeshSurfaceSampler } from "three/examples/jsm/math/MeshSurfaceSampler.js";
 import { ringSlots, type UniverseNode } from "@/lib/universe/nodes";
 
@@ -247,7 +248,8 @@ export function UniverseScene({ nodes, onOpen, onStats }: { nodes: UniverseNode[
     const hitGeo = new THREE.SphereGeometry(0.75, 8, 8);
     const hitMat = new THREE.MeshBasicMaterial({ visible: false });
     disposables.push(hitGeo, hitMat);
-    const loader = new GLTFLoader();
+    // 示例模型用 gltf-transform 做过减面 + meshopt 压缩（几十 MB → 几百 KB），要先装解码器
+    const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
     let disposed = false;
 
     nodes.forEach((node, i) => {

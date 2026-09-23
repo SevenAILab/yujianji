@@ -77,12 +77,26 @@
 }
 
 .universeEntry {
-  background: rgba(10, 18, 52, .86);
-  color: #cfe3ff;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 44px;
+  margin-top: 14px;
+  padding: 0 16px 0 13px;
+  border: 1px solid rgba(207, 227, 255, .28);
+  border-radius: 999px;
+  background: rgba(10, 18, 52, .88);
+  color: #e3eeff;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .02em;
   text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 9px 24px rgba(10, 18, 52, .18);
+  transition: transform 180ms ease, background 180ms ease;
 }
 
-.universeEntry:hover { background: #0a1234; }
+.universeEntry:hover { background: #0a1234; transform: translateY(-1px); }
 
 .globeStage {
   position: relative;

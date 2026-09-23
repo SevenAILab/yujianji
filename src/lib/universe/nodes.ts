@@ -30,6 +30,9 @@ export interface UniverseNode {
   href?: string;
   model?: ModelEntry;
   color?: string;
+  /** 照片和地点：打印面板上给人认出是哪一件 */
+  photo?: string;
+  place?: string;
   sample: boolean;
 }
 
@@ -54,7 +57,10 @@ export function parseManifest(raw: unknown): Map<string, ModelEntry> {
   return out;
 }
 
-type NodeItem = Pick<Item, "id" | "name" | "date" | "isSeed" | "ai">;
+type NodeItem = Pick<Item, "id" | "name" | "date" | "isSeed" | "ai"> & Partial<Pick<Item, "category" | "photo" | "place">>;
+
+/** 风景、天空拍的是一整片环境，没有一个能单独建模的主体：留在手帐里，不进宇宙 */
+const NOT_AN_OBJECT = new Set(["landscape", "sky"]);
 
 export function buildUniverseNodes(input: {
   items: NodeItem[];
@@ -70,6 +76,7 @@ export function buildUniverseNodes(input: {
   for (const [momentId, photoId] of dedupePhotos(input.moments)) photoToMoment.set(photoId, momentId);
   return input.items
     .filter((item) => ((input.includeSeeds && item.isSeed && item.ai?.verdict === "first") || isFirstEncounter(item)) && Number.isFinite(new Date(item.date).getTime()))
+    .filter((item) => !item.category || !NOT_AN_OBJECT.has(item.category))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime() || (a.id < b.id ? -1 : 1))
     .map((item) => {
       const dayKey = itemDayKey(item, input.timeZone) ?? undefined;
@@ -84,6 +91,8 @@ export function buildUniverseNodes(input: {
           ? `/memo/day/${dayKey}#${momentId && (!input.visibleMomentIds || input.visibleMomentIds.has(momentId)) ? momentAnchor(momentId) : photoAnchor(item.id)}`
           : undefined,
         ...(model ? { model, color: model.color } : {}),
+        ...(item.photo ? { photo: item.photo } : {}),
+        ...(item.place ? { place: item.place } : {}),
         sample: false,
       };
     });

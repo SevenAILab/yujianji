@@ -9,6 +9,8 @@ import { deviceTimeZone } from "@/lib/memo/time";
 import { buildUniverseNodes, parseManifest, sampleNodes, type ModelEntry, type UniverseNode } from "@/lib/universe/nodes";
 
 const MANIFEST_URL = "/assets/models/manifest.json";
+// 示例照片对应的模型单独放一份，不和吉米产出的 manifest.json 抢同一个文件；同一个 id 以 manifest.json 为准
+const DEMO_MANIFEST_URL = "/assets/models/demo-manifest.json";
 const SAMPLE_URL = "/assets/encounters.json";
 
 async function fetchJson(url: string): Promise<unknown> {
@@ -26,7 +28,7 @@ export function useUniverseNodes(): { nodes: UniverseNode[]; loading: boolean; s
   const [samples, setSamples] = useState<UniverseNode[] | null>(null);
 
   useEffect(() => {
-    void fetchJson(MANIFEST_URL).then((raw) => setManifest(parseManifest(raw)));
+    void Promise.all([fetchJson(DEMO_MANIFEST_URL), fetchJson(MANIFEST_URL)]).then(([demo, main]) => setManifest(new Map([...parseManifest(demo), ...parseManifest(main)])));
   }, []);
 
   const demoLoaded = useLiveQuery(() => hasDemoData(), [], false);

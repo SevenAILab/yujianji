@@ -101,3 +101,23 @@ describe("记忆宇宙 · 节点", () => {
     expect(buildUniverseNodes({ ...input, includeSeeds: true })).toHaveLength(1);
   });
 });
+
+describe("精神图景只放能单独建模的主体", () => {
+  it("风景、天空留在手帐里，不进宇宙；物件、动物、植物进", () => {
+    const base = { date: "2026-09-13T10:00:00.000Z", isSeed: true, ai: { verdict: "first" } } as const;
+    const nodes = buildUniverseNodes({
+      items: [
+        { ...base, id: "cliff", name: "七姐妹白崖", category: "landscape" },
+        { ...base, id: "sky", name: "晚霞", category: "sky" },
+        { ...base, id: "lighthouse", name: "比奇角灯塔", category: "artifact", photo: "/seed-real/白崖灯塔.jpg", place: "英国 · 七姐妹白崖 · 比奇角" },
+        { ...base, id: "gull", name: "银鸥", category: "animal", date: "2026-09-15T15:20:00.000Z" },
+      ] as never,
+      moments: [],
+      manifest: new Map(),
+      timeZone: "UTC",
+      includeSeeds: true,
+    });
+    expect(nodes.map((node) => node.id)).toEqual(["lighthouse", "gull"]);
+    expect(nodes[0].photo).toBe("/seed-real/白崖灯塔.jpg");
+  });
+});

@@ -1,0 +1,6 @@
+{
+  "demo-uk-fox": { "glbUrl": "/assets/models/demo/fox.glb", "color": "#e8955a" },
+  "demo-sz-orchid": { "glbUrl": "/assets/models/demo/slipper-orchid.glb", "color": "#f0b8c4" },
+  "demo-sz-lotus": { "glbUrl": "/assets/models/demo/lotus.glb", "color": "#f4c6dc" },
+  "demo-sz-leopard-gecko": { "glbUrl": "/assets/models/demo/leopard-gecko.glb", "color": "#f2c14e" }
+}
