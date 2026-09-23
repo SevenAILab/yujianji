@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/sync-memory-universe.mjs",
+    "prebuild": "node scripts/sync-memory-universe.mjs",
     "dev": "next dev",
     "build": "next build",
     "native:build": "node scripts/build-native.mjs",
