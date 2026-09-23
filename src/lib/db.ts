@@ -251,9 +251,9 @@ async function loadDemoDataOnce(): Promise<number> {
         place: { name: placeTail(stop.place), source: "backfill", confidence: "high", locked: true },
         decision: "keep",
         salience: 0.82,
-        category: "first_experience",
+        category: stop.agentCategory,
         trigger: stop.name,
-        why: "第一次见到，而且说了自己的感受",
+        why: stop.why,
         myQuotes: [stop.quote],
         sourceUtteranceIds: [utteranceId],
         photoId: stop.id,
@@ -267,12 +267,42 @@ async function loadDemoDataOnce(): Promise<number> {
       // 金句挑一头一尾：出发时的第一句，收尾时的最后一句
       if (stop === day.stops[0] || stop === day.stops.at(-1)) quotes.push({ momentId, text: stop.quote });
     }
+    // 没写进手帐的片段：折叠的进「还有 N 段没写进来」，丢掉的只计数（回执里「丢 N」）
+    for (const aside of day.asides ?? []) {
+      const at = wallClockIso(day.dayKey, aside.time, timeZone);
+      const sessionId = `demo-session-${aside.id}`;
+      const utteranceId = `${sessionId}:0`;
+      const windowId = `${sessionId}:w0`;
+      const text = aside.quote ?? aside.others ?? "";
+      sessions.push({ id: sessionId, kind: "import", startedAt: at, endedAt: new Date(Date.parse(at) + 20_000).toISOString(), durationSec: 20, timeZone, tzOffsetMin: tzOffsetMinutes(at, timeZone), startedAtSource: "user", status: "ready", speakers: [{ key: "0:0", meanDb: null, talkMs: 20_000, role: aside.quote ? "me" : "other" }], meSource: "user", meUncertain: false, createdAt: at, updatedAt: at });
+      utterances.push({ id: utteranceId, sessionId, index: 0, beginMs: 0, endMs: 20_000, speakerKey: "0:0", speaker: aside.quote ? "me" : "other", text, expiresAt: new Date(Date.parse(at) + 7 * 86_400_000).toISOString() });
+      windows.push({ id: windowId, sessionId, index: 0, utteranceIds: [utteranceId], beginMs: 0, endMs: 20_000, meChars: aside.quote?.length ?? 0, uncertainChars: 0, triage: { action: "judge", reason: "示例内容", runId }, judge: { status: "done", runId } });
+      moments.push({
+        id: `demo-moment-${aside.id}`,
+        sessionId,
+        windowId,
+        dayKey: day.dayKey,
+        at,
+        decision: aside.decision,
+        salience: aside.decision === "fold" ? 0.45 : 0.1,
+        category: aside.category,
+        trigger: aside.trigger,
+        why: aside.why,
+        myQuotes: aside.quote ? [aside.quote] : [],
+        ...(aside.others ? { othersParaphrase: aside.others } : {}),
+        sourceUtteranceIds: [utteranceId],
+        user: { copiedCount: 0 },
+        runId,
+        profileVersion: 1,
+        createdAt: at,
+      });
+    }
     diaryDays.push({
       dayKey: day.dayKey,
       title: day.title,
       quotes,
       paragraphs,
-      foldedMomentIds: [],
+      foldedMomentIds: (day.asides ?? []).filter((aside) => aside.decision === "fold").map((aside) => `demo-moment-${aside.id}`),
       profileVersion: 1,
       generatedAt: new Date(Date.parse(lastAt) + 3 * 3600_000).toISOString(),
       runId,

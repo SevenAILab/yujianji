@@ -24,15 +24,22 @@ describe("示例手帐数据", () => {
 
   it("按天载入示例路线（每站一张照片 + 一段原话 + 一段手帐），移除时保留用户自己的资料，备份排除示例", async () => {
     const stops = DEMO_DAYS.reduce((sum, day) => sum + day.stops.length, 0);
+    const asides = DEMO_DAYS.reduce((sum, day) => sum + (day.asides?.length ?? 0), 0);
     const count = await loadDemoData();
     expect(count).toBe(stops);
     expect(await loadDemoData()).toBe(stops);
-    expect(await db.memoSessions.filter((session) => session.id.startsWith("demo-session-")).count()).toBe(stops);
-    expect(await db.utterances.filter((utterance) => utterance.sessionId.startsWith("demo-session-")).count()).toBe(stops);
-    expect(await db.moments.filter((moment) => moment.id.startsWith("demo-moment-")).count()).toBe(stops);
-    // 每一站的片段都配着自己那张照片
+    expect(await db.memoSessions.filter((session) => session.id.startsWith("demo-session-")).count()).toBe(stops + asides);
+    expect(await db.utterances.filter((utterance) => utterance.sessionId.startsWith("demo-session-")).count()).toBe(stops + asides);
+    expect(await db.moments.filter((moment) => moment.id.startsWith("demo-moment-")).count()).toBe(stops + asides);
+    // 写进手帐的每一站都配着自己那张照片，理由各不相同；折叠/丢掉的片段不配图
     const demoMoments = await db.moments.filter((moment) => moment.id.startsWith("demo-moment-")).toArray();
-    expect(demoMoments.every((moment) => moment.photoId && moment.id === `demo-moment-${moment.photoId}`)).toBe(true);
+    const kept = demoMoments.filter((moment) => moment.decision === "keep");
+    expect(kept).toHaveLength(stops);
+    expect(kept.every((moment) => moment.photoId && moment.id === `demo-moment-${moment.photoId}`)).toBe(true);
+    expect(new Set(kept.map((moment) => moment.why)).size).toBe(stops);
+    expect(demoMoments.filter((moment) => moment.decision !== "keep").every((moment) => !moment.photoId)).toBe(true);
+    const cliffs = await db.diaryDays.get("2026-09-13");
+    expect(cliffs?.foldedMomentIds).toEqual(["demo-moment-demo-aside-cliffs-sheep"]);
     // 旧版 25 张散落的示例照片不再载入，只保留全景
     expect(await db.items.get("tabby-cat-2017-03")).toBeUndefined();
 

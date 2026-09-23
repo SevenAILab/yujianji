@@ -1,0 +1,17 @@
+{
+  "demo-uk-lighthouse": { "photo": "public/seed-real/白崖灯塔.jpg", "bbox": [0.27, 0.45, 0.43, 0.68] },
+  "demo-uk-red-box": { "photo": "public/seed-real/白崖红箱子.jpg", "bbox": [0.50, 0.56, 0.76, 0.68] },
+  "demo-uk-herring-gull": { "photo": "public/seed-real/惠特比鸽子.jpg", "bbox": [0.07, 0.59, 0.48, 0.85] },
+  "demo-uk-pelican": { "photo": "public/demo/london-pelican.jpg", "bbox": [0.15, 0.08, 0.90, 0.97] },
+  "demo-uk-fox": { "photo": "public/demo/london-fox.jpg", "bbox": [0.10, 0.12, 0.86, 0.90] },
+  "demo-uk-fallow-deer": { "photo": "public/demo/oxford-deer.jpg", "bbox": [0.24, 0.12, 0.74, 0.99] },
+  "demo-uk-ammonite": { "photo": "public/demo/whitby-ammonite.jpg", "bbox": [0.01, 0.01, 0.99, 0.99] },
+  "demo-uk-thistle": { "photo": "public/demo/edinburgh-thistle.jpg", "bbox": [0.18, 0.10, 0.82, 0.98] },
+  "demo-uk-highland-cow": { "photo": "public/demo/edinburgh-highland-cow.jpg", "bbox": [0.28, 0.12, 0.82, 0.96] },
+  "demo-sz-lotus": { "photo": "public/demo/shenzhen-lotus.jpg", "bbox": [0.22, 0.08, 0.88, 0.98] },
+  "demo-sz-orchid": { "photo": "public/demo/shenzhen-orchid.jpg", "bbox": [0.02, 0.08, 0.72, 0.92] },
+  "demo-sz-nepenthes": { "photo": "public/demo/shenzhen-nepenthes.jpg", "bbox": [0.25, 0.03, 0.66, 0.98] },
+  "demo-sz-fiddler-crab": { "photo": "public/demo/shenzhen-fiddler-crab.jpg", "bbox": [0.18, 0.08, 0.75, 0.58] },
+  "demo-sz-mimosa": { "photo": "public/demo/shenzhen-mimosa.jpg", "bbox": [0.03, 0.08, 0.78, 0.78] },
+  "demo-sz-leopard-gecko": { "photo": "public/demo/shenzhen-leopard-gecko.jpg", "bbox": [0.20, 0.22, 1.00, 0.92] }
+}

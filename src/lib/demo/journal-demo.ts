@@ -9,9 +9,13 @@
 // 照片主体尽量选轮廓简单的动物、植物、单个物件：后面要走 Tripo 图生 3D，主体越干净，模型越好看。
 // 队员实拍在 /seed-real；其余来自 Wikimedia Commons 的开放授权图片，出处见 public/demo/CREDITS.md。
 import type { Category, Luck } from "../types";
+import type { DropCategory, KeepCategory } from "../memo/types";
 
 export interface DemoStop {
   id: string;
+  /** 小遇为什么把这段留下（手帐里「为什么留下」） */
+  agentCategory: KeepCategory;
+  why: string;
   time: string;
   name: string;
   category: Category;
@@ -32,14 +36,28 @@ export interface DemoStop {
   memorySentence: string;
 }
 
+/** 没写进手帐的片段：折叠（留着但不写）或丢掉——让人看到小遇确实在筛，不是有啥写啥 */
+export interface DemoAside {
+  id: string;
+  time: string;
+  decision: "fold" | "drop";
+  category: KeepCategory | DropCategory;
+  trigger: string;
+  why: string;
+  /** 我说的原话；别人说的就放 others */
+  quote?: string;
+  others?: string;
+}
+
 export interface DemoDay {
   dayKey: string;
   title: string;
   stops: DemoStop[];
+  asides?: DemoAside[];
 }
 
 /** 改示例内容就改这个版本号：已经载入旧示例的设备会自动换成新的 */
-export const DEMO_VERSION = "2026-09-23-routes-3";
+export const DEMO_VERSION = "2026-09-24-agent";
 
 const low = (text: string, basis: string): Luck => ({ text, basis, confidence: "low" });
 
@@ -50,6 +68,8 @@ export const DEMO_DAYS: DemoDay[] = [
     stops: [
       {
         id: "demo-sz-lotus",
+        agentCategory: "observation",
+        why: "你盯着荷花一瓣瓣打开，记下了「里面还攥着」",
         time: "07:40",
         name: "清晨的荷花",
         category: "plant",
@@ -68,6 +88,8 @@ export const DEMO_DAYS: DemoDay[] = [
       },
       {
         id: "demo-sz-orchid",
+        agentCategory: "retold_fact",
+        why: "你把听来的新知说成了自己的话：虫子从后门钻出来带走花粉",
         time: "10:50",
         name: "硬叶兜兰",
         category: "plant",
@@ -86,6 +108,8 @@ export const DEMO_DAYS: DemoDay[] = [
       },
       {
         id: "demo-sz-nepenthes",
+        agentCategory: "difference",
+        why: "亲眼确认「它真的在吃肉」，认知被刷新",
         time: "14:30",
         name: "猪笼草",
         category: "plant",
@@ -110,6 +134,8 @@ export const DEMO_DAYS: DemoDay[] = [
     stops: [
       {
         id: "demo-sz-fiddler-crab",
+        agentCategory: "observation",
+        why: "你给招潮蟹配了表情：「像在跟人打招呼」",
         time: "09:10",
         name: "招潮蟹",
         category: "animal",
@@ -128,6 +154,8 @@ export const DEMO_DAYS: DemoDay[] = [
       },
       {
         id: "demo-sz-mimosa",
+        agentCategory: "first_experience",
+        why: "第一次亲手碰含羞草，还给了它性格：「会害羞」",
         time: "11:20",
         name: "含羞草",
         category: "plant",
@@ -146,6 +174,8 @@ export const DEMO_DAYS: DemoDay[] = [
       },
       {
         id: "demo-sz-leopard-gecko",
+        agentCategory: "retold_fact",
+        why: "朋友讲的新知被你复述了：会眨眼，爬不上玻璃",
         time: "19:30",
         name: "豹纹守宫",
         category: "animal",
@@ -163,6 +193,11 @@ export const DEMO_DAYS: DemoDay[] = [
         memorySentence: "它会眨眼，是守宫里的少数派。",
       },
     ],
+    asides: [
+      { id: "demo-aside-bay-roots", time: "10:05", decision: "fold", category: "observation", trigger: "红树林的根", why: "带感受的观察，但和招潮蟹在同一处，先折叠", quote: "红树林的根都露在外面，像一把把插在泥里的叉子。" },
+      { id: "demo-aside-bay-sun", time: "12:30", decision: "drop", category: "complaint", trigger: "太晒", why: "抱怨天气，不是新鲜体验", quote: "太晒了，防晒霜又忘带了。" },
+      { id: "demo-aside-bay-metro", time: "18:40", decision: "drop", category: "functional", trigger: "问地铁出口", why: "问路，只是事务", quote: "地铁坐到蛇口港站，是 C 出口对吧？" },
+    ],
   },
   {
     dayKey: "2026-09-12",
@@ -170,6 +205,8 @@ export const DEMO_DAYS: DemoDay[] = [
     stops: [
       {
         id: "demo-uk-big-ben",
+        agentCategory: "difference",
+        why: "「原来是钟不是塔」，一次常识被纠正",
         time: "10:05",
         name: "大本钟",
         category: "landscape",
@@ -188,6 +225,8 @@ export const DEMO_DAYS: DemoDay[] = [
       },
       {
         id: "demo-uk-pelican",
+        agentCategory: "first_experience",
+        why: "城市公园里撞见鹈鹕，你拿自己的胳膊比它的嘴",
         time: "11:40",
         name: "圣詹姆斯公园的鹈鹕",
         category: "animal",
@@ -206,6 +245,8 @@ export const DEMO_DAYS: DemoDay[] = [
       },
       {
         id: "demo-uk-fox",
+        agentCategory: "difference",
+        why: "你在问「伦敦的狐狸跟流浪猫一样多吗」，是对差异的好奇",
         time: "21:40",
         name: "城市里的狐狸",
         category: "animal",
@@ -230,6 +271,8 @@ export const DEMO_DAYS: DemoDay[] = [
     stops: [
       {
         id: "demo-uk-seven-sisters",
+        agentCategory: "observation",
+        why: "你给白崖找了个比喻：「一排巨大的粉笔」",
         time: "10:20",
         name: "七姐妹白崖",
         category: "landscape",
@@ -248,6 +291,8 @@ export const DEMO_DAYS: DemoDay[] = [
       },
       {
         id: "demo-uk-red-box",
+        agentCategory: "observation",
+        why: "你看出了画面感：「好像专门摆好等人来拍」",
         time: "12:50",
         name: "草坡上的红箱子",
         category: "artifact",
@@ -266,6 +311,8 @@ export const DEMO_DAYS: DemoDay[] = [
       },
       {
         id: "demo-uk-lighthouse",
+        agentCategory: "first_experience",
+        why: "第一次从崖顶俯看灯塔，连「趴在草上」都记下了",
         time: "15:40",
         name: "比奇角灯塔",
         category: "artifact",
@@ -283,6 +330,13 @@ export const DEMO_DAYS: DemoDay[] = [
         memorySentence: "第一次从上往下看一座灯塔，它小得像玩具。",
       },
     ],
+    asides: [
+      { id: "demo-aside-cliffs-train", time: "09:30", decision: "drop", category: "functional", trigger: "查车次", why: "问车次和换乘，只是事务", quote: "去西福德的火车是几点来着，路上还要换一次车吗？" },
+      { id: "demo-aside-cliffs-sheep", time: "11:40", decision: "fold", category: "observation", trigger: "崖边吃草的羊", why: "有感受，但这一天白崖和灯塔更重要，先折叠", quote: "这边的羊好多，都在崖边上吃草，也不怕掉下去。" },
+      { id: "demo-aside-cliffs-sandwich", time: "13:30", decision: "drop", category: "complaint", trigger: "三明治太贵", why: "抱怨价格，不是新鲜体验", quote: "伯灵峡这个三明治要七英镑，太贵了。" },
+      { id: "demo-aside-cliffs-call", time: "14:20", decision: "drop", category: "others_only", trigger: "同伴打电话", why: "只有同伴在说话，而且是工作的事", others: "同伴在电话里安排下周的会议" },
+      { id: "demo-aside-cliffs-bus", time: "16:30", decision: "drop", category: "functional", trigger: "找公交站", why: "问路，只是事务", quote: "回伊斯特本的公交站在哪边？" },
+    ],
   },
   {
     dayKey: "2026-09-14",
@@ -290,6 +344,8 @@ export const DEMO_DAYS: DemoDay[] = [
     stops: [
       {
         id: "demo-uk-radcliffe",
+        agentCategory: "difference",
+        why: "以为是教堂，其实是阅览室，你在雨里看了很久",
         time: "10:30",
         name: "拉德克利夫图书馆",
         category: "landscape",
@@ -308,6 +364,8 @@ export const DEMO_DAYS: DemoDay[] = [
       },
       {
         id: "demo-uk-fallow-deer",
+        agentCategory: "observation",
+        why: "「来参观学校，结果看了半天鹿」，你被意外吸引住了",
         time: "13:40",
         name: "莫德林学院的黇鹿",
         category: "animal",
@@ -326,6 +384,8 @@ export const DEMO_DAYS: DemoDay[] = [
       },
       {
         id: "demo-uk-port-meadow",
+        agentCategory: "difference",
+        why: "「谁也不管谁」，你看出了这里的生活节奏",
         time: "17:20",
         name: "河里喝水的马",
         category: "landscape",
@@ -350,6 +410,8 @@ export const DEMO_DAYS: DemoDay[] = [
     stops: [
       {
         id: "demo-uk-whitby-abbey",
+        agentCategory: "memory",
+        why: "看到废墟想起吸血鬼的故事，留下这份联想",
         time: "09:50",
         name: "惠特比修道院",
         category: "landscape",
@@ -368,6 +430,8 @@ export const DEMO_DAYS: DemoDay[] = [
       },
       {
         id: "demo-uk-ammonite",
+        agentCategory: "retold_fact",
+        why: "你把「一亿八千万年前它还活着」说成了自己的震撼",
         time: "12:30",
         name: "菊石化石",
         category: "mineral",
@@ -386,6 +450,8 @@ export const DEMO_DAYS: DemoDay[] = [
       },
       {
         id: "demo-uk-herring-gull",
+        agentCategory: "observation",
+        why: "你说海鸥「比我还像在看风景」，带着自嘲的观察",
         time: "15:20",
         name: "港口的银鸥",
         category: "animal",
@@ -410,6 +476,8 @@ export const DEMO_DAYS: DemoDay[] = [
     stops: [
       {
         id: "demo-uk-edinburgh-castle",
+        agentCategory: "retold_fact",
+        why: "「那块黑石头原来是火山」，你复述了打动你的新知",
         time: "10:10",
         name: "爱丁堡城堡",
         category: "landscape",
@@ -428,6 +496,8 @@ export const DEMO_DAYS: DemoDay[] = [
       },
       {
         id: "demo-uk-thistle",
+        agentCategory: "first_experience",
+        why: "第一次被苏格兰国花扎到，才知道它的名字",
         time: "13:20",
         name: "蓟花",
         category: "plant",
@@ -446,6 +516,8 @@ export const DEMO_DAYS: DemoDay[] = [
       },
       {
         id: "demo-uk-highland-cow",
+        agentCategory: "observation",
+        why: "你拿自己的刘海和牛比，这句很像你",
         time: "16:40",
         name: "高地牛",
         category: "animal",
