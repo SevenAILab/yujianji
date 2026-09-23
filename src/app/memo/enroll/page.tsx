@@ -126,14 +126,14 @@ export default function EnrollPage() {
     <main className="app-shell">
       <div className="phone-page">
         <div className={styles.top}>
-          <Link className={styles.back} href="/memo">
-            <ChevronLeft size={16} /> 遇见手记
+          <Link className={styles.back} href="/me">
+            <ChevronLeft size={16} /> 我的
           </Link>
         </div>
 
         <h1 className={styles.title}>让我认识你的声音</h1>
         <p className={styles.subtitle}>
-          录音里常常不止你一个人说话。认过你的声音之后，我才知道哪几句是你说的，只把你的话留进手记。
+          录音里常常不止你一个人说话。认过你的声音之后，我才知道哪几句是你说的，只把你的话留进手帐。
         </p>
 
         <section className={styles.card} style={{ marginTop: 20 }}>

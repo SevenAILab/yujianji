@@ -41,6 +41,13 @@
   font-size: 12px;
 }
 
+.agentLine {
+  margin: 6px 0 0;
+  color: var(--teal-dark);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .todayHead h2 {
   margin: 4px 0 0;
   color: var(--ink);

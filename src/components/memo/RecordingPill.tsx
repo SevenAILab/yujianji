@@ -43,7 +43,7 @@ export function RecordingPill() {
         </button>
         {needsEnroll && recording.phase === "recording" ? (
           <div className={styles.hint}>
-            <Link href="/memo/enroll">花 8 秒让它认识你的声音</Link>
+            <Link href="/memo/enroll">花 8 秒让小遇认识你的声音</Link>
             <button type="button" onClick={dismissEnroll} aria-label="不用了">
               ×
             </button>

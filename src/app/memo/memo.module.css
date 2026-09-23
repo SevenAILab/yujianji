@@ -363,6 +363,15 @@
   white-space: pre-wrap;
 }
 
+.universeLink {
+  display: inline-block;
+  margin-top: 8px;
+  color: #2b3a8f;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
 .why {
   margin: 10px 0 0;
   color: var(--muted);

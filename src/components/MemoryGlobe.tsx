@@ -439,7 +439,7 @@ export function MemoryGlobe({ pins }: { pins: MemoryGlobePin[] }) {
   return (
     <div ref={wrapRef} className={styles.globeWrap}>
       <canvas ref={canvasRef} style={{ display: "block", cursor: "grab", touchAction: "none" }} />
-      <div className={styles.globeHint}>{atMinZoom ? "继续缩小，进入记忆宇宙" : "拖动旋转 · 双指缩放 · 悬停查看"}</div>
+      <div className={styles.globeHint}>{atMinZoom ? "继续缩小，进入精神图景" : "拖动旋转 · 双指缩放"}</div>
       {hover?.item.mediaKind === "panorama" ? (
         <button
           ref={setBubbleElement}

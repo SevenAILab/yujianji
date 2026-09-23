@@ -127,8 +127,8 @@ function ImportInner() {
     <main className="app-shell">
       <div className="phone-page">
         <div className={styles.top}>
-          <Link className={styles.back} href="/memo">
-            <ChevronLeft size={16} /> 遇见手记
+          <Link className={styles.back} href="/">
+            <ChevronLeft size={16} /> 首页
           </Link>
         </div>
         <h1 className={styles.title}>{backfill ? "导入一段事后感想" : "导入录音"}</h1>
