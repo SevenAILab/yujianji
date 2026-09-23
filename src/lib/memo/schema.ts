@@ -133,6 +133,47 @@ export const triageOutputSchema = z.object({
   reason: z.string().max(80),
 });
 
+// ── 日终配图 ─────────────────────────────────────────────────────────
+// 基于识别结果的语义匹配：照片只给名字、类别、地点、时间，不上传原图。
+
+export const DAY_MATCH_MAX_MOMENTS = 30;
+export const DAY_MATCH_MAX_PHOTOS = 40;
+
+export const matchMomentSchema = z.object({
+  id: idSchema,
+  /** ISO 时间和 salience 只给代码守卫排冲突用，不进提示词 */
+  at: z.string().max(40),
+  salience: z.number().min(0).max(1),
+  time: z.string().max(10),
+  place: z.string().max(120),
+  category: categorySchema,
+  trigger: z.string().max(80),
+  quote: z.string().max(400),
+});
+
+export const matchPhotoSchema = z.object({
+  id: idSchema,
+  name: z.string().max(80),
+  category: z.string().max(40),
+  place: z.string().max(120),
+  time: z.string().max(10),
+});
+
+export const matchRequestSchema = z.object({
+  runId: runIdSchema,
+  dayKey: dayKeySchema,
+  moments: z.array(matchMomentSchema).min(1).max(DAY_MATCH_MAX_MOMENTS),
+  photos: z.array(matchPhotoSchema).min(1).max(DAY_MATCH_MAX_PHOTOS),
+});
+export type MatchRequest = z.infer<typeof matchRequestSchema>;
+
+export const matchOutputSchema = z.object({
+  matches: z
+    .array(z.object({ momentId: z.string().max(160), photoId: z.string().max(160), reason: z.string().max(60) }))
+    .max(DAY_MATCH_MAX_MOMENTS),
+});
+export type MatchOutput = z.infer<typeof matchOutputSchema>;
+
 // ── 写作 ─────────────────────────────────────────────────────────────
 
 export const writeMomentSchema = z.object({

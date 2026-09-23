@@ -9,7 +9,7 @@ import { formatYuan, STEP_LABEL } from "@/components/memo/labels";
 import { db } from "@/lib/db";
 import styles from "../../memo.module.css";
 
-const SCOPE_LABEL = { pipeline: "录音处理", triage: "粗筛", judge: "Agent 判断", write: "写作与自查", reflect: "反思学习" } as const;
+const SCOPE_LABEL = { pipeline: "录音处理", triage: "粗筛", judge: "Agent 判断", match: "日终配图", write: "写作与自查", reflect: "反思学习" } as const;
 const LIMIT_LABEL = { steps: "步数上限", tool_calls: "工具调用上限", deadline: "整轮截止时间" } as const;
 
 function decode(raw: string): string {

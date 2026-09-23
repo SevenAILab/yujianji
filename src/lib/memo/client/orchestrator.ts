@@ -6,6 +6,7 @@
 import { nanoid } from "nanoid";
 import { asrCostYuan } from "../../agent/pricing";
 import { db } from "../../db";
+import { applyDayMatches, dayItemRange, dayMatchSignature, remainingAfter, selectDayMatchInput } from "../day-match";
 import { degradeFromQuotes } from "../fillers";
 import { placeAt, placeLabel } from "../place";
 import { quotesForWriting, selectForDiary } from "../select";
@@ -56,7 +57,10 @@ export interface PipelineOptions {
   retry?: boolean;
   /** 用户确认可能重复计费后，强制重新提交语音识别 */
   forceResubmit?: boolean;
-  /** 判断完成后自动生成手记（默认 true） */
+  /**
+   * 判断完成后立刻写这段所在日子的手帐。默认不写：手帐改成日终统一生成
+   * （照片和录音整天一起配），录完只跑到 ready。
+   */
   autoDiary?: boolean;
 }
 
@@ -178,7 +182,7 @@ async function pipeline(sessionId: string, opts: PipelineOptions): Promise<MemoS
         case "judging":
           await doJudge(session, progress);
           session = (await db.memoSessions.get(sessionId))!;
-          if (session.status === "ready" && opts.autoDiary !== false) {
+          if (session.status === "ready" && opts.autoDiary === true) {
             for (const dayKey of await affectedDays(sessionId)) {
               progress("writing", `写 ${shortDay(dayKey)} 的手记`);
               await generateDiary(dayKey).catch((error) => console.warn("diary failed", describeMemoError(error)));
@@ -536,8 +540,49 @@ async function affectedDays(sessionId: string): Promise<string[]> {
   return [...new Set(moments.map((m) => m.dayKey))].sort();
 }
 
-/** 当天所有会话判断完成后生成手记；也可手动"重新生成" */
+/**
+ * 日终补配图（工单 Gate 1.2）：给还没配图的片段，从当天还没被占用的照片里补一张。
+ * 失败只记 degraded，不拦写手帐；返回值写进 DiaryDay.photoMatch 做幂等。
+ */
+export async function runDayMatch(dayKey: string, previous?: DiaryDay["photoMatch"]): Promise<NonNullable<DiaryDay["photoMatch"]>> {
+  const timeZone = deviceTimeZone();
+  const [moments, items] = await Promise.all([db.moments.where("dayKey").equals(dayKey).toArray(), db.items.where("date").between(...dayItemRange(dayKey), true, true).filter((item) => !item.isSeed).toArray()]);
+  const sessionIds = [...new Set(moments.map((m) => m.sessionId))];
+  const sessions = new Map((await db.memoSessions.bulkGet(sessionIds)).filter((s): s is MemoSession => Boolean(s)).map((s) => [s.id, s]));
+  const input = selectDayMatchInput({ dayKey, moments, items, timeZone, momentTimeZone: (m) => sessions.get(m.sessionId)?.timeZone ?? timeZone });
+  const signature = dayMatchSignature(input);
+  const at = new Date().toISOString();
+  if (!input.moments.length || !input.photos.length) return { signature, runId: "", at, outcome: "skipped" };
+  // 剩余集合和上次一样：模型已经看过这些、对不上，不再花钱重问
+  if (previous && previous.outcome !== "failed" && previous.signature === signature) return previous;
+
+  const runId = `m_${dayKey}_${signature}`;
+  try {
+    const res = await memoApi.match({ runId, dayKey, moments: input.moments, photos: input.photos });
+    await saveTrace(res.trace);
+    // 服务端过过一遍守卫，这里拿真实片段再过一遍，模型和网络都不可信
+    const applied = applyDayMatches(input, { matches: res.matches });
+    const written: typeof applied.accepted = [];
+    await db.transaction("rw", db.moments, async () => {
+      for (const match of applied.accepted) {
+        const current = await db.moments.get(match.momentId);
+        if (!current || current.photoId) continue; // 这期间已经有图了，一律不覆盖
+        await db.moments.update(match.momentId, { photoId: match.photoId, photoSource: "day_match" });
+        written.push(match);
+      }
+    });
+    return { signature: dayMatchSignature(remainingAfter(input, written)), runId, at, outcome: "ok" };
+  } catch (error) {
+    if (error instanceof MemoApiError) await saveTrace(error.trace);
+    console.warn("day match failed", describeMemoError(error));
+    return { signature, runId, at, outcome: "failed" };
+  }
+}
+
+/** 日终生成手帐（手动点、或过零点后首次打开）；也可"重新生成"。只有照片没有片段的日子也能生成。 */
 export async function generateDiary(dayKey: string, opts: { budgetMs?: number } = {}): Promise<DiaryDay> {
+  const previous = await db.diaryDays.get(dayKey);
+  const photoMatch = await runDayMatch(dayKey, previous?.photoMatch);
   const moments = await db.moments.where("dayKey").equals(dayKey).toArray();
   const sessionIds = [...new Set(moments.map((m) => m.sessionId))];
   const sessions = new Map((await db.memoSessions.bulkGet(sessionIds)).filter((s): s is MemoSession => Boolean(s)).map((s) => [s.id, s]));
@@ -550,7 +595,7 @@ export async function generateDiary(dayKey: string, opts: { budgetMs?: number } 
   const now = new Date().toISOString();
 
   if (!chosen.length) {
-    const empty: DiaryDay = { dayKey, title: `${shortDay(dayKey)} 的手记`, quotes: [], paragraphs: [], foldedMomentIds: foldedIds, profileVersion: profile.version, generatedAt: now, runId: "", status: partial ? "partial" : "ready" };
+    const empty: DiaryDay = { dayKey, title: `${shortDay(dayKey)} 的手记`, quotes: [], paragraphs: [], foldedMomentIds: foldedIds, profileVersion: profile.version, generatedAt: now, runId: "", status: partial ? "partial" : "ready", photoMatch };
     await db.diaryDays.put(empty);
     return empty;
   }
@@ -570,6 +615,7 @@ export async function generateDiary(dayKey: string, opts: { budgetMs?: number } 
       generatedAt: now,
       runId: res.trace.runId,
       status: partial ? "partial" : "ready",
+      photoMatch,
     };
     await db.diaryDays.put(diary);
     return diary;
@@ -589,6 +635,7 @@ export async function generateDiary(dayKey: string, opts: { budgetMs?: number } 
       generatedAt: now,
       runId,
       status: "partial",
+      photoMatch,
     };
     await db.diaryDays.put(fallback);
     return fallback;

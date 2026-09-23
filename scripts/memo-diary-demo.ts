@@ -132,6 +132,8 @@ async function main() {
   const t0 = Date.now();
   let last = "";
   const final = await runPipeline(session.id, {
+    // 演示整条链路：录完直接写手帐（产品默认是日终统一生成）
+    autoDiary: true,
     onProgress: (p) => {
       const line = `${p.status}: ${p.message}`;
       if (line !== last) {

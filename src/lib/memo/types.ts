@@ -205,6 +205,8 @@ export interface Moment {
    * 留白好过配错图。一段最多一张；drop 片段不配图；同一张图不会被两段同时用（守卫保证）。
    */
   photoId?: string;
+  /** 配图从哪来：judge 阶段配的没有这个字段；日终补配的是 day_match（只补空白，从不覆盖 judge 的） */
+  photoSource?: "day_match";
   linkedItemIds?: string[];
   backfill?: BackfillInfo;
   guardNotes?: string[];
@@ -244,6 +246,11 @@ export interface DiaryDay {
   runId: string;
   /** partial = 有会话或窗口失败，手记只含成功部分 */
   status: "ready" | "partial";
+  /**
+   * 日终补配图的幂等记录。signature 是"补完之后还剩下的待补片段 + 候选照片"的签名：
+   * 下次生成时剩余集合没变，就说明模型已经看过这些、对不上，不再花钱重问。
+   */
+  photoMatch?: { signature: string; runId: string; at: string; outcome: "ok" | "skipped" | "failed" };
 }
 
 export interface ProfileRule {
@@ -283,7 +290,7 @@ export type FeedbackEvent =
 
 export type FeedbackType = FeedbackEvent["type"];
 
-export type TraceScope = "pipeline" | "triage" | "judge" | "write" | "reflect";
+export type TraceScope = "pipeline" | "triage" | "judge" | "match" | "write" | "reflect";
 
 export interface TraceStep {
   kind: "stage" | "model" | "tool" | "guard" | "check" | "verify" | "retry" | "degrade" | "error";

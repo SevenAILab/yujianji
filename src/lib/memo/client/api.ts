@@ -3,7 +3,7 @@
 // 遇见手记接口的前端封装：带设备标识、把错误码转成人话、失败时保留服务端带回的 trace。
 import { apiUrl } from "../../app-mode";
 import { getDeviceId } from "../../device-id";
-import type { JudgeRequest, ReflectOp, ReflectRequest, WriteRequest } from "../schema";
+import type { JudgeRequest, MatchRequest, ReflectOp, ReflectRequest, WriteRequest } from "../schema";
 import type { AgentTrace, DiaryParagraph, SpeakerRole } from "../types";
 
 export class MemoApiError extends Error {
@@ -163,6 +163,9 @@ export const memoApi = {
   },
   judge(body: JudgeRequest) {
     return call<JudgeResponse>("POST", "/api/memo/judge", { json: body });
+  },
+  match(body: MatchRequest) {
+    return call<{ matches: { momentId: string; photoId: string; reason: string }[]; trace: AgentTrace }>("POST", "/api/memo/match", { json: body });
   },
   write(body: WriteRequest) {
     return call<{ title: string; quotes: { momentId: string; text: string }[]; paragraphs: DiaryParagraph[]; trace: AgentTrace }>("POST", "/api/memo/write", { json: body });

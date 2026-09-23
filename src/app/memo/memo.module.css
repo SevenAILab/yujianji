@@ -769,3 +769,21 @@
   font-size: 12px;
   line-height: 1.55;
 }
+
+/* 只拍没说的照片条目：只有物件名，不写任何生成文字 */
+.photoCaption {
+  margin: -8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+/* 从宇宙跳过来时，短暂提示是哪一段 */
+.entryFocus {
+  animation: entryFocus 2.4s ease-out;
+}
+
+@keyframes entryFocus {
+  0% { box-shadow: 0 0 0 6px rgba(47, 111, 106, 0.18); background: rgba(47, 111, 106, 0.06); }
+  100% { box-shadow: 0 0 0 6px rgba(47, 111, 106, 0); background: transparent; }
+}

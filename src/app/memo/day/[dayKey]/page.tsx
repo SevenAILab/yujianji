@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { use, useMemo, useRef, useState } from "react";
+import { use, useEffect, useMemo, useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ChevronLeft, Eye, Pencil, RefreshCw, Trash2, Undo2 } from "lucide-react";
 import { AppNav } from "@/components/AppNav";
@@ -12,8 +12,10 @@ import { copyFeedback, deleteMoment, editParagraph, restoreMoment, runReflect, s
 import { confirmBackfill, generateDiary } from "@/lib/memo/client/orchestrator";
 import { placeLabel } from "@/lib/memo/place";
 import { CATEGORY_LABELS } from "@/lib/memo/schema";
+import { dayItemRange, itemDayKey } from "@/lib/memo/day-match";
 import { dedupePhotos, effectiveDecision, quotesForWriting, selectForDiary } from "@/lib/memo/select";
-import { isDayKey, shortDay } from "@/lib/memo/time";
+import { clockIn, deviceTimeZone, isDayKey, shortDay } from "@/lib/memo/time";
+import { buildDiaryTimeline, isFirstEncounter, momentAnchor, photoAnchor } from "@/lib/memo/timeline";
 import type { DiaryParagraph, MemoSession, Moment } from "@/lib/memo/types";
 import styles from "../../memo.module.css";
 
@@ -45,6 +47,48 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
   );
   // 跨窗口去重：同一张照片只给 salience 最高的那一段，其余留白
   const photoByMoment = useMemo(() => dedupePhotos(moments), [moments]);
+  // 当天的照片（按日期范围查，不整表读）：给"只拍没说"的照片条目用
+  const dayItems = useLiveQuery(() => (isDayKey(dayKey) ? db.items.where("date").between(...dayItemRange(dayKey), true, true).toArray() : []), [dayKey], []);
+  const timeZone = useMemo(() => deviceTimeZone(), []);
+  const timeline = useMemo(
+    () => (diary ? buildDiaryTimeline({ dayKey, paragraphs: diary.paragraphs, moments, items: dayItems, timeZone }) : []),
+    [diary, dayKey, moments, dayItems, timeZone],
+  );
+  const itemById = useMemo(() => new Map(dayItems.map((item) => [item.id, item])), [dayItems]);
+  const firstPhotoCount = useMemo(() => {
+    const used = new Set(photoByMoment.values());
+    return dayItems.filter((item) => isFirstEncounter(item) && !used.has(item.id) && itemDayKey(item, timeZone) === dayKey).length;
+  }, [dayItems, photoByMoment, timeZone, dayKey]);
+  const keptCount = moments.filter((m) => effectiveDecision(m) === "keep").length;
+  const hasMaterial = moments.length > 0 || firstPhotoCount > 0;
+
+  // 从宇宙跳过来带着 #m-xxx / #p-xxx：内容是异步读出来的，渲染好之后再滚过去
+  const scrolledRef = useRef(false);
+  useEffect(() => {
+    if (scrolledRef.current || !timeline.length || typeof window === "undefined") return;
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (!el) return;
+    scrolledRef.current = true;
+    el.scrollIntoView({ block: "start" });
+    el.classList.add(styles.entryFocus);
+    window.setTimeout(() => el.classList.remove(styles.entryFocus), 2400);
+    // 上面的照片加载完会把它往下推，等图片都到了再对齐一次（最多等 2 秒）
+    const pending = [...document.images].filter((img) => !img.complete);
+    if (pending.length) {
+      const settle = Promise.all(
+        pending.map(
+          (img) =>
+            new Promise((resolve) => {
+              img.addEventListener("load", resolve, { once: true });
+              img.addEventListener("error", resolve, { once: true });
+            }),
+        ),
+      );
+      void Promise.race([settle, new Promise((resolve) => window.setTimeout(resolve, 2000))]).then(() => el.scrollIntoView({ block: "start" }));
+    }
+  }, [timeline]);
   const [showFolded, setShowFolded] = useState(false);
   const folded = useMemo(() => {
     const ids = diary?.foldedMomentIds ?? selectForDiary(moments).foldedIds;
@@ -109,12 +153,17 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
         </div>
       ))}
 
-      {!diary && moments.length ? (
+      {!diary && hasMaterial ? (
         <div className={styles.notice} style={{ marginTop: 12 }}>
-          这天有 {moments.filter((m) => effectiveDecision(m) === "keep").length} 段留下的片段，还没写成手记。
+          这天有{keptCount ? ` ${keptCount} 段留下的话` : ""}{keptCount && firstPhotoCount ? "、" : ""}{firstPhotoCount ? ` ${firstPhotoCount} 张第一次拍下的照片` : ""}，还没写成手帐。一天结束时会自动整理，也可以现在就生成。
         </div>
       ) : null}
-      {!moments.length ? <div className={styles.notice} style={{ marginTop: 12 }}>这天还没有留下的片段。</div> : null}
+      {!diary && !hasMaterial ? <div className={styles.notice} style={{ marginTop: 12 }}>这天还没有记录。</div> : null}
+      {!diary && hasMaterial ? (
+        <button type="button" className={`${styles.button} ${styles.buttonPrimary}`} style={{ marginTop: 12 }} onClick={() => void regenerate()} disabled={busy}>
+          <RefreshCw size={13} /> {busy ? "正在整理…" : "生成这天的手帐"}
+        </button>
+      ) : null}
 
       {diary?.quotes.length ? (
         <section className={styles.quotes} aria-label="今日金句">
@@ -128,9 +177,24 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
       ) : null}
 
       <div className={styles.diaryBody}>
-        {diary?.paragraphs.map((p) => (
+        {timeline.map((entry) => {
+          if (entry.kind === "photo") {
+            const item = itemById.get(entry.itemId);
+            return item ? (
+              <article key={`p-${entry.itemId}`} id={photoAnchor(entry.itemId)} className={styles.diaryEntry}>
+                <h3 className={styles.diaryStamp}>
+                  {clockIn(entry.at, timeZone)} · {entry.place || "地点未知"}
+                </h3>
+                <img className={styles.diaryPhoto} src={item.photo} alt={entry.name} loading="lazy" />
+                <p className={styles.photoCaption}>{entry.name}</p>
+              </article>
+            ) : null;
+          }
+          const p = entry.paragraph;
+          return (
           <ParagraphCard
             key={p.momentId}
+            anchorId={momentAnchor(p.momentId)}
             paragraph={p}
             moment={byId.get(p.momentId)}
             photo={(() => {
@@ -155,16 +219,18 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
               showToast({ message: `已挂回 ${shortDay(target.dayKey)}${target.place ? ` · ${target.place}` : ""}，去那天重新生成手记` });
             }}
           />
-        ))}
+          );
+        })}
       </div>
 
-      {diary?.paragraphs.length ? <p className={styles.diaryEnd}>· · ·</p> : null}
+      {timeline.length ? <p className={styles.diaryEnd}>· · ·</p> : null}
+      {diary && !timeline.length ? <div className={styles.notice} style={{ marginTop: 12 }}>这天没有留下的话，也没有第一次拍下的照片。</div> : null}
 
       {/* 以下都是次级入口：手记本身要干净，但删改捞回是它学习的唯一来源，不能没有 */}
       <div className={styles.row} style={{ marginTop: 28 }}>
-        {moments.length ? (
-          <button type="button" className={`${styles.button} ${diary ? "" : styles.buttonPrimary}`} onClick={() => void regenerate()} disabled={busy}>
-            <RefreshCw size={13} /> {busy ? "正在写…" : diary ? "重新生成" : "生成今日手记"}
+        {diary && hasMaterial ? (
+          <button type="button" className={styles.button} onClick={() => void regenerate()} disabled={busy}>
+            <RefreshCw size={13} /> {busy ? "正在写…" : "重新生成"}
           </button>
         ) : null}
         {folded.length ? (
@@ -288,6 +354,7 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
 }
 
 function ParagraphCard(props: {
+  anchorId: string;
   paragraph: DiaryParagraph;
   moment?: Moment;
   photo?: { id: string; name: string; photo: string };
@@ -304,7 +371,7 @@ function ParagraphCard(props: {
   const { paragraph: p, moment: m, photo } = props;
   const backfill = m?.backfill;
   return (
-    <article className={styles.diaryEntry}>
+    <article id={props.anchorId} className={styles.diaryEntry}>
       <h3 className={styles.diaryStamp}>{p.heading}</h3>
       {photo ? (
         // 没配到图就什么都不放——留白好过占位灰块
@@ -375,8 +442,8 @@ function Shell({ children }: { children: React.ReactNode }) {
     <main className="app-shell">
       <div className="phone-page">
         <div className={styles.top}>
-          <Link className={styles.back} href="/memo">
-            <ChevronLeft size={16} /> 遇见手记
+          <Link className={styles.back} href="/journeys">
+            <ChevronLeft size={16} /> 旅途
           </Link>
         </div>
         {children}
