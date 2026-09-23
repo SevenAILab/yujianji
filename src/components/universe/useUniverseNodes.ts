@@ -6,11 +6,9 @@ import { useEffect, useMemo, useState } from "react";
 import { db, hasDemoData } from "@/lib/db";
 import { itemDayKey } from "@/lib/memo/day-match";
 import { deviceTimeZone } from "@/lib/memo/time";
-import { buildUniverseNodes, parseManifest, sampleNodes, type ModelEntry, type UniverseNode } from "@/lib/universe/nodes";
+import { buildUniverseNodes, sampleNodes, type UniverseNode } from "@/lib/universe/nodes";
+import { useModelManifest } from "./useModelIds";
 
-const MANIFEST_URL = "/assets/models/manifest.json";
-// 示例照片对应的模型单独放一份，不和吉米产出的 manifest.json 抢同一个文件；同一个 id 以 manifest.json 为准
-const DEMO_MANIFEST_URL = "/assets/models/demo-manifest.json";
 const SAMPLE_URL = "/assets/encounters.json";
 
 async function fetchJson(url: string): Promise<unknown> {
@@ -24,12 +22,8 @@ async function fetchJson(url: string): Promise<unknown> {
 
 export function useUniverseNodes(): { nodes: UniverseNode[]; loading: boolean; sample: boolean; demo: boolean } {
   const [timeZone] = useState(() => (typeof window === "undefined" ? "Asia/Shanghai" : deviceTimeZone()));
-  const [manifest, setManifest] = useState<Map<string, ModelEntry> | null>(null);
+  const manifest = useModelManifest();
   const [samples, setSamples] = useState<UniverseNode[] | null>(null);
-
-  useEffect(() => {
-    void Promise.all([fetchJson(DEMO_MANIFEST_URL), fetchJson(MANIFEST_URL)]).then(([demo, main]) => setManifest(new Map([...parseManifest(demo), ...parseManifest(main)])));
-  }, []);
 
   const demoLoaded = useLiveQuery(() => hasDemoData(), [], false);
   const items = useLiveQuery(
