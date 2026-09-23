@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, FolderInput, ImagePlus, Mic, PenLine, Sparkles, Square } from "lucide-react";
+import { Camera, FolderInput, ImagePlus, Mic, Sparkles, Square } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -228,7 +228,6 @@ export default function Home() {
               <span>导入</span>
             </label>
           </div>
-          <p className={styles.captureHint}>{recorderBusy ? "录着音也可以拍照、切页面" : "导入可以选照片，也可以选手机里的录音"}</p>
           <div className={styles.captureInputs}>
             <input
               id="home-camera-input"
@@ -255,11 +254,6 @@ export default function Home() {
               onChange={(event) => void handleImportFile(event)}
             />
           </div>
-
-          <button className={styles.textEncounter} onClick={() => router.push("/encounter?mode=text")}>
-            <PenLine size={15} />
-            没有照片？只写字也可以记住这一刻
-          </button>
 
           {seedReady && items.length === 0 ? (
             <div className={styles.onboarding}>

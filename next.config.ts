@@ -61,6 +61,13 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        source: "/memory-universe/:path*",
+        headers: [
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Content-Security-Policy-Report-Only", value: csp.replace("frame-ancestors 'none'", "frame-ancestors 'self'") },
+        ],
+      },
+      {
         // 接口一律不缓存，避免 CDN 把限流响应或健康状态缓存住。
         source: "/api/:path*",
         headers: [{ key: "Cache-Control", value: "no-store" }],

@@ -114,16 +114,16 @@
 .dashboard {
   position: relative;
   z-index: 4;
-  margin-top: -54px;
+  margin-top: -36px;
   padding: 22px 24px 24px;
   border: 0;
   background: transparent;
 }
 
 .captureActions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-  gap: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
 }
 
 .captureAction {
@@ -131,17 +131,18 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  min-height: 64px;
-  padding: 10px 6px;
+  gap: 3px;
+  width: 64px;
+  height: 64px;
+  padding: 6px;
   border: 1px solid rgba(53, 122, 116, 0.22);
-  border-radius: 18px;
+  border-radius: 50%;
   background: rgba(255, 253, 245, 0.92);
   box-shadow: 0 6px 16px rgba(22, 97, 90, 0.08);
   color: #2b6f68;
   font: inherit;
   font-family: var(--serif);
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 750;
   cursor: pointer;
   user-select: none;
@@ -163,32 +164,9 @@
   color: #fff;
 }
 
-.captureHint {
-  margin: 10px 0 0;
-  color: var(--muted);
-  font-size: 12px;
-  text-align: center;
-}
-
 .captureInputs {
   display: contents;
 }
-
-.textEncounter {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  width: 100%;
-  margin-top: 11px;
-  padding: 5px;
-  border: 0;
-  background: transparent;
-  color: #76918f;
-  font-size: 11px;
-}
-
-.textEncounter:hover { color: #176c68; }
 
 .stats {
   display: grid;
@@ -303,11 +281,12 @@
   }
 
   .dashboard {
-    margin-top: -24px;
+    margin-top: -12px;
     padding: 6px 17px 8px;
   }
 
-  .textEncounter { margin-top: 5px; min-height: 28px; }
+  .captureActions { gap: 14px; }
+  .captureAction { width: 58px; height: 58px; font-size: 10px; }
   .stats { margin-top: 8px; }
   .stats > div { gap: 4px; }
   .stats strong { font-size: 23px; }
@@ -317,7 +296,7 @@
 }
 
 @media (max-width: 560px) and (max-height: 720px) {
-  .dashboard { margin-top: -30px; }
+  .dashboard { margin-top: -18px; }
 }
 
 @media (max-width: 350px) {
