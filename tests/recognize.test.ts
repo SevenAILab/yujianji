@@ -106,6 +106,21 @@ describe("recognize result validation", () => {
     expect(parseRecognizeResult(JSON.stringify(success), history)).toEqual(success);
   });
 
+  it("normalizes 3D-oriented category aliases returned by the model", () => {
+    expect(
+      parseRecognizeResult(
+        JSON.stringify({ ...success, category: "furniture" }),
+        history,
+      ).category,
+    ).toBe("artifact");
+    expect(
+      parseRecognizeResult(
+        JSON.stringify({ ...success, category: "creature" }),
+        history,
+      ).category,
+    ).toBe("animal");
+  });
+
   it("rejects an invalid reunion id", () => {
     expect(() =>
       parseRecognizeResult(

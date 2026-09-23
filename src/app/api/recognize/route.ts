@@ -96,7 +96,7 @@ export async function POST(request: Request) {
       if (!(error instanceof RecognizeParseError)) throw error;
 
       console.warn(
-        JSON.stringify({ event: "recognize_parse_failure", code: error.code, ...describeRawShape(raw) }),
+        JSON.stringify({ event: "recognize_parse_failure", code: error.code, detail: error.message, ...describeRawShape(raw) }),
       );
 
       // 三类可纠正的错误：关联了不存在的 id、编造过往、JSON 格式坏了。纠正一次通常就好。

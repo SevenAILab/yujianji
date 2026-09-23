@@ -68,9 +68,28 @@ export function parseRecognizeResult(
     );
   }
 
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    const result = value as Record<string, unknown>;
+    const aliases: Record<string, string> = {
+      creature: "animal",
+      furniture: "artifact",
+      prop: "artifact",
+      object: "artifact",
+      building: "artifact",
+      architecture: "artifact",
+    };
+    if (typeof result.category === "string" && aliases[result.category]) {
+      result.category = aliases[result.category];
+    }
+  }
+
   const parsed = recognizeResultSchema.safeParse(value);
   if (!parsed.success) {
-    throw new RecognizeParseError("INVALID_MODEL_OUTPUT", "模型字段校验失败");
+    const fields = parsed.error.issues
+      .slice(0, 4)
+      .map((issue) => `${issue.path.join(".") || "root"}:${issue.code}`)
+      .join(",");
+    throw new RecognizeParseError("INVALID_MODEL_OUTPUT", `模型字段校验失败：${fields}`);
   }
 
   if (parsed.data.unrecognized) {
