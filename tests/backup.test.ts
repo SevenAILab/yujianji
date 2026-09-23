@@ -85,3 +85,35 @@ describe("备份包含遇见手记（v2）", () => {
     expect(Object.keys(backup.memo!)).not.toContain("utterances");
   });
 });
+
+describe("删除本机全部数据", () => {
+  it("手记、原话、声纹一起清掉，只留设备标识", async () => {
+    const { db } = await import("../src/lib/db");
+    const { wipeLocalData } = await import("../src/lib/backup");
+    const now = new Date().toISOString();
+    await db.items.put(makeItem("w1", now));
+    await db.meta.put({ key: "device-id", value: "dev_keep" });
+    await db.meta.put({ key: "seeded", value: true });
+    await db.memoSessions.put({ id: "s1" } as never);
+    await db.memoChunks.put({ sessionId: "s1", index: 0, blob: new Blob(["a"]), createdAt: now });
+    await db.memoAudio.put({ sessionId: "s1", blob: new Blob(["a"]), mime: "audio/mp4", createdAt: now });
+    await db.memoVoiceprint.put({ id: "me" } as never);
+    await db.utterances.put({ id: "s1:0", sessionId: "s1", expiresAt: now } as never);
+    await db.memoWindows.put({ id: "w1", sessionId: "s1" } as never);
+    await db.moments.put({ id: "m1", sessionId: "s1", dayKey: "2026-09-23", decision: "keep" } as never);
+    await db.diaryDays.put({ dayKey: "2026-09-23" } as never);
+    await db.profiles.put({ version: 2 } as never);
+    await db.feedbackEvents.put({ id: "f1", momentId: "m1" } as never);
+    await db.agentTraces.put({ runId: "r1", scope: "judge", refId: "w1" } as never);
+    await db.timeline.put({ id: "t1", startAt: now, kind: "audio", sessionId: "s1" } as never);
+
+    await wipeLocalData();
+
+    const counts = await Promise.all(
+      [db.items, db.memoSessions, db.memoChunks, db.memoAudio, db.memoVoiceprint, db.utterances, db.memoWindows, db.moments, db.diaryDays, db.profiles, db.feedbackEvents, db.agentTraces, db.timeline].map((t) => t.count()),
+    );
+    expect(counts.every((n) => n === 0)).toBe(true);
+    expect(await db.meta.get("device-id")).toEqual({ key: "device-id", value: "dev_keep" });
+    expect(await db.meta.get("seeded")).toBeUndefined();
+  });
+});

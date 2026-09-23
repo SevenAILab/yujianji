@@ -28,7 +28,7 @@ export async function GET() {
     {
       ok: true,
       version: APP_VERSION,
-      commit: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? null,
+      commit: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || process.env.BUILD_COMMIT || null,
       model: {
         vision: process.env.VISION_MODEL ?? "qwen3-vl-plus",
         omni: process.env.OMNI_MODEL ?? "qwen3.5-omni-plus",

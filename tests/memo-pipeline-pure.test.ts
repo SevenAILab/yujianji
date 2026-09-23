@@ -232,3 +232,30 @@ describe("跨窗口配图去重", () => {
     expect(r.get("kept")).toBe("p1");
   });
 });
+
+describe("跨窗口配图去重 · 用户操作", () => {
+  const at = (min: number) => new Date(Date.UTC(2026, 8, 4, 9, min)).toISOString();
+
+  it("用户删掉的配图段把图让出来", () => {
+    const r = dedupePhotos([
+      { id: "a", at: at(0), salience: 0.9, decision: "keep" as const, photoId: "p1", user: { decision: "drop" as const } },
+      { id: "b", at: at(5), salience: 0.6, decision: "keep" as const, photoId: "p1" },
+    ]);
+    expect(r.has("a")).toBe(false);
+    expect(r.get("b")).toBe("p1");
+  });
+
+  it("用户捞回的 drop 段重新参与", () => {
+    const r = dedupePhotos([{ id: "a", at: at(0), salience: 0.9, decision: "drop" as const, photoId: "p1", user: { decision: "keep" as const } }]);
+    expect(r.get("a")).toBe("p1");
+  });
+
+  it("salience 和时间都相同时按 id 排，结果稳定", () => {
+    const r = dedupePhotos([
+      { id: "z", at: at(3), salience: 0.8, decision: "keep" as const, photoId: "p1" },
+      { id: "m", at: at(3), salience: 0.8, decision: "keep" as const, photoId: "p1" },
+    ]);
+    expect(r.get("m")).toBe("p1");
+    expect(r.has("z")).toBe(false);
+  });
+});

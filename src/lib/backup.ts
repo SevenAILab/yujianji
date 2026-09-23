@@ -188,13 +188,36 @@ export async function importBackup(file: File): Promise<ImportSummary> {
   return { added, updated, skipped, trips, memo };
 }
 
+/**
+ * 遇见手记的全部表。「删除本机全部数据」必须连它们一起清——
+ * 否则用户以为删干净了，手记、原话、声纹却还留在手机里。
+ */
+function memoTables() {
+  return [
+    db.memoSessions,
+    db.timeline,
+    db.memoChunks,
+    db.memoAudio,
+    db.memoVoiceprint,
+    db.utterances,
+    db.memoWindows,
+    db.moments,
+    db.diaryDays,
+    db.profiles,
+    db.feedbackEvents,
+    db.agentTraces,
+  ];
+}
+
 /** 删除本机全部用户数据。示例数据一并清掉，回到全新状态。 */
 export async function wipeLocalData(): Promise<void> {
-  await db.transaction("rw", db.items, db.trips, db.meta, db.healthSamples, db.pendingEncounters, async () => {
+  const tables = [db.items, db.trips, db.meta, db.healthSamples, db.pendingEncounters, ...memoTables()];
+  await db.transaction("rw", tables, async () => {
     await db.items.clear();
     await db.trips.clear();
     await db.healthSamples.clear();
     await db.pendingEncounters.clear();
+    await Promise.all(memoTables().map((table) => table.clear()));
     // meta 里除了设备标识都清掉：设备标识留着，否则配额会被绕过。
     const rows = await db.meta.toArray();
     await Promise.all(

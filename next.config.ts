@@ -1,4 +1,17 @@
+import { execSync } from "node:child_process";
 import type { NextConfig } from "next";
+
+/**
+ * 构建时记下 git commit，/api/health 回出来——自有服务器上没有 VERCEL_GIT_COMMIT_SHA，
+ * 不记的话线上跑的到底是哪一版只能靠猜。不在 git 目录里构建就是空，不影响构建。
+ */
+function buildCommit(): string {
+  try {
+    return execSync("git rev-parse --short HEAD", { cwd: process.cwd(), stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
+  } catch {
+    return "";
+  }
+}
 
 /**
  * CSP 先跑 Report-Only。地图（D3/TopoJSON）、全景（WebGL）、分享图（Canvas）
@@ -22,6 +35,7 @@ const csp = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  env: { BUILD_COMMIT: buildCommit() },
   turbopack: {
     ignoreIssue: [
       // 遇见手记服务端要按环境变量找 ffmpeg 和临时目录，Turbopack 会提示"动态文件访问导致整个项目被 trace"。

@@ -64,16 +64,19 @@ export function quotesForWriting(m: Pick<Moment, "myQuotes" | "uncertainQuotes" 
  * 走多次 judge，每次守卫都拿到全新的"已占用"集合，所以同一张照片仍可能被两段拿到。
  * 这里按天做最终仲裁：salience 高的留住，其余留白（留白远好过两段配同一张图）。
  *
+ * 看的是用户操作之后的决定：用户删掉的配图段要把图让出来，捞回的段重新参与。
+ * 冲突顺序固定为 salience 降序 → 时间升序 → id 升序，同样的输入永远得到同样的结果。
+ *
  * 返回 momentId → photoId，只包含真正该显示配图的片段。
  */
-export function dedupePhotos<T extends Pick<Moment, "id" | "at" | "salience" | "photoId" | "decision">>(
-  moments: T[],
-): Map<string, string> {
+export function dedupePhotos<
+  T extends Pick<Moment, "id" | "at" | "salience" | "photoId" | "decision"> & { user?: Pick<Moment["user"], "decision"> },
+>(moments: T[]): Map<string, string> {
   const taken = new Map<string, string>(); // photoId -> momentId
   const result = new Map<string, string>();
   const ordered = [...moments]
-    .filter((m) => m.photoId && m.decision !== "drop")
-    .sort((a, b) => b.salience - a.salience || new Date(a.at).getTime() - new Date(b.at).getTime());
+    .filter((m) => m.photoId && effectiveDecision({ decision: m.decision, user: { copiedCount: 0, ...m.user } }) !== "drop")
+    .sort(compareForPhoto);
   for (const m of ordered) {
     const photoId = m.photoId!;
     if (taken.has(photoId)) continue; // 已经给了更重要的那段
@@ -81,4 +84,9 @@ export function dedupePhotos<T extends Pick<Moment, "id" | "at" | "salience" | "
     result.set(m.id, photoId);
   }
   return result;
+}
+
+/** 配图冲突的固定顺序：salience 降序 → 时间升序 → id 升序 */
+export function compareForPhoto(a: Pick<Moment, "id" | "at" | "salience">, b: Pick<Moment, "id" | "at" | "salience">): number {
+  return b.salience - a.salience || new Date(a.at).getTime() - new Date(b.at).getTime() || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
 }
