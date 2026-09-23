@@ -1,0 +1,9 @@
+{
+  "ceramic-fox": {
+    "category": "prop",
+    "bbox": [0.35, 0.16, 0.70, 0.82],
+    "quality": "standard",
+    "removeBackground": false,
+    "yaw": 0
+  }
+}
