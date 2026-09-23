@@ -16,9 +16,10 @@ export function isFirstEncounter(item: Pick<Item, "isSeed" | "ai">): boolean {
   return !item.isSeed && item.ai?.verdict === "first";
 }
 
-/** 当天被正文段落用掉的照片：momentId → photoId */
-export function photosByMoment(moments: Moment[]): Map<string, string> {
-  return dedupePhotos(moments);
+/** 正文段落实际用掉的照片：momentId → photoId。折叠片段不占正文照片。 */
+export function photosByMoment(moments: Moment[], visibleMomentIds?: ReadonlySet<string>): Map<string, string> {
+  const visible = visibleMomentIds ? moments.filter((moment) => visibleMomentIds.has(moment.id)) : moments;
+  return dedupePhotos(visible);
 }
 
 export function buildDiaryTimeline(input: {
@@ -29,7 +30,8 @@ export function buildDiaryTimeline(input: {
   timeZone: string;
 }): DiaryTimelineItem[] {
   const byId = new Map(input.moments.map((m) => [m.id, m]));
-  const photoByMoment = photosByMoment(input.moments);
+  const paragraphMomentIds = new Set(input.paragraphs.map((paragraph) => paragraph.momentId));
+  const photoByMoment = photosByMoment(input.moments, paragraphMomentIds);
   const used = new Set(photoByMoment.values());
 
   const entries: DiaryTimelineItem[] = [];

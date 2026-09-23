@@ -540,6 +540,8 @@ async function affectedDays(sessionId: string): Promise<string[]> {
   return [...new Set(moments.map((m) => m.dayKey))].sort();
 }
 
+const diaryInflight = new Map<string, Promise<DiaryDay>>();
+
 /**
  * 日终补配图（工单 Gate 1.2）：给还没配图的片段，从当天还没被占用的照片里补一张。
  * 失败只记 degraded，不拦写手帐；返回值写进 DiaryDay.photoMatch 做幂等。
@@ -581,6 +583,17 @@ export async function runDayMatch(dayKey: string, previous?: DiaryDay["photoMatc
 
 /** 日终生成手帐（手动点、或过零点后首次打开）；也可"重新生成"。只有照片没有片段的日子也能生成。 */
 export async function generateDiary(dayKey: string, opts: { budgetMs?: number } = {}): Promise<DiaryDay> {
+  const ongoing = diaryInflight.get(dayKey);
+  if (ongoing) return ongoing;
+  const run = generateDiaryOnce(dayKey, opts);
+  const tracked = run.finally(() => {
+    if (diaryInflight.get(dayKey) === tracked) diaryInflight.delete(dayKey);
+  });
+  diaryInflight.set(dayKey, tracked);
+  return tracked;
+}
+
+async function generateDiaryOnce(dayKey: string, opts: { budgetMs?: number } = {}): Promise<DiaryDay> {
   const previous = await db.diaryDays.get(dayKey);
   const photoMatch = await runDayMatch(dayKey, previous?.photoMatch);
   const moments = await db.moments.where("dayKey").equals(dayKey).toArray();

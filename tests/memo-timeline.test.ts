@@ -54,6 +54,20 @@ describe("手帐时间线", () => {
     expect(t.map((e) => (e.kind === "photo" ? e.itemId : ""))).toEqual(["ok"]);
   });
 
+  it("折叠片段占用的照片仍作为独立照片条目出现", () => {
+    const t = buildDiaryTimeline({
+      dayKey: DAY,
+      paragraphs: [paragraph("visible")],
+      moments: [
+        moment("visible", at(10), { photoId: "visible-photo" }),
+        moment("folded", at(11), { photoId: "folded-photo", decision: "fold" }),
+      ],
+      items: [item("visible-photo", at(10)), item("folded-photo", at(11))],
+      timeZone: TZ,
+    });
+    expect(t.map((entry) => (entry.kind === "photo" ? entry.itemId : entry.momentId))).toEqual(["visible", "folded-photo"]);
+  });
+
   it("封面：第一张配图优先，其次第一张照片条目", () => {
     const mixed = buildDiaryTimeline({
       dayKey: DAY,

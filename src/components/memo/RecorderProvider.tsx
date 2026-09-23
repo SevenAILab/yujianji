@@ -54,6 +54,8 @@ export interface RecorderApi {
   stop: () => Promise<void>;
   /** 处理一段没正常结束（刷新/关页面）或失败的录音 */
   process: (sessionId: string) => Promise<void>;
+  /** 停止当前录音并等待后台处理结束，供删除本机数据使用。 */
+  discardAll: () => Promise<void>;
   isActive: (sessionId: string) => boolean;
   dismissEnroll: () => void;
   clearError: () => void;
@@ -82,6 +84,7 @@ export function RecorderProvider({ children }: { children: ReactNode }) {
   const placeRef = useRef<string | null>(null);
   const sessionRef = useRef<string | undefined>(undefined);
   const processingRef = useRef(new Set<string>());
+  const processingTasksRef = useRef(new Map<string, Promise<void>>());
 
   useEffect(() => setSupported(recordingSupported()), []);
 
@@ -105,35 +108,66 @@ export function RecorderProvider({ children }: { children: ReactNode }) {
 
   const process = useCallback(
     async (sessionId: string) => {
-      if (processingRef.current.has(sessionId)) return;
-      processingRef.current.add(sessionId);
-      updateJob(sessionId, { status: "processing", message: "开始处理", finishedAt: undefined });
-      try {
-        const final = await runPipeline(sessionId, {
-          autoDiary: false,
-          retry: true,
-          onProgress: (p) => updateJob(sessionId, { status: "processing", message: p.message }),
-        });
-        if (final.status === "ready") {
-          const moments = await db.moments.where("sessionId").equals(sessionId).toArray();
-          const kept = moments.filter((m) => effectiveDecision(m) === "keep");
-          updateJob(sessionId, {
-            status: "done",
-            message: kept.length ? `留下 ${kept.length} 段，一天结束时写进手帐` : "这段没有需要留下的话",
-            dayKey: kept[0]?.dayKey,
-            finishedAt: Date.now(),
+      const ongoing = processingTasksRef.current.get(sessionId);
+      if (ongoing) {
+        await ongoing;
+        return;
+      }
+      const task = (async () => {
+        processingRef.current.add(sessionId);
+        updateJob(sessionId, { status: "processing", message: "开始处理", finishedAt: undefined });
+        try {
+          const final = await runPipeline(sessionId, {
+            autoDiary: false,
+            retry: true,
+            onProgress: (p) => updateJob(sessionId, { status: "processing", message: p.message }),
           });
-        } else {
-          updateJob(sessionId, { status: "error", message: final.error?.message ?? "处理没有完成", finishedAt: Date.now() });
+          if (final.status === "ready") {
+            const moments = await db.moments.where("sessionId").equals(sessionId).toArray();
+            const kept = moments.filter((m) => effectiveDecision(m) === "keep");
+            updateJob(sessionId, {
+              status: "done",
+              message: kept.length ? `留下 ${kept.length} 段，一天结束时写进手帐` : "这段没有需要留下的话",
+              dayKey: kept[0]?.dayKey,
+              finishedAt: Date.now(),
+            });
+          } else {
+            updateJob(sessionId, { status: "error", message: final.error?.message ?? "处理没有完成", finishedAt: Date.now() });
+          }
+        } catch (cause) {
+          updateJob(sessionId, { status: "error", message: describeMemoError(cause), finishedAt: Date.now() });
+        } finally {
+          processingRef.current.delete(sessionId);
         }
-      } catch (cause) {
-        updateJob(sessionId, { status: "error", message: describeMemoError(cause), finishedAt: Date.now() });
+      })();
+      processingTasksRef.current.set(sessionId, task);
+      try {
+        await task;
       } finally {
-        processingRef.current.delete(sessionId);
+        if (processingTasksRef.current.get(sessionId) === task) processingTasksRef.current.delete(sessionId);
       }
     },
     [updateJob],
   );
+
+  const discardAll = useCallback(async () => {
+    const rec = recorderRef.current;
+    const sessionId = sessionRef.current;
+    recorderRef.current = null;
+    sessionRef.current = undefined;
+    busyRef.current = false;
+    setRecording(IDLE);
+    setNeedsEnroll(false);
+    if (rec) {
+      try {
+        await rec.stop();
+      } catch {
+        rec.release();
+      }
+    }
+    if (sessionId) await deleteSession(sessionId).catch(() => undefined);
+    await Promise.allSettled([...processingTasksRef.current.values()]);
+  }, []);
 
   // 刷新或重新打开后，把停在半路（已上传/转写/判断中）的录音接着跑完。
   // 停在 recording 的是没正常结束的，要用户确认「处理已录下的部分」，不自动动它。
@@ -247,8 +281,8 @@ export function RecorderProvider({ children }: { children: ReactNode }) {
   const isActive = useCallback((sessionId: string) => sessionRef.current === sessionId || processingRef.current.has(sessionId), []);
 
   const api = useMemo<RecorderApi>(
-    () => ({ enabled, supported, recording, jobs, needsEnroll, start, stop, process, isActive, dismissEnroll, clearError }),
-    [enabled, supported, recording, jobs, needsEnroll, start, stop, process, isActive, dismissEnroll, clearError],
+    () => ({ enabled, supported, recording, jobs, needsEnroll, start, stop, process, discardAll, isActive, dismissEnroll, clearError }),
+    [enabled, supported, recording, jobs, needsEnroll, start, stop, process, discardAll, isActive, dismissEnroll, clearError],
   );
 
   return (

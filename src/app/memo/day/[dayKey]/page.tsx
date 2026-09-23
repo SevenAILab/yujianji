@@ -61,6 +61,7 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
   }, [dayItems, photoByMoment, timeZone, dayKey]);
   const keptCount = moments.filter((m) => effectiveDecision(m) === "keep").length;
   const hasMaterial = moments.length > 0 || firstPhotoCount > 0;
+  const hasDemoMaterial = moments.some((moment) => moment.sessionId.startsWith("demo-session-"));
 
   // 从宇宙跳过来带着 #m-xxx / #p-xxx：内容是异步读出来的，渲染好之后再滚过去
   const scrolledRef = useRef(false);
@@ -142,6 +143,8 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
       </p>
       <h1 className={styles.diaryTitle}>{diary?.title ?? `${shortDay(dayKey)} 的手记`}</h1>
 
+      {hasDemoMaterial ? <div className={styles.notice} style={{ marginTop: 8 }}>演示数据 · 以下旁白和转写为模拟文案，不含真实录音。</div> : null}
+
       {diary?.status === "partial" ? (
         <div className={styles.warning} style={{ marginTop: 8 }}>
           有录音或片段处理失败，这篇手记只包含成功的部分。<Link href="/memo">去首页重试</Link>
@@ -170,7 +173,7 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
           {diary.quotes.map((q) => (
             <div key={q.momentId} className={styles.quote}>
               <span>{q.text}</span>
-              <CopyButton text={q.text} label="复制" onCopied={() => void copyFeedback(q.momentId, "quote").then(maybeLearn)} />
+              {hasDemoMaterial ? null : <CopyButton text={q.text} label="复制" onCopied={() => void copyFeedback(q.momentId, "quote").then(maybeLearn)} />}
             </div>
           ))}
         </section>
@@ -193,9 +196,10 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
           const p = entry.paragraph;
           return (
           <ParagraphCard
-            key={p.momentId}
-            anchorId={momentAnchor(p.momentId)}
-            paragraph={p}
+          key={p.momentId}
+          anchorId={momentAnchor(p.momentId)}
+          readOnly={hasDemoMaterial}
+          paragraph={p}
             moment={byId.get(p.momentId)}
             photo={(() => {
               const id = photoByMoment.get(p.momentId);
@@ -228,7 +232,7 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
 
       {/* 以下都是次级入口：手记本身要干净，但删改捞回是它学习的唯一来源，不能没有 */}
       <div className={styles.row} style={{ marginTop: 28 }}>
-        {diary && hasMaterial ? (
+        {diary && hasMaterial && !hasDemoMaterial ? (
           <button type="button" className={styles.button} onClick={() => void regenerate()} disabled={busy}>
             <RefreshCw size={13} /> {busy ? "正在写…" : "重新生成"}
           </button>
@@ -238,7 +242,7 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
             还有 {folded.length} 段没写进来
           </button>
         ) : null}
-        {diary?.runId ? (
+        {diary?.runId && !hasDemoMaterial ? (
           <Link className={styles.button} href={`/memo/trace/${encodeURIComponent(diary.runId)}`}>
             写作与自查过程
           </Link>
@@ -253,18 +257,18 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
               <div key={m.id} className={styles.listItem}>
                 <div className={styles.between}>
                   <strong className={styles.small}>{m.trigger}</strong>
-                  <button
-                    type="button"
-                    className={styles.button}
+                    {!hasDemoMaterial ? <button
+                      type="button"
+                      className={styles.button}
                     onClick={() =>
                       void restoreMoment(m.id).then(() => {
                         showToast({ message: "已捞回，先显示整理后的原话，重新生成时再写" });
                         void maybeLearn();
                       })
                     }
-                  >
-                    捞回
-                  </button>
+                    >
+                      捞回
+                    </button> : null}
                 </div>
                 <span className={`${styles.small} ${styles.muted}`}>
                   {CATEGORY_LABELS[m.category]} · {m.why}
@@ -355,6 +359,7 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
 
 function ParagraphCard(props: {
   anchorId: string;
+  readOnly: boolean;
   paragraph: DiaryParagraph;
   moment?: Moment;
   photo?: { id: string; name: string; photo: string };
@@ -410,7 +415,7 @@ function ParagraphCard(props: {
         <p className={styles.diaryText}>{p.text}</p>
       )}
       {/* 原话、改写、删除、复制全部收在这里：页面要干净，但这些操作是它学习的唯一来源 */}
-      {!props.editing ? (
+      {!props.editing && !props.readOnly ? (
         <details className={styles.entryMore}>
           <summary className={styles.entryMoreSummary} aria-label="这一段的操作">···</summary>
           <div className={styles.actions}>

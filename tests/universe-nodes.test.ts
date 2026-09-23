@@ -81,4 +81,23 @@ describe("记忆宇宙 · 节点", () => {
     expect(nodes[0].sample).toBe(true);
     expect(nodes[0].href).toBeUndefined();
   });
+
+  it("折叠片段的节点跳到照片条目", () => {
+    const moments = [{ id: "folded", at: "2026-09-22T02:00:00.000Z", salience: 0.8, decision: "fold", photoId: "b", user: { copiedCount: 0 } }] as unknown as Moment[];
+    const nodes = buildUniverseNodes({
+      items: [item("b", "2026-09-22T02:05:00.000Z")],
+      moments,
+      visibleMomentIds: new Set(),
+      manifest: new Map(),
+      timeZone: TZ,
+    });
+    expect(nodes[0].href).toBe("/memo/day/2026-09-22#p-b");
+  });
+
+  it("只有展厅显式开启时才把 seed 初见作为宇宙节点", () => {
+    const seed = item("demo", "2026-09-22T02:00:00.000Z", { isSeed: true });
+    const input = { items: [seed], moments: [], manifest: new Map(), timeZone: TZ };
+    expect(buildUniverseNodes(input)).toHaveLength(0);
+    expect(buildUniverseNodes({ ...input, includeSeeds: true })).toHaveLength(1);
+  });
 });

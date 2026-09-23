@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { grantConsent, isConsentCurrent, readConsent } from "@/lib/consent";
 import { clearLegacySeeds } from "@/lib/db";
+import { cleanupExpired } from "@/lib/memo/client/repo";
 import styles from "./ConsentGate.module.css";
 
 /**
@@ -22,6 +23,7 @@ export function ConsentGate() {
   // 所以顺便承担一次性数据迁移。
   useEffect(() => {
     void clearLegacySeeds();
+    void cleanupExpired().catch(() => undefined);
   }, []);
 
   useEffect(() => {

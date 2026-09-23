@@ -67,6 +67,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
 
   if (session === undefined) return <Shell>加载中…</Shell>;
   if (session === null) return <Shell>找不到这段录音，可能已经删除。</Shell>;
+  const demoSession = session.id.startsWith("demo-session-");
 
   const selectedMe = meKeys ?? (session.speakers ?? []).filter((s) => s.role === "me").map((s) => s.key);
   const retry = (s: MemoSession) =>
@@ -114,8 +115,9 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   return (
     <Shell>
       <h1 className={styles.title}>
-        {KIND_LABEL[session.kind]} · {dayKeyIn(session.startedAt, session.timeZone).slice(5)} {clockIn(session.startedAt, session.timeZone)}
+        {KIND_LABEL[session.kind]}{demoSession ? " · 模拟" : ""} · {dayKeyIn(session.startedAt, session.timeZone).slice(5)} {clockIn(session.startedAt, session.timeZone)}
       </h1>
+      {demoSession ? <div className={styles.notice} style={{ marginTop: 8 }}>模拟录音演示 · 以下为编写的模拟转写，不含真实音频。</div> : null}
       <p className={styles.subtitle}>
         {placeLabel(session.place)} · {formatDuration(session.durationSec)} · 时间来源：{session.startedAtSource === "recorder" ? "录音时钟" : session.startedAtSource === "file_metadata" ? "文件里的录制时间" : "你确认的时间"} · {session.timeZone}
       </p>
@@ -172,7 +174,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         </>
       ) : null}
 
-      {session.speakers?.length ? (
+      {session.speakers?.length && !demoSession ? (
         <>
           <h2 className={styles.sectionTitle}>谁是"我"</h2>
           <section className={styles.card}>
@@ -269,7 +271,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
       </div>
       {error ? <div className={styles.warning} style={{ marginTop: 12 }}>{error}</div> : null}
 
-      <button
+      {!demoSession ? <button
         type="button"
         className={`${styles.button} ${styles.buttonDanger}`}
         style={{ marginTop: 20 }}
@@ -279,7 +281,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         }}
       >
         <Trash2 size={13} /> 删除这段录音的数据
-      </button>
+      </button> : null}
     </Shell>
   );
 }

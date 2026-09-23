@@ -74,11 +74,13 @@ export async function undoDelete(eventId: string): Promise<boolean> {
  */
 export async function cleanupExpired(now = Date.now()): Promise<{ utterances: number; uncertainQuotes: number; audio: number }> {
   const nowIso = new Date(now).toISOString();
-  const expired = await db.utterances.where("expiresAt").below(nowIso).primaryKeys();
+  const expired = (await db.utterances.where("expiresAt").below(nowIso).toArray())
+    .filter((utterance) => !utterance.sessionId.startsWith("demo-session-"))
+    .map((utterance) => utterance.id);
   if (expired.length) await db.utterances.bulkDelete(expired);
 
   const cutoff = new Date(now - UTTERANCE_TTL_MS).toISOString();
-  const stale = await db.moments.filter((m) => m.createdAt < cutoff && Boolean(m.uncertainQuotes?.length) && !m.user.speakerConfirmed).toArray();
+  const stale = await db.moments.filter((m) => !m.id.startsWith("demo-moment-") && m.createdAt < cutoff && Boolean(m.uncertainQuotes?.length) && !m.user.speakerConfirmed).toArray();
   if (stale.length) await db.moments.bulkPut(stale.map((m) => ({ ...m, uncertainQuotes: [] })));
 
   const done = await db.memoSessions.filter((s) => s.status === "ready" || s.status === "judging").primaryKeys();

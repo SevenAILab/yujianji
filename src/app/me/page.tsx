@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { AppNav } from "@/components/AppNav";
 import { DeviceSection } from "@/components/me/DeviceSection";
+import { useRecorder } from "@/components/memo/RecorderProvider";
 import { db, hasDemoData, loadDemoData, removeDemoData } from "@/lib/db";
 import { downloadBackup, importBackup, wipeLocalData } from "@/lib/backup";
 import {
@@ -33,6 +34,7 @@ import styles from "./me.module.css";
 type Busy = "none" | "export" | "import" | "wipe" | "demo";
 
 export default function MePage() {
+  const recorder = useRecorder();
   const items = useLiveQuery(() => db.items.toArray(), [], []);
   const [health, setHealth] = useState<StorageHealth | null>(null);
   const [lastExportAt, setLastExportAt] = useState<string | null>(null);
@@ -134,7 +136,7 @@ export default function MePage() {
       } else {
         const added = await loadDemoData();
         setDemoLoaded(true);
-        setNotice(`已载入 ${added} 条示例，它们在地图上是浅色的。`);
+        setNotice(`已载入 ${added} 条示例照片、模拟转写和手帐。模拟内容不含真实录音，也不会进入备份。`);
       }
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "操作失败，请重试。");
@@ -148,6 +150,7 @@ export default function MePage() {
     setError("");
     setNotice("");
     try {
+      await recorder.discardAll();
       await wipeLocalData();
       await refreshHealth();
       setConfirmingWipe(false);
@@ -299,10 +302,9 @@ export default function MePage() {
 
         <section className={styles.card}>
           <p className="eyebrow">示例内容</p>
-          <h2>别人的遇见集</h2>
+          <h2>演示展厅</h2>
           <p className={styles.hint}>
-            25 条用于演示的记录，在地图上显示为浅色，带「示例数据」角标。
-            它们不属于你，也不会进入备份文件。
+            25 张示例照片、25 段明确标记的模拟转写和对应手帐，可展示记忆宇宙。模拟内容不含真实录音，不属于你的记录，也不会进入备份。
           </p>
           <button
             className="secondary-action"

@@ -148,9 +148,13 @@ describe("日终补配图 · 代码守卫", () => {
     expect(r.accepted.map((a) => a.photoId)).toEqual(["p1"]);
   });
 
-  it("签名只看 id 集合、与顺序无关；补完之后剩余集合变了签名也变", () => {
+  it("签名与顺序无关，但内容变化也会触发重新匹配；补完之后剩余集合变了签名也变", () => {
     const reversed = { moments: [...input.moments].reverse(), photos: [...input.photos].reverse() };
     expect(dayMatchSignature(reversed)).toBe(dayMatchSignature(input));
+    expect(dayMatchSignature({
+      ...input,
+      photos: input.photos.map((photo, index) => index === 0 ? { ...photo, name: "改过的照片名" } : photo),
+    })).not.toBe(dayMatchSignature(input));
     const rest = remainingAfter(input, [{ momentId: "high", photoId: "p1", reason: "" }]);
     expect(rest.moments.map((m) => m.id)).toEqual(["low"]);
     expect(rest.photos.map((p) => p.id)).toEqual(["p2"]);
@@ -199,6 +203,32 @@ describe("日终生成手帐（本地库 + 接口隔离）", () => {
     await generateDiary(DAY);
     await generateDiary(DAY);
     expect(api.match).toHaveBeenCalledTimes(1);
+  });
+
+  it("同一天并发点生成只执行一次匹配和写作", async () => {
+    await seed({ photos: false, moments: true });
+    const { generateDiary } = await import("../src/lib/memo/client/orchestrator");
+    let release!: () => void;
+    let entered!: () => void;
+    const gate = new Promise<void>((resolve) => { release = resolve; });
+    const started = new Promise<void>((resolve) => { entered = resolve; });
+    api.write.mockImplementation(async (body: { moments: { id: string }[] }) => {
+      entered();
+      await gate;
+      return {
+        title: "并发测试手帐",
+        quotes: [],
+        paragraphs: body.moments.map((m) => ({ momentId: m.id, heading: "12:00 · 深圳", text: "写好的段落", verified: true, degraded: false, retries: 0 })),
+        trace: { runId: "w_concurrent", scope: "write", refId: DAY, startedAt: at(12), ms: 1, costYuan: 0, outcome: "ok", steps: [] },
+      };
+    });
+    const first = generateDiary(DAY);
+    const second = generateDiary(DAY);
+    await started;
+    expect(api.write).toHaveBeenCalledTimes(1);
+    release();
+    await expect(Promise.all([first, second])).resolves.toHaveLength(2);
+    expect(api.write).toHaveBeenCalledTimes(1);
   });
 
   it("配图失败不拦写手帐，下次生成会重试", async () => {

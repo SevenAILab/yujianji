@@ -10,7 +10,7 @@ import { useRecorder } from "@/components/memo/RecorderProvider";
 import { LOCAL_ONLY } from "@/lib/app-mode";
 import { db } from "@/lib/db";
 import { runPipeline, type PipelineProgress } from "@/lib/memo/client/orchestrator";
-import { cleanupExpired, latestProfile } from "@/lib/memo/client/repo";
+import { latestProfile } from "@/lib/memo/client/repo";
 import { placeLabel } from "@/lib/memo/place";
 import { effectiveDecision } from "@/lib/memo/select";
 import { clockIn, dayKeyIn, deviceTimeZone, shortDay } from "@/lib/memo/time";
@@ -34,7 +34,6 @@ export default function MemoHomePage() {
     const tz = deviceTimeZone();
     setTimeZone(tz);
     setToday(dayKeyIn(new Date().toISOString(), tz));
-    void cleanupExpired().catch(() => undefined);
     void latestProfile().catch(() => undefined);
   }, []);
 
@@ -130,7 +129,7 @@ export default function MemoHomePage() {
                 <div key={s.id} className={styles.listItem}>
                   <div className={styles.between}>
                     <Link href={`/memo/session/${s.id}`} className={styles.back}>
-                      {clockIn(s.startedAt, s.timeZone)} · {KIND_LABEL[s.kind]} · {formatDuration(s.durationSec)}
+                      {clockIn(s.startedAt, s.timeZone)} · {KIND_LABEL[s.kind]}{s.id.startsWith("demo-session-") ? " · 模拟" : ""} · {formatDuration(s.durationSec)}
                     </Link>
                     <span className={`${styles.badge} ${s.status === "failed" ? styles.badgeWarn : s.status === "ready" ? styles.badgeOk : ""}`}>{STATUS_LABEL[s.status]}</span>
                   </div>

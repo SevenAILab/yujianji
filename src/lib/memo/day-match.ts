@@ -113,8 +113,14 @@ function fnv1a(text: string): string {
 }
 
 export function dayMatchSignature(input: Pick<DayMatchInput, "moments" | "photos">): string {
-  const moments = input.moments.map((m) => m.id).sort().join(",");
-  const photos = input.photos.map((p) => p.id).sort().join(",");
+  const moments = input.moments
+    .map((m) => [m.id, m.at, m.place, m.category, m.trigger, m.quote].join("\u001f"))
+    .sort()
+    .join("\u001e");
+  const photos = input.photos
+    .map((p) => [p.id, p.name, p.category, p.place, p.time].join("\u001f"))
+    .sort()
+    .join("\u001e");
   return fnv1a(`m:${moments}|p:${photos}`);
 }
 

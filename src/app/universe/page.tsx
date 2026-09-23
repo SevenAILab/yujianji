@@ -14,7 +14,7 @@ import styles from "./universe.module.css";
 
 export default function UniversePage() {
   const router = useRouter();
-  const { nodes, loading, sample } = useUniverseNodes();
+  const { nodes, loading, sample, demo } = useUniverseNodes();
   const [stats, setStats] = useState<UniverseStats | null>(null);
   const open = useCallback(
     (node: UniverseNode) => {
@@ -32,7 +32,7 @@ export default function UniversePage() {
         </Link>
         <div className={styles.title}>
           <h1>记忆宇宙</h1>
-          <p>{loading ? "正在展开…" : sample ? "示例 · 拍下你的第一次后换成你自己的" : `${nodes.length} 个第一次，最早的在最里面`}</p>
+          <p>{loading ? "正在展开…" : sample ? "示例 · 拍下你的第一次后换成你自己的" : `${nodes.length} 个第一次${demo ? " · 演示数据" : "，最早的在最里面"}`}</p>
         </div>
       </header>
       <p className={styles.hint}>{sample ? "拖动旋转 · 双指缩放" : "拖动旋转 · 双指缩放 · 点一个物件，回到那天"}</p>

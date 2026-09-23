@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ChevronLeft, Mic, RotateCcw, Square } from "lucide-react";
 import { AppNav } from "@/components/AppNav";
+import { useRecorder } from "@/components/memo/RecorderProvider";
 import { db } from "@/lib/db";
 import { pickMimeType, recordingSupported } from "@/lib/memo/client/recorder";
 import styles from "../memo.module.css";
@@ -15,6 +16,7 @@ import styles from "../memo.module.css";
 const TARGET_MS = 8_000;
 
 export default function EnrollPage() {
+  const recorder = useRecorder();
   const saved = useLiveQuery(() => db.memoVoiceprint.get("me"), [], undefined);
   const [state, setState] = useState<"idle" | "recording" | "saving">("idle");
   const [leftMs, setLeftMs] = useState(TARGET_MS);
@@ -23,6 +25,7 @@ export default function EnrollPage() {
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const mainRecording = ["recording", "starting", "stopping"].includes(recorder.recording.phase);
 
   useEffect(() => {
     return () => {
@@ -37,6 +40,10 @@ export default function EnrollPage() {
   }, []);
 
   async function start() {
+    if (mainRecording) {
+      setError("当前正在录音，请先停止主录音，再注册声音。");
+      return;
+    }
     setError("");
     setJustSaved(false);
     const support = recordingSupported();
@@ -145,7 +152,7 @@ export default function EnrollPage() {
               type="button"
               className={`${styles.button} ${styles.buttonPrimary}`}
               onClick={() => void start()}
-              disabled={state === "saving"}
+              disabled={state === "saving" || mainRecording}
             >
               {saved ? <RotateCcw size={13} /> : <Mic size={13} />}
               {state === "saving" ? "保存中…" : saved ? "重新录一次" : "开始"}

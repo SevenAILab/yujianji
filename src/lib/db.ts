@@ -4,6 +4,7 @@ import Dexie, { type Table } from "dexie";
 import type { Item, Trip } from "./types";
 import { itemSchema } from "./schema";
 import type { NativeHealthSample } from "./native-bridge";
+import { dayKeyIn, deviceTimeZone, tzOffsetMinutes } from "./memo/time";
 import type {
   AgentTrace,
   DiaryDay,
@@ -130,16 +131,133 @@ export async function clearLegacySeeds(): Promise<number> {
 }
 
 export async function loadDemoData(): Promise<number> {
-  const items = await fetchSeedItems();
-  await db.items.bulkPut(items);
-  await db.meta.put({ key: DEMO_FLAG_KEY, value: true });
+  if (await hasDemoData()) return db.items.filter((item) => item.isSeed && item.ai?.verdict === "first").count();
+  const seedItems = await fetchSeedItems();
+  const items = seedItems.filter((item) => item.ai?.verdict === "first");
+  const timeZone = deviceTimeZone();
+  const usedDays = new Set([
+    ...(await db.diaryDays.toCollection().primaryKeys()).map(String),
+    ...(await db.items.toArray()).map((item) => dayKeyIn(item.date, timeZone)),
+  ]);
+  let firstDay = Date.UTC(2026, 7, 1);
+  while (Array.from({ length: items.length }, (_, index) => new Date(firstDay + index * 86_400_000).toISOString().slice(0, 10)).some((day) => usedDays.has(day))) {
+    firstDay -= items.length * 86_400_000;
+  }
+
+  const sessions: MemoSession[] = [];
+  const utterances: Utterance[] = [];
+  const windows: MemoWindow[] = [];
+  const moments: Moment[] = [];
+  const diaryDays: DiaryDay[] = [];
+  items.forEach((source, index) => {
+    const day = new Date(firstDay + index * 86_400_000);
+    const localNoon = Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate(), 12, 0);
+    const startedAt = new Date(localNoon - tzOffsetMinutes(new Date(localNoon).toISOString(), timeZone) * 60_000).toISOString();
+    const endedAt = new Date(Date.parse(startedAt) + 45_000).toISOString();
+    const dayKey = dayKeyIn(startedAt, timeZone);
+    const item: Item = { ...source, date: startedAt, createdAt: startedAt };
+    const sessionId = `demo-session-${item.id}`;
+    const momentId = `demo-moment-${item.id}`;
+    const utteranceId = `${sessionId}:0`;
+    const windowId = `${sessionId}:w0`;
+    const quote = item.userNote || `我第一次注意到${item.name}。`;
+    const text = `${quote} ${item.ai?.memorySentence ?? "這一刻值得留在今天的手記裡。"}`.trim();
+    const session: MemoSession = {
+      id: sessionId,
+      kind: "import",
+      startedAt,
+      endedAt,
+      durationSec: 45,
+      timeZone,
+      tzOffsetMin: tzOffsetMinutes(startedAt, timeZone),
+      startedAtSource: "user",
+      status: "ready",
+      speakers: [{ key: "0:0", meanDb: null, talkMs: 45_000, role: "me" }],
+      meSource: "user",
+      meUncertain: false,
+      createdAt: startedAt,
+      updatedAt: startedAt,
+    };
+    const moment: Moment = {
+      id: momentId,
+      sessionId,
+      windowId,
+      dayKey,
+      at: startedAt,
+      place: { name: item.place, source: "backfill", confidence: "high", locked: true },
+      decision: "keep",
+      salience: 0.82,
+      category: "first_experience",
+      trigger: item.name,
+      why: "模拟演示内容：用示例照片和编写的旁白展示从录音到手帐的结构。",
+      myQuotes: [quote],
+      sourceUtteranceIds: [utteranceId],
+      photoId: item.id,
+      linkedItemIds: [item.id],
+      user: { copiedCount: 0 },
+      runId: `demo-run-${item.id}`,
+      profileVersion: 1,
+      createdAt: startedAt,
+    };
+    const paragraph = {
+      momentId,
+      heading: `${item.name} · ${item.place}`,
+      text: item.ai?.memorySentence || item.userNote || `第一次遇见${item.name}，我把它和当时的光线一起记了下来。`,
+      verified: false,
+      degraded: false,
+      retries: 0,
+    };
+    sessions.push(session);
+    utterances.push({ id: utteranceId, sessionId, index: 0, beginMs: 0, endMs: 45_000, speakerKey: "0:0", speaker: "me", text, expiresAt: new Date(Date.parse(startedAt) + 7 * 86_400_000).toISOString() });
+    windows.push({ id: windowId, sessionId, index: 0, utteranceIds: [utteranceId], beginMs: 0, endMs: 45_000, meChars: text.length, uncertainChars: 0, triage: { action: "judge", reason: "模拟演示数据", runId: `demo-run-${item.id}` }, judge: { status: "done", runId: `demo-run-${item.id}` } });
+    moments.push(moment);
+    diaryDays.push({ dayKey, title: `演示 · ${item.name} · 那天的手记`, quotes: [{ momentId, text: quote }], paragraphs: [paragraph], foldedMomentIds: [], profileVersion: 1, generatedAt: startedAt, runId: `demo-run-${item.id}`, status: "ready" });
+    items[index] = item;
+  });
+
+  const tables = [db.items, db.memoSessions, db.utterances, db.memoWindows, db.moments, db.diaryDays, db.timeline, db.meta];
+  await db.transaction("rw", tables, async () => {
+    await db.items.bulkPut(seedItems);
+    await db.items.bulkPut(items);
+    await db.memoSessions.bulkPut(sessions);
+    await db.utterances.bulkPut(utterances);
+    await db.memoWindows.bulkPut(windows);
+    await db.moments.bulkPut(moments);
+    await db.diaryDays.bulkPut(diaryDays);
+    await db.meta.put({ key: DEMO_FLAG_KEY, value: true });
+  });
   return items.length;
 }
 
 export async function removeDemoData(): Promise<number> {
   const seeds = await db.items.filter((item) => item.isSeed).toArray();
-  await db.items.bulkDelete(seeds.map((item) => item.id));
-  await db.meta.put({ key: DEMO_FLAG_KEY, value: false });
+  const sessions = await db.memoSessions.filter((session) => session.id.startsWith("demo-session-")).toArray();
+  const sessionIds = sessions.map((session) => session.id);
+  const moments = await db.moments.filter((moment) => moment.id.startsWith("demo-moment-")).toArray();
+  const momentIds = new Set(moments.map((moment) => moment.id));
+  const demoDays = (await db.diaryDays.toArray()).filter((diary) => diary.paragraphs.some((paragraph) => momentIds.has(paragraph.momentId)));
+  const tables = [db.items, db.memoSessions, db.utterances, db.memoWindows, db.moments, db.diaryDays, db.timeline, db.meta];
+  await db.transaction("rw", tables, async () => {
+    await db.items.bulkDelete(seeds.map((item) => item.id));
+    if (sessionIds.length) {
+      await db.memoSessions.bulkDelete(sessionIds);
+      await db.utterances.where("sessionId").anyOf(sessionIds).delete();
+      await db.memoWindows.where("sessionId").anyOf(sessionIds).delete();
+      await db.timeline.where("sessionId").anyOf(sessionIds).delete();
+    }
+    if (moments.length) await db.moments.bulkDelete(moments.map((moment) => moment.id));
+    for (const diary of demoDays) {
+      const paragraphs = diary.paragraphs.filter((paragraph) => !momentIds.has(paragraph.momentId));
+      const quotes = diary.quotes.filter((quote) => !momentIds.has(quote.momentId));
+      const foldedMomentIds = diary.foldedMomentIds.filter((id) => !momentIds.has(id));
+      if (!paragraphs.length && !quotes.length && diary.runId.startsWith("demo-run-")) {
+        await db.diaryDays.delete(diary.dayKey);
+      } else {
+        await db.diaryDays.put({ ...diary, paragraphs, quotes, foldedMomentIds });
+      }
+    }
+    await db.meta.put({ key: DEMO_FLAG_KEY, value: false });
+  });
   return seeds.length;
 }
 

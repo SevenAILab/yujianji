@@ -4,6 +4,7 @@ import { z } from "zod";
 import { db } from "./db";
 import { itemSchema, tripSchema } from "./schema";
 import type { Item, Trip } from "./types";
+import type { AgentTrace, DiaryDay, FeedbackEvent, MemoSession, Moment, TimelineEvent } from "./memo/types";
 import { markExported } from "./storage-health";
 
 export const BACKUP_VERSION = 2;
@@ -59,23 +60,39 @@ export async function buildBackup(): Promise<BackupFile> {
   const [items, trips, sessions, moments, diaryDays, profiles, feedbackEvents, timeline, traces] = await Promise.all([
     db.items.toArray(),
     db.trips.toArray().catch(() => empty<Trip>()),
-    db.memoSessions.toArray().catch(empty),
-    db.moments.toArray().catch(empty),
-    db.diaryDays.toArray().catch(empty),
+    db.memoSessions.toArray().catch(() => empty<MemoSession>()),
+    db.moments.toArray().catch(() => empty<Moment>()),
+    db.diaryDays.toArray().catch(() => empty<DiaryDay>()),
     db.profiles.toArray().catch(empty),
-    db.feedbackEvents.toArray().catch(empty),
-    db.timeline.toArray().catch(empty),
-    db.agentTraces.toArray().catch(empty),
+    db.feedbackEvents.toArray().catch(() => empty<FeedbackEvent>()),
+    db.timeline.toArray().catch(() => empty<TimelineEvent>()),
+    db.agentTraces.toArray().catch(() => empty<AgentTrace>()),
   ]);
+  const cleanDiaries = diaryDays.flatMap((diary) => {
+    const paragraphs = diary.paragraphs.filter((paragraph) => !paragraph.momentId.startsWith("demo-moment-"));
+    const quotes = diary.quotes.filter((quote) => !quote.momentId.startsWith("demo-moment-"));
+    const foldedMomentIds = diary.foldedMomentIds.filter((id) => !id.startsWith("demo-moment-"));
+    if (!paragraphs.length && !quotes.length && diary.runId.startsWith("demo-run-")) return [];
+    if (paragraphs.length === diary.paragraphs.length && quotes.length === diary.quotes.length && foldedMomentIds.length === diary.foldedMomentIds.length) return [diary];
+    return [{ ...diary, paragraphs, quotes, foldedMomentIds }];
+  });
   return {
     format: "yujianji-backup",
     version: BACKUP_VERSION,
     exportedAt: new Date().toISOString(),
-    // 示例数据不属于用户，不进备份，免得导入后越滚越多。
+      // 示例数据不属于用户，不进备份，免得导入后越滚越多。
     items: items.filter((item) => !item.isSeed),
     trips,
     // 逐字稿不在这里：7 天 TTL 是对同伴原话的承诺，备份不能绕过它
-    memo: { sessions, moments, diaryDays, profiles, feedbackEvents, timeline, traces },
+    memo: {
+      sessions: sessions.filter((session) => !session.id.startsWith("demo-session-")),
+      moments: moments.filter((moment) => !moment.id.startsWith("demo-moment-")),
+      diaryDays: cleanDiaries,
+      profiles,
+      feedbackEvents: feedbackEvents.filter((event) => !event.momentId.startsWith("demo-moment-")),
+      timeline: timeline.filter((event) => !event.sessionId?.startsWith("demo-session-")),
+      traces: traces.filter((trace) => !trace.runId.startsWith("demo-run-")),
+    },
   };
 }
 

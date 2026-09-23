@@ -61,11 +61,15 @@ export function buildUniverseNodes(input: {
   moments: Moment[];
   manifest: Map<string, ModelEntry>;
   timeZone: string;
+  /** 展厅显式开启时，允许把随 Demo 提供的 seed 初见显示为节点。 */
+  includeSeeds?: boolean;
+  /** 已经写进正文的片段；未出现的配图只能跳到照片条目。 */
+  visibleMomentIds?: ReadonlySet<string>;
 }): UniverseNode[] {
   const photoToMoment = new Map<string, string>();
   for (const [momentId, photoId] of dedupePhotos(input.moments)) photoToMoment.set(photoId, momentId);
   return input.items
-    .filter((item) => isFirstEncounter(item) && Number.isFinite(new Date(item.date).getTime()))
+    .filter((item) => ((input.includeSeeds && item.isSeed && item.ai?.verdict === "first") || isFirstEncounter(item)) && Number.isFinite(new Date(item.date).getTime()))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime() || (a.id < b.id ? -1 : 1))
     .map((item) => {
       const dayKey = itemDayKey(item, input.timeZone) ?? undefined;
@@ -76,7 +80,9 @@ export function buildUniverseNodes(input: {
         name: item.name,
         at: item.date,
         dayKey,
-        href: dayKey ? `/memo/day/${dayKey}#${momentId ? momentAnchor(momentId) : photoAnchor(item.id)}` : undefined,
+        href: dayKey
+          ? `/memo/day/${dayKey}#${momentId && (!input.visibleMomentIds || input.visibleMomentIds.has(momentId)) ? momentAnchor(momentId) : photoAnchor(item.id)}`
+          : undefined,
         ...(model ? { model, color: model.color } : {}),
         sample: false,
       };
