@@ -2,7 +2,7 @@
 
 示例手帐里的照片分两类：
 
-- `/seed-real/*.jpg`：队员英国之行的实拍（大本钟、白崖、白崖灯塔、草坡上的红箱子、惠特比港的银鸥、牛津、爱丁堡城堡）。
+- 队员 Seven 英国之行的实拍（经本人同意公开）：`/demo/uk-big-ben.jpg`、`/demo/uk-radcliffe-camera.jpg`、`/demo/uk-edinburgh-castle.jpg`、`/demo/uk-red-box.jpg`，以及仓库里早已公开的 `/seed/white-cliff.jpg`、`/seed/beach-lighthouse.jpg`、`/seed/whitby-harbor.jpg`。
 - `/demo/*.jpg`：来自 Wikimedia Commons 的开放授权图片，按原授权使用；为适配手机显示，统一缩到长边 1280 像素并重新压缩。
 
 | 文件 | 原图 | 作者 | 授权 |
@@ -22,4 +22,4 @@
 | `/demo/shenzhen-mimosa.jpg` | [Mimosa pudica leaves close up.jpg](https://commons.wikimedia.org/wiki/File:Mimosa_pudica_leaves_close_up.jpg) | NonNerd | CC0 |
 | `/demo/shenzhen-leopard-gecko.jpg` | [Leopard gecko (Eublepharis macularius), Entomica 2.jpg](https://commons.wikimedia.org/wiki/File:Leopard_gecko_(Eublepharis_macularius),_Entomica_2.jpg) | Fungus Guy | CC BY-SA 4.0 |
 
-3D 模型（`/assets/models/demo/*.glb`）来自队员用 Tripo 生成的模型，经 gltf-transform 减面并做 meshopt 压缩。
+3D 模型（`/assets/models/demo/*.glb`）由上面这些示例照片裁出主体后经 Tripo 图生 3D 生成（`scripts/demo-3d`），再用 gltf-transform 减面并做 meshopt 压缩。

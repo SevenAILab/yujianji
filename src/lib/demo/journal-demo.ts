@@ -7,7 +7,7 @@
 // 每个点 = 一张照片 + 当时说的一句话 + 手帐里的一段。时间是当地时钟（HH:MM），
 // 载入时按设备时区换算，手帐上显示的就是这个钟点。
 // 照片主体尽量选轮廓简单的动物、植物、单个物件：后面要走 Tripo 图生 3D，主体越干净，模型越好看。
-// 队员实拍在 /seed-real；其余来自 Wikimedia Commons 的开放授权图片，出处见 public/demo/CREDITS.md。
+// 队员实拍在 /demo/uk-*.jpg 和 /seed/（白崖、灯塔、惠特比海鸥）；其余来自 Wikimedia Commons 的开放授权图片，出处见 public/demo/CREDITS.md。
 import type { Category, Luck } from "../types";
 import type { DropCategory, KeepCategory } from "../memo/types";
 
@@ -57,7 +57,7 @@ export interface DemoDay {
 }
 
 /** 改示例内容就改这个版本号：已经载入旧示例的设备会自动换成新的 */
-export const DEMO_VERSION = "2026-09-24-agent";
+export const DEMO_VERSION = "2026-09-24-agent-2";
 
 const low = (text: string, basis: string): Luck => ({ text, basis, confidence: "low" });
 
@@ -210,7 +210,7 @@ export const DEMO_DAYS: DemoDay[] = [
         time: "10:05",
         name: "大本钟",
         category: "landscape",
-        photo: "/seed-real/伦敦大本钟.jpg",
+        photo: "/demo/uk-big-ben.jpg",
         place: "英国 · 伦敦 · 威斯敏斯特",
         country: "GBR",
         lat: 51.5007,
@@ -276,7 +276,7 @@ export const DEMO_DAYS: DemoDay[] = [
         time: "10:20",
         name: "七姐妹白崖",
         category: "landscape",
-        photo: "/seed-real/白崖.jpg",
+        photo: "/seed/white-cliff.jpg",
         place: "英国 · 七姐妹白崖 · 西福德角",
         country: "GBR",
         lat: 50.7641,
@@ -296,7 +296,7 @@ export const DEMO_DAYS: DemoDay[] = [
         time: "12:50",
         name: "草坡上的红箱子",
         category: "artifact",
-        photo: "/seed-real/白崖红箱子.jpg",
+        photo: "/demo/uk-red-box.jpg",
         place: "英国 · 七姐妹白崖 · 伯灵峡",
         country: "GBR",
         lat: 50.7432,
@@ -316,7 +316,7 @@ export const DEMO_DAYS: DemoDay[] = [
         time: "15:40",
         name: "比奇角灯塔",
         category: "artifact",
-        photo: "/seed-real/白崖灯塔.jpg",
+        photo: "/seed/beach-lighthouse.jpg",
         place: "英国 · 七姐妹白崖 · 比奇角",
         country: "GBR",
         lat: 50.7362,
@@ -349,7 +349,7 @@ export const DEMO_DAYS: DemoDay[] = [
         time: "10:30",
         name: "拉德克利夫图书馆",
         category: "landscape",
-        photo: "/seed-real/牛津圆形教堂.jpg",
+        photo: "/demo/uk-radcliffe-camera.jpg",
         place: "英国 · 牛津 · 拉德克利夫广场",
         country: "GBR",
         lat: 51.7534,
@@ -455,7 +455,7 @@ export const DEMO_DAYS: DemoDay[] = [
         time: "15:20",
         name: "港口的银鸥",
         category: "animal",
-        photo: "/seed-real/惠特比鸽子.jpg",
+        photo: "/seed/whitby-harbor.jpg",
         place: "英国 · 惠特比 · 惠特比港",
         country: "GBR",
         lat: 54.4857,
@@ -481,7 +481,7 @@ export const DEMO_DAYS: DemoDay[] = [
         time: "10:10",
         name: "爱丁堡城堡",
         category: "landscape",
-        photo: "/seed-real/爱丁堡城堡.jpg",
+        photo: "/demo/uk-edinburgh-castle.jpg",
         place: "英国 · 爱丁堡 · 城堡岩",
         country: "GBR",
         lat: 55.9476,
