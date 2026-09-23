@@ -1,6 +1,62 @@
 {
-  "demo-uk-fox": { "glbUrl": "/assets/models/demo/fox.glb", "color": "#e8955a" },
-  "demo-sz-orchid": { "glbUrl": "/assets/models/demo/slipper-orchid.glb", "color": "#f0b8c4" },
-  "demo-sz-lotus": { "glbUrl": "/assets/models/demo/lotus.glb", "color": "#f4c6dc" },
-  "demo-sz-leopard-gecko": { "glbUrl": "/assets/models/demo/leopard-gecko.glb", "color": "#f2c14e" }
+  "demo-sz-lotus": {
+    "glbUrl": "/assets/models/demo/sz-lotus.glb",
+    "color": "#f2a7c3"
+  },
+  "demo-sz-orchid": {
+    "glbUrl": "/assets/models/demo/sz-orchid.glb",
+    "color": "#e9b36a"
+  },
+  "demo-sz-nepenthes": {
+    "glbUrl": "/assets/models/demo/sz-nepenthes.glb",
+    "color": "#9cc46a"
+  },
+  "demo-sz-fiddler-crab": {
+    "glbUrl": "/assets/models/demo/sz-fiddler-crab.glb",
+    "color": "#e8e2d0"
+  },
+  "demo-sz-mimosa": {
+    "glbUrl": "/assets/models/demo/sz-mimosa.glb",
+    "color": "#8fc46a"
+  },
+  "demo-sz-leopard-gecko": {
+    "glbUrl": "/assets/models/demo/sz-leopard-gecko.glb",
+    "color": "#f2c14e"
+  },
+  "demo-uk-pelican": {
+    "glbUrl": "/assets/models/demo/uk-pelican.glb",
+    "color": "#f3eadb"
+  },
+  "demo-uk-fox": {
+    "glbUrl": "/assets/models/demo/uk-fox.glb",
+    "color": "#d98a55"
+  },
+  "demo-uk-red-box": {
+    "glbUrl": "/assets/models/demo/uk-red-box.glb",
+    "color": "#e8553a"
+  },
+  "demo-uk-lighthouse": {
+    "glbUrl": "/assets/models/demo/uk-lighthouse.glb",
+    "color": "#e0473c"
+  },
+  "demo-uk-fallow-deer": {
+    "glbUrl": "/assets/models/demo/uk-fallow-deer.glb",
+    "color": "#c99a66"
+  },
+  "demo-uk-ammonite": {
+    "glbUrl": "/assets/models/demo/uk-ammonite.glb",
+    "color": "#8a8f96"
+  },
+  "demo-uk-herring-gull": {
+    "glbUrl": "/assets/models/demo/uk-herring-gull.glb",
+    "color": "#dfe6ee"
+  },
+  "demo-uk-thistle": {
+    "glbUrl": "/assets/models/demo/uk-thistle.glb",
+    "color": "#b56ad6"
+  },
+  "demo-uk-highland-cow": {
+    "glbUrl": "/assets/models/demo/uk-highland-cow.glb",
+    "color": "#c9733c"
+  }
 }
