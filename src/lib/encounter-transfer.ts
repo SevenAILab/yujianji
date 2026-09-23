@@ -44,7 +44,7 @@ export async function takePendingEncounterFile(): Promise<PendingEncounterFile |
         type: stored.type,
         lastModified: stored.lastModified,
       }),
-      source: stored.source,
+      source: stored.source === "home-import" ? "album" : stored.source,
     };
   } catch {
     return null;

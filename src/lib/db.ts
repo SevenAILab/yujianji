@@ -22,12 +22,13 @@ import type {
 type SeedMeta = { key: string; value: boolean | string };
 
 export type PendingEncounterRow = {
-  key: "current";
+  /** current：交给 /encounter 的照片；memo-import：首页「导入」选中、交给 /memo/import 的录音 */
+  key: "current" | "memo-import";
   file: Blob;
   name: string;
   type: string;
   lastModified: number;
-  source: "camera" | "album" | "insta360";
+  source: "camera" | "album" | "insta360" | "home-import";
 };
 
 class YujianjiDatabase extends Dexie {

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import "./globals.css";
 import { LOCAL_ONLY } from "@/lib/app-mode";
 import { ConsentGate } from "@/components/ConsentGate";
+import { RecorderProvider } from "@/components/memo/RecorderProvider";
 
 export const metadata: Metadata = {
   title: "遇见集 · 遇见世界，收藏第一次",
@@ -34,7 +35,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {LOCAL_ONLY ? (
           <div className="local-mode-banner">离线本地版 · 数据留在本机 · 云端 AI 已关闭</div>
         ) : null}
-        {children}
+        {/* 录音器挂在这里：切页面不断，才能录着音去首页拍照 */}
+        <RecorderProvider>{children}</RecorderProvider>
         <ConsentGate />
       </body>
     </html>

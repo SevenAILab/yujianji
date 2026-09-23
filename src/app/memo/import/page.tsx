@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ChevronLeft, FileAudio, MapPin } from "lucide-react";
 import { AppNav } from "@/components/AppNav";
@@ -10,6 +10,7 @@ import { formatDuration } from "@/components/memo/labels";
 import { db } from "@/lib/db";
 import { describeMemoError } from "@/lib/memo/client/api";
 import { fromLocalInputValue, inspectAudioFile, toLocalInputValue, type InspectedAudio } from "@/lib/memo/client/import";
+import { clearPendingMemoImport, peekPendingMemoImport } from "@/lib/memo/client/import-handoff";
 import { reverseGeocode, samplePosition } from "@/lib/memo/client/location";
 import { createSession, finalizeAudio, runPipeline, type PipelineProgress } from "@/lib/memo/client/orchestrator";
 import type { PlaceRef } from "@/lib/memo/types";
@@ -52,7 +53,22 @@ function ImportInner() {
     return "请填写开始录音的时间。";
   }, [info]);
 
-  async function pick(selected: File | null) {
+  // 从首页「导入」过来：文件已经选好了，暂存在 IndexedDB 里（刷新也还在）。离开这页就清掉。
+  const handoffTried = useRef(false);
+  useEffect(() => {
+    if (handoffTried.current) return;
+    handoffTried.current = true;
+    void peekPendingMemoImport().then((pending) => {
+      if (pending) void pick(pending, { fromHandoff: true });
+    });
+    // pick 只在挂载时用一次
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => () => void clearPendingMemoImport(), []);
+
+  async function pick(selected: File | null, opts: { fromHandoff?: boolean } = {}) {
+    // 用户自己换了文件：首页交过来的那个不要了
+    if (!opts.fromHandoff) void clearPendingMemoImport();
     setError("");
     setFile(selected);
     setInfo(null);
@@ -96,6 +112,7 @@ function ImportInner() {
         ...(placeName.trim() ? { place: { name: placeName.trim(), source: placeSource, confidence: "high" as const, locked: true } } : {}),
       });
       await finalizeAudio(session.id, file, info.mime);
+      await clearPendingMemoImport();
       const final = await runPipeline(session.id, { onProgress: setProgress });
       const moments = await db.moments.where("sessionId").equals(session.id).toArray();
       const day = moments.find((m) => m.decision !== "drop")?.dayKey;

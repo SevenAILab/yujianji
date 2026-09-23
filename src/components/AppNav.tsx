@@ -1,34 +1,29 @@
 "use client";
 
-import { Camera, Globe2, Mic, NotebookText, User } from "lucide-react";
+import { Globe2, NotebookText, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LOCAL_ONLY } from "@/lib/app-mode";
 
+/**
+ * 底栏只留三个：旅途（每日手帐）/ 地图（首页，拍摄·录音·导入都在这里）/ 我的。
+ * 「手记」并进首页的录音按钮和旅途页，「设备」并进「我的」；那些页面仍可直达。
+ */
 export function AppNav() {
   const pathname = usePathname();
+  const onJourneys = pathname.startsWith("/journeys") || pathname.startsWith("/memo/day");
+  // 注意 "/memo".startsWith("/me") 也是真的——以前「手记」和「我的」会同时高亮
+  const onMe = pathname === "/me" || pathname.startsWith("/me/") || pathname.startsWith("/devices") || pathname === "/memo/me" || pathname.startsWith("/memo/enroll");
   return (
     <nav className="bottom-nav" aria-label="主导航">
-      <Link className={pathname.startsWith("/journeys") ? "active" : ""} href="/journeys">
+      <Link className={onJourneys ? "active" : ""} href="/journeys">
         <NotebookText size={19} strokeWidth={1.8} />
         旅途
       </Link>
-      <Link className={pathname === "/" ? "active" : ""} href="/">
+      <Link className={pathname === "/" || pathname.startsWith("/universe") ? "active" : ""} href="/">
         <Globe2 size={20} strokeWidth={1.8} />
         地图
       </Link>
-      {LOCAL_ONLY ? null : (
-        // 遇见手记需要服务端（上传、转写、模型），离线本地版不显示入口
-        <Link className={pathname.startsWith("/memo") ? "active" : ""} href="/memo">
-          <Mic size={19} strokeWidth={1.8} />
-          手记
-        </Link>
-      )}
-      <Link className={pathname.startsWith("/devices") ? "active" : ""} href="/devices">
-        <Camera size={19} strokeWidth={1.8} />
-        设备
-      </Link>
-      <Link className={pathname.startsWith("/me") ? "active" : ""} href="/me">
+      <Link className={onMe ? "active" : ""} href="/me">
         <User size={19} strokeWidth={1.8} />
         我的
       </Link>

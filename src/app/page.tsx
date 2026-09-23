@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, Globe2, ImagePlus, PenLine, Plus } from "lucide-react";
+import { Camera, FolderInput, Globe2, ImagePlus, Mic, PenLine, Square } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
   useEffect,
@@ -8,15 +8,16 @@ import {
   useRef,
   useState,
   type ChangeEvent as ReactChangeEvent,
-  type PointerEvent as ReactPointerEvent,
 } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { AppNav } from "@/components/AppNav";
 import { InsightLine } from "@/components/InsightLine";
 import { MapErrorBoundary } from "@/components/MapErrorBoundary";
+import { useRecorder } from "@/components/memo/RecorderProvider";
 import { MemoryGlobe, type MemoryGlobeApiPin, type MemoryGlobePin } from "@/components/MemoryGlobe";
 import { db, ensureSeeded, loadDemoData } from "@/lib/db";
 import { setPendingEncounterFile } from "@/lib/encounter-transfer";
+import { isAudioFile, setPendingMemoImport } from "@/lib/memo/client/import-handoff";
 import { hydrateMapPins } from "@/lib/local-map-pins";
 import { usePageZoomLock } from "@/lib/use-page-zoom-lock";
 import type { Item } from "@/lib/types";
@@ -48,10 +49,6 @@ export default function Home() {
     } catch (error) { if (cameraPageActive.current) setToast(cameraError(error)); }
     finally { cameraLock.current = false; if (cameraPageActive.current) setCameraBusy(false); }
   }
-  function openCamera() {
-    if (insta360) setPickerOpen(true);
-    else openFilePicker(photoInputRef.current);
-  }
   usePageZoomLock();
   const [seedReady, setSeedReady] = useState(false);
   const [loadingDemo, setLoadingDemo] = useState(false);
@@ -59,23 +56,14 @@ export default function Home() {
   const [mapPins, setMapPins] = useState<MemoryGlobePin[]>([]);
   const photoInputRef = useRef<HTMLInputElement>(null);
   const albumInputRef = useRef<HTMLInputElement>(null);
-  const openedByDragRef = useRef(false);
-  const captureSliderRef = useRef<HTMLDivElement>(null);
-  const cameraLabelRef = useRef<HTMLLabelElement>(null);
-  const albumLabelRef = useRef<HTMLLabelElement>(null);
-  const captureStartXRef = useRef(0);
-  const captureDragRef = useRef(0);
-  const captureDraggingRef = useRef(false);
-  const captureTargetRef = useRef<"camera" | "album" | null>(null);
-  const [captureDrag, setCaptureDrag] = useState(0);
-  const [captureDragging, setCaptureDragging] = useState(false);
-  const [captureTarget, setCaptureTarget] = useState<"camera" | "album" | null>(null);
   const items = useLiveQuery(
     () => (seedReady ? db.items.orderBy("date").toArray() : Promise.resolve([] as Item[])),
     [seedReady],
     [],
   );
   const [toast, setToast] = useState("");
+  const recorder = useRecorder();
+  const recorderBusy = recorder.recording.phase === "recording" || recorder.recording.phase === "stopping";
 
   async function beginFileEncounter(
     file: File | undefined,
@@ -87,10 +75,26 @@ export default function Home() {
     router.push("/encounter");
   }
 
-  function openFilePicker(input: HTMLInputElement | null) {
-    if (!input) return;
-    input.value = "";
-    input.click();
+  /** 首页「导入」：照片、视频走遇见流程；录音交给导入页确认时间地点 */
+  async function handleImportFile(event: ReactChangeEvent<HTMLInputElement>) {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+    if (!file) return;
+    if (!isAudioFile(file)) {
+      await beginFileEncounter(file, "album");
+      return;
+    }
+    if (!recorder.enabled) {
+      setToast("离线本地版不能处理录音，只能导入照片。");
+      return;
+    }
+    setToast("正在读取录音…");
+    try {
+      await setPendingMemoImport(file);
+      router.push("/memo/import?from=home");
+    } catch {
+      setToast("这个浏览器存不下这段录音，请到「导入录音」页直接选择。");
+    }
   }
 
   function handleSelectedFile(
@@ -102,97 +106,6 @@ export default function Home() {
     void beginFileEncounter(file, source);
   }
 
-  function captureSliderBounds() {
-    const rail = captureSliderRef.current?.getBoundingClientRect();
-    const camera = cameraLabelRef.current?.getBoundingClientRect();
-    const album = albumLabelRef.current?.getBoundingClientRect();
-    if (!rail || !camera || !album) return { left: -54, right: 54 };
-    const railCenter = rail.left + rail.width / 2;
-    return {
-      left: camera.left + camera.width / 2 - railCenter,
-      right: album.left + album.width / 2 - railCenter,
-    };
-  }
-
-  function setSliderTarget(target: "camera" | "album" | null) {
-    if (captureTargetRef.current === target) return;
-    captureTargetRef.current = target;
-    setCaptureTarget(target);
-  }
-
-  function startCaptureDrag(event: ReactPointerEvent<HTMLLabelElement>) {
-    captureStartXRef.current = event.clientX;
-    captureDragRef.current = 0;
-    captureDraggingRef.current = true;
-    setSliderTarget(null);
-    event.currentTarget.htmlFor = "";
-    setCaptureDragging(true);
-    event.currentTarget.setPointerCapture(event.pointerId);
-  }
-
-  function moveCaptureDrag(event: ReactPointerEvent<HTMLLabelElement>) {
-    if (!captureDraggingRef.current) return;
-    const bounds = captureSliderBounds();
-    const next = Math.max(bounds.left, Math.min(bounds.right, event.clientX - captureStartXRef.current));
-    captureDragRef.current = next;
-    setCaptureDrag(next);
-    if (next <= bounds.left * .78) setSliderTarget("camera");
-    else if (next >= bounds.right * .78) setSliderTarget("album");
-    else setSliderTarget(null);
-  }
-
-  function completeCaptureDrag(completedDrag: number) {
-    const bounds = captureSliderBounds();
-    const cameraThreshold = bounds.left * .78;
-    const albumThreshold = bounds.right * .78;
-    captureDraggingRef.current = false;
-    setCaptureDragging(false);
-    setCaptureDrag(0);
-    captureDragRef.current = 0;
-    const target = completedDrag >= albumThreshold
-      ? "album"
-      : completedDrag <= cameraThreshold
-        ? "camera"
-        : null;
-    setSliderTarget(target);
-    return target;
-  }
-
-  function finishCaptureDrag(event: ReactPointerEvent<HTMLLabelElement>) {
-    const completedDrag = captureDragRef.current;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-    const target = completeCaptureDrag(completedDrag);
-    // 触屏上，一旦拖动超过浏览器的 slop 阈值，pointerup 之后就不会再补发 click，
-    // 所以靠 <label htmlFor> 去触发 file input 在手机上必然失效（鼠标端却能用，
-    // 因为 click 会落在 down/up 的共同祖先上，与拖动距离无关）。
-    // pointerup 处理函数本身就在用户手势上下文里，直接 .click() 在 iOS Safari 上可用。
-    if (target) {
-      event.currentTarget.htmlFor = "";
-      openedByDragRef.current = true;
-      if (target === "camera") openCamera();
-      else openFilePicker(albumInputRef.current);
-      return;
-    }
-    // Keep the system picker for an ordinary tap; a connected camera adds a choice.
-    if (insta360) {
-      event.currentTarget.htmlFor = "";
-      openedByDragRef.current = true;
-      setPickerOpen(true);
-    } else {
-      event.currentTarget.htmlFor = "home-album-input";
-      openedByDragRef.current = false;
-    }
-  }
-
-  function cancelCaptureDrag() {
-    captureDraggingRef.current = false;
-    captureDragRef.current = 0;
-    setSliderTarget(null);
-    setCaptureDragging(false);
-    setCaptureDrag(0);
-  }
 
   useEffect(() => {
     if (!items.length) {
@@ -284,51 +197,40 @@ export default function Home() {
         </div>
 
         <section className={styles.dashboard} aria-label="开始一次遇见">
-          <div className={styles.captureSlider}>
-            <div className={`${styles.captureSliderRail} ${captureDragging ? styles.active : ""}`} ref={captureSliderRef}>
-              <span className={styles.captureSliderLine} />
-              <div className={styles.captureSliderLabels}>
-                <label ref={cameraLabelRef} htmlFor="home-camera-input" onClick={(event) => { if (insta360) { event.preventDefault(); setPickerOpen(true); } }}>
-                  <Camera size={18} strokeWidth={1.7} />拍摄
-                </label>
-                <label ref={albumLabelRef} htmlFor="home-album-input">
-                  相册<ImagePlus size={17} strokeWidth={1.7} />
-                </label>
-              </div>
-              <label
-                htmlFor={captureTarget === "camera" ? "home-camera-input" : captureTarget === "album" ? "home-album-input" : undefined}
-                className={`${styles.captureSliderThumb} ${captureDragging ? styles.dragging : ""}`}
-                style={{ transform: `translateX(${captureDrag}px)` }}
-                role="slider"
-                tabIndex={0}
-                data-target={captureTarget ?? undefined}
-                aria-label="向左滑动拍摄，向右滑动打开相册"
-                aria-valuemin={-100}
-                aria-valuemax={100}
-                aria-valuenow={Math.round(
-                  captureDrag < 0
-                    ? (captureDrag / Math.abs(captureSliderBounds().left)) * 100
-                    : (captureDrag / captureSliderBounds().right) * 100,
-                )}
-                onPointerDown={startCaptureDrag}
-                onPointerMove={moveCaptureDrag}
-                onPointerUp={finishCaptureDrag}
-                onPointerCancel={cancelCaptureDrag}
-                onClick={(event) => {
-                  // 拖动那条路已经程序化打开过了，拦掉 label 的默认行为，
-                  // 否则鼠标端会连开两次；轻点则必须放行，交给系统面板。
-                  if (openedByDragRef.current) event.preventDefault();
-                  window.setTimeout(() => setSliderTarget(null), 0);
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === "ArrowLeft") openCamera();
-                  if (event.key === "ArrowRight") openFilePicker(albumInputRef.current);
-                }}
+          <div className={styles.captureActions}>
+            {/* 拍摄、导入必须是用户亲手点的 <label htmlFor>：iOS Safari 只认这条路径，程序化 .click() 会被吞 */}
+            <label
+              htmlFor="home-camera-input"
+              className={styles.captureAction}
+              onClick={(event) => {
+                if (insta360) {
+                  event.preventDefault();
+                  setPickerOpen(true);
+                }
+              }}
+            >
+              <Camera size={20} strokeWidth={1.7} />
+              <span>拍摄</span>
+            </label>
+            {recorder.enabled ? (
+              <button
+                type="button"
+                className={`${styles.captureAction} ${recorderBusy ? styles.captureActionRecording : ""}`}
+                onClick={() => void (recorderBusy ? recorder.stop() : recorder.start())}
+                disabled={recorder.recording.phase === "starting" || recorder.recording.phase === "stopping"}
+                aria-pressed={recorderBusy}
               >
-                <Plus size={24} strokeWidth={1.8} />
-              </label>
-            </div>
-            <p>左滑拍摄&nbsp;&nbsp;·&nbsp;&nbsp;右滑相册</p>
+                {recorderBusy ? <Square size={18} strokeWidth={1.9} /> : <Mic size={20} strokeWidth={1.7} />}
+                <span>{recorder.recording.phase === "starting" ? "准备中" : recorderBusy ? "停止" : "录音"}</span>
+              </button>
+            ) : null}
+            <label htmlFor="home-import-input" className={styles.captureAction}>
+              <FolderInput size={20} strokeWidth={1.7} />
+              <span>导入</span>
+            </label>
+          </div>
+          <p className={styles.captureHint}>{recorderBusy ? "录着音也可以拍照、切页面" : "导入可以选照片，也可以选手机里的录音"}</p>
+          <div className={styles.captureInputs}>
             <input
               id="home-camera-input"
               ref={photoInputRef}
@@ -345,6 +247,13 @@ export default function Home() {
               type="file"
               accept="image/*,video/*"
               onChange={(event) => handleSelectedFile(event, "album")}
+            />
+            <input
+              id="home-import-input"
+              className="file-input"
+              type="file"
+              accept="image/*,video/*,audio/*,.m4a,.mp3,.wav,.aac"
+              onChange={(event) => void handleImportFile(event)}
             />
           </div>
 

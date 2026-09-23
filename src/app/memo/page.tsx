@@ -6,6 +6,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { BookOpen, FlaskConical, Mic, MessageSquarePlus, RotateCcw, Upload, UserRound } from "lucide-react";
 import { AppNav } from "@/components/AppNav";
 import { formatDuration, KIND_LABEL, STATUS_LABEL } from "@/components/memo/labels";
+import { useRecorder } from "@/components/memo/RecorderProvider";
 import { LOCAL_ONLY } from "@/lib/app-mode";
 import { db } from "@/lib/db";
 import { runPipeline, type PipelineProgress } from "@/lib/memo/client/orchestrator";
@@ -27,6 +28,7 @@ export default function MemoHomePage() {
   const diaries = useLiveQuery(() => db.diaryDays.orderBy("dayKey").reverse().limit(14).toArray(), [], []);
   const voiceprint = useLiveQuery(() => db.memoVoiceprint.get("me"), [], undefined);
   const resumed = useRef(false);
+  const recorder = useRecorder();
 
   useEffect(() => {
     const tz = deviceTimeZone();
@@ -142,7 +144,10 @@ export default function MemoHomePage() {
                       ) : null}
                     </>
                   ) : null}
-                  {s.status === "recording" ? (
+                  {s.status === "recording" && recorder.isActive(s.id) ? (
+                    <span className={`${styles.small} ${styles.muted}`}>正在录音，停止后会自动处理。</span>
+                  ) : null}
+                  {s.status === "recording" && !recorder.isActive(s.id) ? (
                     <div className={styles.row}>
                       <span className={`${styles.small} ${styles.muted}`}>这段录音没有正常结束（页面被关掉或刷新）。</span>
                       <button className={styles.button} type="button" onClick={() => void runPipeline(s.id, { onProgress })}>

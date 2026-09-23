@@ -93,123 +93,58 @@
   background: transparent;
 }
 
-.captureSlider {
-  position: relative;
-  padding: 0 20px;
+.captureActions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 10px;
 }
 
-.captureSliderLabels {
-  position: absolute;
-  inset: 0 18px;
-  z-index: 2;
+.captureAction {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: #357a74;
-  font-family: var(--serif);
-  font-size: 12px;
-  font-weight: 750;
-}
-
-.captureSliderLabels span,
-.captureSliderLabels button,
-.captureSliderLabels label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.captureSliderLabels button,
-.captureSliderLabels label {
-  padding: 8px 5px;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  font-weight: inherit;
-  cursor: pointer;
-  touch-action: none;
-  user-select: none;
-}
-
-.captureSliderLabels span { pointer-events: none; }
-
-.captureSliderRail {
-  position: relative;
-  display: flex;
-  height: 44px;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  background: transparent;
-  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
-}
-
-.captureSliderRail.active {
-  border-color: transparent;
-  background: transparent;
-  box-shadow: none;
-}
-
-.captureSliderRail.active::after {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  border-radius: inherit;
-  background: linear-gradient(105deg, transparent 20%, rgba(255, 255, 255, .78) 43%, rgba(166, 222, 210, .38) 52%, transparent 72%);
-  background-position: 130% 0;
-  background-size: 230% 100%;
-  content: "";
-  pointer-events: none;
-  animation: capture-flow 1.15s linear infinite;
-}
-
-.captureSliderLine {
-  position: absolute;
-  left: 50%;
-  z-index: 0;
-  width: 108px;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(92, 150, 140, .68), rgba(136, 177, 167, .22) 43%, rgba(136, 177, 167, .22) 57%, rgba(69, 139, 127, .72));
-  transform: translateX(-50%);
-}
-
-.captureSliderThumb {
-  position: relative;
-  z-index: 3;
-  display: grid;
-  width: 54px;
-  height: 54px;
-  place-items: center;
-  padding: 0;
-  border: 3px solid #f8f6ef;
-  border-radius: 50%;
-  background: #2b8b80;
-  color: #fffdf5;
-  box-shadow: 0 6px 16px rgba(22, 97, 90, .2);
-  cursor: grab;
-  touch-action: none;
+  gap: 4px;
+  min-height: 64px;
+  padding: 10px 6px;
+  border: 1px solid rgba(53, 122, 116, 0.22);
+  border-radius: 18px;
+  background: rgba(255, 253, 245, 0.92);
+  box-shadow: 0 6px 16px rgba(22, 97, 90, 0.08);
+  color: #2b6f68;
+  font: inherit;
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
   user-select: none;
-  transition: transform 240ms cubic-bezier(.22, .8, .3, 1), box-shadow 160ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.captureSliderThumb.dragging {
-  box-shadow: 0 9px 22px rgba(22, 97, 90, .26);
-  cursor: grabbing;
-  transition: box-shadow 160ms ease;
+.captureAction:active {
+  transform: scale(0.98);
 }
 
-@keyframes capture-flow {
-  from { background-position: 130% 0; }
-  to { background-position: -130% 0; }
+.captureAction:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
-.captureSlider > p {
-  margin: 8px 0 0;
-  color: #91a39f;
-  font-size: 10px;
+.captureActionRecording {
+  border-color: rgba(176, 48, 40, 0.4);
+  background: #b03028;
+  color: #fff;
+}
+
+.captureHint {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 12px;
   text-align: center;
+}
+
+.captureInputs {
+  display: contents;
 }
 
 .textEncounter {
@@ -296,7 +231,6 @@
   .heroHeader { padding: 28px 24px 6px; }
   .globeReset { width: 50px; height: 50px; flex-basis: 50px; }
   .dashboard { padding-right: 17px; padding-left: 17px; }
-  .captureSlider { padding: 0 10px; }
   .stats strong { font-size: 25px; }
   .stats span { font-size: 12px; }
 }
@@ -346,8 +280,6 @@
     padding: 6px 17px 8px;
   }
 
-  .captureSlider { padding: 0 8px; }
-  .captureSlider > p { margin-top: 5px; font-size: 9px; }
   .textEncounter { margin-top: 5px; min-height: 28px; }
   .stats { margin-top: 8px; }
   .stats > div { gap: 4px; }
@@ -362,7 +294,6 @@
 }
 
 @media (max-width: 350px) {
-  .captureSlider { padding: 0; }
   .wordmark { font-size: 32px; }
 }
 
