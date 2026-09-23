@@ -101,11 +101,13 @@ async function syncModels(files){
     const pending=files.filter(f=>!loadedIds.has(f.id)).sort((a,b)=>(b.id===pendingFocus)-(a.id===pendingFocus));
     if(!files.length){ui.loading.textContent='你的记忆宇宙，正等待第一张照片';return}
     if(pending.length)ui.loading.classList.remove('is-hidden');
+    // 所有模型同时开始下载（国内站每个请求首字节要等 2 秒多，一个个排队要近一分钟），仍按时间顺序放进宇宙
+    const prefetch=new Map(pending.map(f=>{const task=load(f.url);task.catch(()=>{});return[f.id,task]}));
     for(const f of pending){
       const index=files.findIndex(item=>item.id===f.id);
       ui.loading.textContent=`正在让「${f.name}」成为星点…`;
       try{
-        const asset=await load(f.url);
+        const asset=await(prefetch.get(f.id)??load(f.url));
         models[index]=prepare(asset.gltf,f.name,index,asset.palette);models[index].id=f.id;
         loadedIds.add(f.id);particles();buildLine();memoryAtmosphere.refreshToken++;
         ui.loading.textContent=`${loadedIds.size} 件记忆已进入宇宙`;
@@ -113,7 +115,7 @@ async function syncModels(files){
         if(pendingFocus===f.id)focusModel(f.id);
         if(embedded)window.parent.postMessage({type:'memory-universe:loaded',count:loadedIds.size,total:files.length},location.origin);
       }catch(e){ui.loading.textContent=`「${f.name}」载入失败，稍后自动重试`;console.error('记忆载入失败',e)}
-      await new Promise(resolve=>setTimeout(resolve,80));
+      await new Promise(resolve=>setTimeout(resolve,16));
     }
     if(loadedIds.size===files.length)setTimeout(()=>ui.loading.classList.add('is-hidden'),1800);
   }finally{syncing=false;if(queuedFiles){const next=queuedFiles;queuedFiles=null;syncModels(next)}}
