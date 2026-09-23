@@ -57,6 +57,16 @@ npm run dev
 完整启动和接口说明见 `services/image-to-3d/README.md`。密钥、上传图片、SQLite
 数据库及生成模型均在忽略列表中，不进入 Git。
 
+全新检出后，`npm ci && npm run build` 可按根目录 `package-lock.json` 安装并构建
+Web 应用；这只保证 Web 端依赖完整。要跑通“上传 → 识别 → 3D → 记忆图景”，还需：
+
+1. Web 服务配置 `DASHSCOPE_API_KEY`、`MEMORY_3D_API_URL`，以及可选但推荐的
+   `MEMORY_3D_SERVICE_KEY`；
+2. 启动 `services/image-to-3d`，配置 `TRIPO_API_KEY`；若设置了
+   `SERVICE_API_KEY`，其值须与 Web 端的 `MEMORY_3D_SERVICE_KEY` 一致；
+3. 确保 Web 服务端能够访问 `MEMORY_3D_API_URL`。浏览器只调用同源的
+   `/api/memory-3d/*` 代理，不直接接触 Tripo 密钥。
+
 ### 用量护栏
 
 五个花钱接口（`recognize` / `encounter-av` / `reply` / `insight` / `summary`）都必须带
