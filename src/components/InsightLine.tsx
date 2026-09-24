@@ -45,8 +45,19 @@ export function InsightLine({ items }: { items: Item[] }) {
   const [line, setLine] = useState<string | null>(null);
 
   useEffect(() => {
-    if (items.length < INSIGHT_MIN_ITEMS) {
+    if (!items.length) {
       setLine(null);
+      return;
+    }
+
+    // MVP 只有一条记录时也给首页留一句真实记忆，不让统计栏下面空着。
+    // 记录达到三条后，继续走原来的随机事实 + 模型润色流程。
+    if (items.length < INSIGHT_MIN_ITEMS) {
+      const item = items[items.length > 1 ? new Date().getDate() % items.length : 0];
+      const date = item.date.slice(0, 7).replace("-", "年") + "月";
+      const fallback = item.ai?.memorySentence?.trim()
+        || `${date}，${item.place || "旅途中"}遇见了${item.name}。`;
+      setLine(fallback.replace(/[「」]/g, ""));
       return;
     }
 

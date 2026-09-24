@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -28,6 +29,18 @@ import { apiFetch } from "@/lib/api-client";
 
 export default function Home() {
   const router = useRouter();
+  const heroHeaderRef = useRef<HTMLElement>(null);
+  const taglineRef = useRef<HTMLParagraphElement>(null);
+  const universeEntryRef = useRef<HTMLAnchorElement>(null);
+  const [heroConnector, setHeroConnector] = useState<{
+    width: number;
+    height: number;
+    startX: number;
+    startY: number;
+    elbowX: number;
+    targetX: number;
+    targetY: number;
+  } | null>(null);
   const insta360 = useInsta360();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [cameraBusy, setCameraBusy] = useState(false);
@@ -173,22 +186,76 @@ export default function Home() {
     };
   }, [mine]);
 
+  useLayoutEffect(() => {
+    const updateConnector = () => {
+      const header = heroHeaderRef.current;
+      const tagline = taglineRef.current;
+      const entry = universeEntryRef.current;
+      if (!header || !tagline || !entry) return;
+      const headerRect = header.getBoundingClientRect();
+      const taglineRect = tagline.getBoundingClientRect();
+      const entryRect = entry.getBoundingClientRect();
+      const textGap = Number.parseFloat(window.getComputedStyle(tagline).fontSize) || 15;
+      const startX = taglineRect.right - headerRect.left + textGap;
+      const startY = taglineRect.top - headerRect.top + taglineRect.height / 2;
+      const targetX = entryRect.left - headerRect.left + 10;
+      const targetY = entryRect.top - headerRect.top + entryRect.height * 0.9;
+      setHeroConnector({
+        width: headerRect.width,
+        height: headerRect.height,
+        startX,
+        startY,
+        elbowX: Math.max(startX + 28, targetX - 26),
+        targetX,
+        targetY,
+      });
+    };
+    updateConnector();
+    const header = heroHeaderRef.current;
+    const observer = typeof ResizeObserver === "undefined" || !header
+      ? null
+      : new ResizeObserver(updateConnector);
+    if (observer) {
+      observer.observe(header);
+      if (taglineRef.current) observer.observe(taglineRef.current);
+      if (universeEntryRef.current) observer.observe(universeEntryRef.current);
+    }
+    window.addEventListener("resize", updateConnector);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", updateConnector);
+    };
+  }, []);
+
   return (
     <main className={`app-shell ${styles.homeShell}`}>
       <div className={`phone-page ${styles.homePage}`}>
-        <header className={styles.heroHeader}>
+        <header ref={heroHeaderRef} className={styles.heroHeader}>
           <div>
             <p className={styles.wordmark}>遇见集<sup>®</sup></p>
-            <p className={styles.subtitle}>THE PLACES THAT MADE ME</p>
-            <p className={styles.tagline}>世界很大，而你，正好出发。</p>
+            <p className={styles.subtitle}>A COLLECTION OF ENCOUNTERS</p>
+            <p ref={taglineRef} className={styles.tagline}>每一次新的遇见，都是一个人精神图景的扩张</p>
           </div>
           <div className={styles.headerActions}>
             {/* 精神图景入口：评委不一定会去捏合地球，这里给一个看得见、带字的门 */}
-            <Link className={styles.universeEntry} href="/universe" aria-label="进入精神图景">
+            <Link ref={universeEntryRef} className={styles.universeEntry} href="/universe" aria-label="进入精神图景">
               <Sparkles size={18} strokeWidth={1.9} />
               <span>进入图景</span>
             </Link>
           </div>
+          {heroConnector ? (
+            <svg
+              className={styles.annotationLine}
+              viewBox={`0 0 ${heroConnector.width} ${heroConnector.height}`}
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                d={`M ${heroConnector.startX} ${heroConnector.startY} H ${heroConnector.elbowX} L ${heroConnector.targetX} ${heroConnector.targetY}`}
+              />
+              <circle cx={heroConnector.startX} cy={heroConnector.startY} r="3" />
+            </svg>
+          ) : null}
         </header>
 
         <div className={styles.globeStage}>
