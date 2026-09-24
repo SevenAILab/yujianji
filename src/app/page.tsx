@@ -215,7 +215,7 @@ export default function Home() {
     const observer = typeof ResizeObserver === "undefined" || !header
       ? null
       : new ResizeObserver(updateConnector);
-    if (observer) {
+    if (observer && header) {
       observer.observe(header);
       if (taglineRef.current) observer.observe(taglineRef.current);
       if (universeEntryRef.current) observer.observe(universeEntryRef.current);

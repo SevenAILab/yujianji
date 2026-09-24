@@ -84,7 +84,11 @@ function Universe() {
         <iframe key={frameKey} ref={frameRef} className={styles.scene} src="/memory-universe/index.html?source=parent" title="精神图景" allow="fullscreen" />
       )}
       <header className={styles.header}>
-        <div className={styles.topRow}>
+        <div className={styles.title}>
+          <h1>精神图景</h1>
+          <p>{subtitle}</p>
+        </div>
+        <div className={styles.actionStack}>
           <Link href="/" className={styles.back}>
             <ChevronLeft size={16} /> 回到地球
           </Link>
@@ -93,10 +97,6 @@ function Universe() {
               <Printer size={15} /> {picking ? "取消打印" : "3D 打印"}
             </button>
           ) : null}
-        </div>
-        <div className={styles.title}>
-          <h1>精神图景</h1>
-          <p>{subtitle}</p>
         </div>
       </header>
       {picking ? (

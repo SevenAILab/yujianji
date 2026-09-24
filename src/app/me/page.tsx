@@ -164,7 +164,7 @@ export default function MePage() {
   }
 
   return (
-    <main className="app-shell">
+    <main className={`app-shell ${styles.meShell}`}>
       <div className="phone-page">
         <header className="page-header">
           <h1 className="page-title">我的</h1>

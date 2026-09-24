@@ -58,8 +58,8 @@
   align-items: center;
   gap: 2px;
   padding: 5px 11px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
+  border: 0;
+  border-radius: 0;
   background: #fff;
   color: var(--teal-dark);
   font: inherit;
@@ -67,6 +67,7 @@
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
 }
 
 .rows li.note {

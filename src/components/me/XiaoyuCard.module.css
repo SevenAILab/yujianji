@@ -18,6 +18,12 @@
   font-size: 19px;
 }
 
+/* `XiaoyuCard` 的类名会命中全局卡片规则；头像本身固定使用主题蓝。 */
+:global(.app-shell:not([class*="homeShell"])) .avatar {
+  background: #454471 !important;
+  color: #f8f1dd !important;
+}
+
 .title {
   margin: 0;
   color: var(--ink);

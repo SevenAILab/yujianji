@@ -1,9 +1,10 @@
 .receipt {
   margin-top: 14px;
   padding: 14px 16px;
-  border: 1px solid rgba(47, 111, 106, 0.16);
-  border-radius: 18px;
-  background: linear-gradient(135deg, rgba(220, 239, 235, 0.72), rgba(251, 253, 252, 0.95));
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: #f7f4eb;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
 }
 
 .head {
@@ -47,6 +48,6 @@
 .meta {
   display: block;
   margin-top: 4px;
-  color: var(--muted);
+  color: rgba(27, 23, 21, .68);
   font-size: 12px;
 }

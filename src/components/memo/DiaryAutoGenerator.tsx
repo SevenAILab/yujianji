@@ -49,7 +49,7 @@ export function DiaryAutoGenerator() {
 
   if (!written) return null;
   return (
-    <Link className="toast" href={`/memo/day/${written}`} style={{ textDecoration: "none" }} onClick={() => setWritten(null)}>
+    <Link className="diary-ready-notice" href={`/memo/day/${written}`} onClick={() => setWritten(null)}>
       {shortDay(written)} 的手帐写好了，去看看 →
     </Link>
   );
