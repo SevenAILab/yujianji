@@ -349,11 +349,6 @@ export default function Home() {
                 {loadingDemo ? "正在载入…" : "还是先看看别人的遇见集"}
               </button>
             </div>
-          ) : !mine.length ? (
-            <div className={styles.demoNote}>
-              正在看示例：英国 5 天和深圳两个周末。拍下你的第一次后，这里只算你自己的。
-              <Link href="/me">移除示例</Link>
-            </div>
           ) : (
             <>
               <div className={styles.stats} aria-label="遇见统计">
@@ -363,7 +358,19 @@ export default function Home() {
                 <div><strong>{stats.locations}</strong><span>地点</span></div>
               </div>
 
-              <div className={styles.insight}><InsightLine items={mine} /></div>
+              <div className={styles.insight}>
+                {mine.length ? (
+                  <InsightLine items={mine} />
+                ) : (
+                  <p className="insight-line">每一次停下来看，都会让世界多一处与你有关的坐标。</p>
+                )}
+              </div>
+              {!mine.length ? (
+                <div className={styles.demoNote}>
+                  正在看示例：英国 5 天和深圳两个周末。拍下你的第一次后，这里只算你自己的。
+                  <Link href="/me">移除示例</Link>
+                </div>
+              ) : null}
             </>
           )}
         </section>
