@@ -234,7 +234,6 @@ export default function Home() {
           <div>
             <p className={styles.wordmark}>遇见集<sup>®</sup></p>
             <p className={styles.subtitle}>A COLLECTION OF ENCOUNTERS</p>
-            <p ref={taglineRef} className={styles.tagline}>每一次新的遇见，都是一个人精神图景的扩张</p>
           </div>
           <div className={styles.headerActions}>
             {/* 精神图景入口：评委不一定会去捏合地球，这里给一个看得见、带字的门 */}

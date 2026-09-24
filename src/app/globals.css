@@ -442,6 +442,7 @@ img {
 /* 三个主入口统一采用首页地图的导航：当前页只高亮图标圆形，不显示整块胶囊。 */
 .bottom-nav.bottom-nav--home-style {
   position: fixed !important;
+  z-index: 100 !important;
   right: 0 !important;
   bottom: 0 !important;
   left: 0 !important;
@@ -451,6 +452,7 @@ img {
   border-radius: 24px 24px 0 0 !important;
   background: rgba(250, 249, 243, .96) !important;
   box-shadow: 0 -12px 28px rgba(45, 86, 79, .07) !important;
+  transform: none !important;
 }
 
 .bottom-nav.bottom-nav--home-style a {
