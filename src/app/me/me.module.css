@@ -1,3 +1,8 @@
+.meShell:global(.app-shell:not([class*="homeShell"])) {
+  /* 与首页地球窗口共用同一层复古米黄色。 */
+  --ui-cream: #f7f4eb;
+}
+
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -11,14 +16,15 @@
   align-items: center;
   gap: 4px;
   padding: 16px 8px;
-  border: 1px solid var(--line);
-  border-radius: 17px;
-  background: rgba(255, 255, 255, 0.78);
+  border: 0;
+  border-radius: 0;
+  background: #f7f4eb;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
 }
 
 .stats strong {
   color: var(--teal-dark);
-  font-family: var(--serif);
+  font-family: Arial, sans-serif;
   font-size: 26px;
   font-weight: 750;
   line-height: 1;

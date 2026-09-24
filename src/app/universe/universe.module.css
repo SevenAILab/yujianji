@@ -3,32 +3,41 @@
   width: 100%;
   height: 100dvh;
   overflow: hidden;
-  background: #111522;
-  color: #e7efff;
+  background: #eee8da;
+  color: #1b1715;
 }
 
 .header {
   position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + 14px);
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
   right: 16px;
   left: 16px;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 10px;
   pointer-events: none;
+}
+
+.actionStack {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
 }
 
 .back {
   display: inline-flex;
   align-items: center;
   gap: 2px;
-  align-self: flex-start;
   padding: 7px 12px 7px 8px;
-  border: 1px solid rgba(207, 227, 255, 0.25);
-  border-radius: 999px;
-  background: rgba(7, 13, 36, 0.55);
-  color: #e7efff;
+  border: 0;
+  border-radius: 0;
+  background: #454471;
+  color: #f8f1dd;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
@@ -42,11 +51,16 @@
   font-size: 26px;
   font-weight: 800;
   letter-spacing: -0.03em;
+  color: #f8f1dd;
+}
+
+.title {
+  max-width: calc(100% - 130px);
 }
 
 .title p {
   margin: 4px 0 0;
-  color: rgba(207, 227, 255, 0.7);
+  color: rgba(248, 241, 221, 0.82);
   font-size: 12px;
 }
 
@@ -68,10 +82,11 @@
   margin: 0 auto;
   max-width: 340px;
   padding: 10px 14px;
-  border: 1px solid rgba(207, 227, 255, 0.35);
-  border-radius: 999px;
-  background: rgba(7, 13, 36, 0.72);
-  color: #e7efff;
+  border: 0;
+  border-radius: 0;
+  background: #f8f1dd;
+  color: #454471;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
   font-size: 13px;
   font-weight: 700;
   text-align: center;
@@ -79,22 +94,16 @@
   backdrop-filter: blur(8px);
 }
 
-.topRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
 .printButton {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  border: 1px solid rgba(255, 214, 170, 0.55);
-  border-radius: 999px;
-  background: rgba(255, 196, 140, 0.16);
-  color: #ffe2c4;
+  border: 0;
+  border-radius: 0;
+  background: #454471;
+  color: #f8f1dd;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
   font-size: 13px;
   font-weight: 700;
   pointer-events: auto;
@@ -102,8 +111,8 @@
 }
 
 .printButtonActive {
-  background: #ffd3a8;
-  color: #3a2415;
+  background: #454471;
+  color: #f8f1dd;
 }
 
 .pickHint {
@@ -115,10 +124,11 @@
   margin: 0 auto;
   max-width: 340px;
   padding: 10px 14px;
-  border: 1px solid rgba(255, 214, 170, 0.45);
-  border-radius: 999px;
-  background: rgba(58, 36, 21, 0.72);
-  color: #ffe2c4;
+  border: 0;
+  border-radius: 0;
+  background: #454471;
+  color: #f8f1dd;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
   font-size: 13px;
   font-weight: 700;
   text-align: center;

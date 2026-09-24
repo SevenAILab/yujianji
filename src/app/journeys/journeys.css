@@ -195,21 +195,61 @@
   gap: 4px;
   max-width: 154px;
   padding: 9px 11px;
-  border: 1px solid rgba(98, 119, 98, .13);
-  color: #315f5d;
+  border: 0;
+  border-radius: 0;
+  color: #1b1715;
   text-align: left;
-  box-shadow: 0 5px 12px rgba(54, 79, 70, .11);
+  box-shadow: none;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
   transition: transform 180ms ease;
 }
 
-.map-sticky-note small { color: #ce755a; font-size: 7px; font-weight: 900; letter-spacing: .08em; }
+.map-sticky-note small { color: inherit; font-size: 7px; font-weight: 900; letter-spacing: .08em; opacity: .78; }
 .map-sticky-note strong { font-family: var(--serif); font-size: 11px; line-height: 1.35; }
-.map-sticky-note p { margin: 0; color: #68817d; font-size: 8px; line-height: 1.45; }
-.note-west { right: 3%; top: 9%; background: #fff7cf; transform: rotate(2deg); }
-.note-south { left: 3%; top: 35%; background: #eff7ed; transform: rotate(-2deg); }
-.note-east { right: 3%; bottom: 24%; background: #f9e8dd; transform: rotate(2deg); }
-.note-extra-one { left: 3%; top: 58%; background: #edf3d8; transform: rotate(-2deg); }
-.note-extra-two { right: 3%; bottom: 7%; background: #e8f0ed; transform: rotate(2deg); }
+.map-sticky-note p { margin: 0; color: inherit; font-size: 8px; line-height: 1.45; opacity: .78; }
+/* 六种便签：蓝、绿实色；蓝、绿描边标签；蓝、绿标题条。 */
+.note-indigo { right: 3%; top: 9%; }
+.note-moss { left: 3%; top: 35%; }
+.note-indigo-frame { right: 3%; bottom: 24%; }
+.note-moss-frame { left: 3%; top: 58%; }
+.note-indigo-banner { right: 3%; bottom: 7%; }
+.note-moss-banner { left: 27%; top: 17%; }
+
+/* 全局普通按钮的规则优先级更高；在此取回便签的独立视觉样式。 */
+.app-shell:not([class*="homeShell"]) button.map-sticky-note.note-indigo {
+  background: #454471 !important;
+  color: #f8f1dd !important;
+}
+
+.app-shell:not([class*="homeShell"]) button.map-sticky-note.note-moss {
+  background: #8b9c7e !important;
+  color: #1b1715 !important;
+}
+
+.app-shell:not([class*="homeShell"]) button.map-sticky-note.note-indigo-frame {
+  border: 2px solid #454471 !important;
+  background: #f7f4eb !important;
+  color: #454471 !important;
+}
+
+.app-shell:not([class*="homeShell"]) button.map-sticky-note.note-moss-frame {
+  border: 2px solid #8b9c7e !important;
+  background: #f7f4eb !important;
+  color: #1b1715 !important;
+}
+
+.app-shell:not([class*="homeShell"]) button.map-sticky-note.note-indigo-banner {
+  background: linear-gradient(#454471 0 28px, #f7f4eb 28px) !important;
+  color: #1b1715 !important;
+}
+
+.app-shell:not([class*="homeShell"]) button.map-sticky-note.note-moss-banner {
+  background: linear-gradient(#8b9c7e 0 28px, #f7f4eb 28px) !important;
+  color: #1b1715 !important;
+}
+
+.note-indigo-banner small,
+.note-moss-banner small { color: #f8f1dd !important; opacity: 1; }
 
 .map-location-marker {
   position: absolute;

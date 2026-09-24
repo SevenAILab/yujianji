@@ -991,6 +991,33 @@ body :is(h2, h3, .page-title, .section-title, .detail-title h1, .journey-title-r
   box-shadow: var(--shadow);
 }
 
+/* 系统完成提示：贴边滑入的斜切信息窗，不使用居中的浮动胶囊。 */
+.diary-ready-notice {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  left: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  width: min(calc(100% - 34px), 480px);
+  min-height: 48px;
+  padding: 11px 42px 11px 24px;
+  background: #454471;
+  color: #f8f1dd;
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px));
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.4;
+  text-decoration: none;
+  animation: diary-ready-notice-in 360ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
+@keyframes diary-ready-notice-in {
+  from { transform: translateX(-110%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
 .section-heading {
   display: flex;
   align-items: end;
@@ -1615,3 +1642,178 @@ body :is(h2, h3, .page-title, .section-title, .detail-title h1, .journey-title-r
 
 .picker-sheet .insta360-capture-option { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 44px; padding: 12px 16px; border: 1px solid var(--line); border-radius: 14px; background: #e1eee8; color: var(--teal-dark); font: inherit; text-align: left; cursor: pointer; }
 .picker-sheet .insta360-capture-option:disabled { opacity: .55; cursor: wait; }
+
+/*
+ * 遇见集二级页面统一视觉系统
+ * 首页（.homeShell）保留原样；其余 app-shell 页面共享 style guide 的纸面、靛蓝、苔绿、珊瑚与 45° 斜切。
+ */
+.app-shell:not([class*="homeShell"]) {
+  /* 让旧页面沿用 style-lab 的颜色 token，而不是保留旧的青绿色系。 */
+  --ink: #1b1715;
+  --muted: rgba(69, 68, 113, .72);
+  --teal: #454471;
+  --teal-dark: #454471;
+  --mint: #8b9c7e;
+  --sky: #eee8da;
+  --paper: #eee8da;
+  --line: transparent;
+  --warning: #ef655f;
+  --ui-ink: #1b1715;
+  --ui-paper: #eee8da;
+  --ui-cream: #f8f1dd;
+  --ui-indigo: #454471;
+  --ui-moss: #8b9c7e;
+  --ui-coral: #ef655f;
+  --ui-line: rgba(69, 68, 113, .18);
+  min-height: 100svh;
+  background: #eee8da;
+  color: var(--ui-ink);
+}
+
+.app-shell:not([class*="homeShell"]) .phone-page {
+  background: #eee8da;
+  color: var(--ui-ink);
+}
+
+.app-shell:not([class*="homeShell"]) .page-header,
+.app-shell:not([class*="homeShell"]) .brand-lockup,
+.app-shell:not([class*="homeShell"]) .section-header {
+  color: var(--ui-indigo);
+}
+
+.app-shell:not([class*="homeShell"]) h1,
+.app-shell:not([class*="homeShell"]) h2,
+.app-shell:not([class*="homeShell"]) h3,
+.app-shell:not([class*="homeShell"]) .page-title,
+.app-shell:not([class*="homeShell"]) .brand-lockup h1 {
+  color: var(--ui-indigo) !important;
+}
+
+.app-shell:not([class*="homeShell"]) .muted,
+.app-shell:not([class*="homeShell"]) small,
+.app-shell:not([class*="homeShell"]) [class*="hint"],
+.app-shell:not([class*="homeShell"]) [class*="meta"] {
+  color: rgba(69, 68, 113, .72);
+}
+
+/* 统一纸面容器：取消圆角和玻璃阴影，保留信息层级与内容结构。 */
+.app-shell:not([class*="homeShell"]) .surface,
+.app-shell:not([class*="homeShell"]) [class*="card"],
+.app-shell:not([class*="homeShell"]) [class*="Card"],
+.app-shell:not([class*="homeShell"]) [class*="panel"],
+.app-shell:not([class*="homeShell"]) [class*="Panel"],
+.app-shell:not([class*="homeShell"]) [class*="sheet"],
+.app-shell:not([class*="homeShell"]) [class*="Sheet"],
+.app-shell:not([class*="homeShell"]) [class*="today"] {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--ui-cream) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.app-shell:not([class*="homeShell"]) .surface,
+.app-shell:not([class*="homeShell"]) [class*="card"],
+.app-shell:not([class*="homeShell"]) [class*="Card"],
+.app-shell:not([class*="homeShell"]) [class*="panel"],
+.app-shell:not([class*="homeShell"]) [class*="Panel"],
+.app-shell:not([class*="homeShell"]) [class*="sheet"],
+.app-shell:not([class*="homeShell"]) [class*="Sheet"],
+.app-shell:not([class*="homeShell"]) [class*="today"] {
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px));
+}
+
+/* 默认按钮为右上/左下斜切；危险动作只换色，不改变信息结构。 */
+.app-shell:not([class*="homeShell"]) .primary-action,
+.app-shell:not([class*="homeShell"]) .secondary-action,
+.app-shell:not([class*="homeShell"]) .danger-action,
+.app-shell:not([class*="homeShell"]) button[class*="Button"]:not(.icon-action):not([aria-label]),
+.app-shell:not([class*="homeShell"]) button[class*="button"]:not(.icon-action):not([aria-label]),
+.app-shell:not([class*="homeShell"]) a[class*="Button"],
+.app-shell:not([class*="homeShell"]) a[class*="button"],
+.app-shell:not([class*="homeShell"]) button:not([aria-label]):not(.icon-action) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: var(--ui-indigo) !important;
+  color: var(--ui-cream) !important;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+
+.app-shell:not([class*="homeShell"]) .danger-action,
+.app-shell:not([class*="homeShell"]) [class*="danger"] {
+  background: var(--ui-coral) !important;
+  color: var(--ui-ink) !important;
+}
+
+.app-shell:not([class*="homeShell"]) .icon-action,
+.app-shell:not([class*="homeShell"]) button[aria-label] {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--ui-indigo) !important;
+  box-shadow: none !important;
+}
+
+/* 旧页面里的行分隔、边框和阴影改由色块及留白表达层级。 */
+.app-shell:not([class*="homeShell"]) [class*="rows"] > *,
+.app-shell:not([class*="homeShell"]) [class*="links"] > *,
+.app-shell:not([class*="homeShell"]) [class*="divider"],
+.app-shell:not([class*="homeShell"]) [class*="separator"],
+.app-shell:not([class*="homeShell"]) [class*="rule"] {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-shell:not([class*="homeShell"]) [class*="tab"],
+.app-shell:not([class*="homeShell"]) [class*="Tab"],
+.app-shell:not([class*="homeShell"]) [class*="kind"],
+.app-shell:not([class*="homeShell"]) [class*="Kind"] {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+
+.app-shell:not([class*="homeShell"]) input:not([type="file"]),
+.app-shell:not([class*="homeShell"]) textarea,
+.app-shell:not([class*="homeShell"]) select {
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: 0;
+  background: var(--ui-cream) !important;
+  color: var(--ui-ink) !important;
+  box-shadow: inset 0 -2px 0 var(--ui-indigo) !important;
+}
+
+.app-shell:not([class*="homeShell"]) input:focus,
+.app-shell:not([class*="homeShell"]) textarea:focus,
+.app-shell:not([class*="homeShell"]) select:focus {
+  box-shadow: inset 0 -3px 0 var(--ui-moss) !important;
+}
+
+.app-shell:not([class*="homeShell"]) .bottom-nav.bottom-nav--home-style {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--ui-cream) !important;
+  box-shadow: none !important;
+  clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%, 0 18px) !important;
+}
+
+.app-shell:not([class*="homeShell"]) .bottom-nav.bottom-nav--home-style a {
+  color: rgba(69, 68, 113, .72) !important;
+}
+
+.app-shell:not([class*="homeShell"]) .bottom-nav.bottom-nav--home-style a.active {
+  color: var(--ui-indigo) !important;
+}
+
+.app-shell:not([class*="homeShell"]) .bottom-nav.bottom-nav--home-style a.active svg {
+  background: var(--ui-indigo) !important;
+  color: var(--ui-cream) !important;
+}
+
+.app-shell:not([class*="homeShell"]) :focus-visible {
+  outline: 2px solid var(--ui-indigo);
+  outline-offset: 3px;
+}

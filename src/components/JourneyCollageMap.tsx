@@ -11,7 +11,7 @@ const WIDTH = 420;
 const HEIGHT = 640;
 const MARKER_GAP = 34;
 const photoSlots = ["photo-west", "photo-south", "photo-east", "photo-extra-one", "photo-extra-two"];
-const noteSlots = ["note-west", "note-south", "note-east", "note-extra-one", "note-extra-two"];
+const noteSlots = ["note-indigo", "note-moss", "note-indigo-frame", "note-moss-frame", "note-indigo-banner", "note-moss-banner"];
 
 type RegionFeature = {
   type: "Feature";
