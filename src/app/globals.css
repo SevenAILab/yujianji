@@ -12,6 +12,11 @@
   --warning: #b96f2f;
   --shadow: 0 18px 45px rgba(40, 93, 95, 0.12);
   --serif: "Noto Serif SC", "Songti SC", "STSong", Georgia, serif;
+  --font-caption: 10px;
+  --font-label: 12px;
+  --font-body: 14px;
+  --font-title: 22px;
+  --font-display: 34px;
 }
 
 * {
@@ -469,6 +474,28 @@ img {
   overflow: visible !important;
   border-radius: 50% !important;
   background: #e1eee8 !important;
+}
+
+/* MVP 字体规范：所有文字统一使用与首页图标标签相同的衬线字体，并只保留五级字号。 */
+body :is(*, .font-unify) {
+  font-family: var(--serif) !important;
+  font-size: var(--font-body) !important;
+}
+
+body :is(small, .eyebrow, .brand-lockup span, .subtitle, .caption) {
+  font-size: var(--font-caption) !important;
+}
+
+body :is(nav a, button, input, select, textarea, label, .tag, .label) {
+  font-size: var(--font-label) !important;
+}
+
+body :is(h1, .wordmark, [class*="wordmark"]) {
+  font-size: var(--font-display) !important;
+}
+
+body :is(h2, h3, .page-title, .section-title, .detail-title h1, .journey-title-row strong) {
+  font-size: var(--font-title) !important;
 }
 
 @media (max-width: 560px) {
