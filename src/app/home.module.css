@@ -225,7 +225,10 @@
   .subtitle { margin-top: 9px; }
   .tagline { margin-top: 16px; font-size: 14px !important; }
   .universeEntry { min-width: 106px; height: 40px; padding-inline: 10px; font-size: 11px !important; }
-  .globeStage { min-height: 0; margin: 0 20px; padding: 5px 8px 9px; }
+  .homeShell { height: auto; min-height: 100svh; overflow-x: hidden; overflow-y: auto; }
+  .homePage { display: block; height: auto; min-height: calc(100svh - 78px - env(safe-area-inset-bottom)); }
+  /* 地球窗口由屏幕宽度决定，不能被可用视口高度的 grid 行压缩。 */
+  .globeStage { height: min(calc(100vw - 40px), 505px); min-height: 0; margin: 0 20px; padding: 5px 8px 9px; flex-shrink: 0; }
   .globeStage > div { height: 100% !important; min-height: 0; }
   .dashboard { padding: 12px 16px 20px; }
   .captureAction { width: 60px; height: 60px; font-size: 10px !important; }
