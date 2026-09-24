@@ -434,6 +434,43 @@ img {
   color: var(--teal-dark);
 }
 
+/* 三个主入口统一采用首页地图的导航：当前页只高亮图标圆形，不显示整块胶囊。 */
+.bottom-nav.bottom-nav--home-style {
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: min(100%, 560px) !important;
+  padding: 11px 18px calc(11px + env(safe-area-inset-bottom)) !important;
+  border-width: 1px 0 0 !important;
+  border-radius: 24px 24px 0 0 !important;
+  background: rgba(250, 249, 243, .96) !important;
+  box-shadow: 0 -12px 28px rgba(45, 86, 79, .07) !important;
+}
+
+.bottom-nav.bottom-nav--home-style a {
+  flex: 1 !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+  min-width: 0 !important;
+  padding: 7px 9px !important;
+  font-family: var(--serif) !important;
+  font-size: 12px !important;
+}
+
+.bottom-nav.bottom-nav--home-style a.active {
+  background: transparent !important;
+  color: #168176 !important;
+}
+
+.bottom-nav.bottom-nav--home-style a.active svg {
+  width: 38px !important;
+  height: 38px !important;
+  padding: 7px !important;
+  overflow: visible !important;
+  border-radius: 50% !important;
+  background: #e1eee8 !important;
+}
+
 @media (max-width: 560px) {
   .bottom-nav {
     right: 0 !important;
