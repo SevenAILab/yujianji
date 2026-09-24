@@ -441,6 +441,7 @@ img {
 
 /* 三个主入口统一采用首页地图的导航：当前页只高亮图标圆形，不显示整块胶囊。 */
 .bottom-nav.bottom-nav--home-style {
+  position: fixed !important;
   right: 0 !important;
   bottom: 0 !important;
   left: 0 !important;
@@ -465,15 +466,10 @@ img {
 .bottom-nav.bottom-nav--home-style a.active {
   background: transparent !important;
   color: #168176 !important;
-}
-
-.bottom-nav.bottom-nav--home-style a.active svg {
-  width: 38px !important;
-  height: 38px !important;
-  padding: 7px !important;
-  overflow: visible !important;
-  border-radius: 50% !important;
-  background: #e1eee8 !important;
+  font-weight: 800 !important;
+  text-decoration: underline !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 4px !important;
 }
 
 /* MVP 字体规范：所有文字统一使用与首页图标标签相同的衬线字体，并只保留五级字号。 */
@@ -1806,11 +1802,10 @@ body :is(h2, h3, .page-title, .section-title, .detail-title h1, .journey-title-r
 
 .app-shell:not([class*="homeShell"]) .bottom-nav.bottom-nav--home-style a.active {
   color: var(--ui-indigo) !important;
-}
-
-.app-shell:not([class*="homeShell"]) .bottom-nav.bottom-nav--home-style a.active svg {
-  background: var(--ui-indigo) !important;
-  color: var(--ui-cream) !important;
+  font-weight: 800 !important;
+  text-decoration: underline !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 4px !important;
 }
 
 .app-shell:not([class*="homeShell"]) :focus-visible {
