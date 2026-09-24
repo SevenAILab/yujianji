@@ -445,7 +445,7 @@ img {
   bottom: 0 !important;
   left: 0 !important;
   width: min(100%, 560px) !important;
-  padding: 11px 18px calc(11px + env(safe-area-inset-bottom)) !important;
+  padding: 7px 18px calc(7px + env(safe-area-inset-bottom)) !important;
   border-width: 1px 0 0 !important;
   border-radius: 24px 24px 0 0 !important;
   background: rgba(250, 249, 243, .96) !important;
@@ -454,8 +454,8 @@ img {
 
 .bottom-nav.bottom-nav--home-style a {
   flex: 1 !important;
-  flex-direction: column !important;
-  gap: 5px !important;
+  flex-direction: row !important;
+  gap: 0 !important;
   min-width: 0 !important;
   padding: 7px 9px !important;
   font-family: var(--serif) !important;
@@ -515,11 +515,11 @@ body :is(h2, h3, .page-title, .section-title, .detail-title h1, .journey-title-r
 
   .bottom-nav a {
     flex: 1 !important;
-    flex-direction: column !important;
+    flex-direction: row !important;
     min-width: 0 !important;
-    gap: 1px !important;
-    padding: 3px 2px !important;
-    font-size: 10px !important;
+    gap: 0 !important;
+    padding: 6px 2px !important;
+    font-size: 12px !important;
   }
 
   .bottom-nav a.active svg {

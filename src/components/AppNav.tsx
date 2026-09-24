@@ -1,6 +1,5 @@
 "use client";
 
-import { Globe2, NotebookText, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -15,18 +14,9 @@ export function AppNav() {
   const onMe = pathname === "/me" || pathname.startsWith("/me/") || pathname.startsWith("/devices") || pathname === "/memo/me" || pathname.startsWith("/memo/enroll");
   return (
     <nav className="bottom-nav bottom-nav--home-style" aria-label="主导航">
-      <Link className={onJourneys ? "active" : ""} href="/journeys">
-        <NotebookText size={19} strokeWidth={1.8} />
-        旅途
-      </Link>
-      <Link className={pathname === "/" || pathname.startsWith("/universe") ? "active" : ""} href="/">
-        <Globe2 size={20} strokeWidth={1.8} />
-        地图
-      </Link>
-      <Link className={onMe ? "active" : ""} href="/me">
-        <User size={19} strokeWidth={1.8} />
-        我的
-      </Link>
+      <Link className={onJourneys ? "active" : ""} href="/journeys">旅途</Link>
+      <Link className={pathname === "/" || pathname.startsWith("/universe") ? "active" : ""} href="/">地图</Link>
+      <Link className={onMe ? "active" : ""} href="/me">我的</Link>
     </nav>
   );
 }
