@@ -11,9 +11,9 @@
 .globeHint {
   position: absolute;
   top: 16px;
-  left: 18px;
+  left: 48px;
   color: #568078;
-  font-size: 12px;
+  font-size: 12px !important;
   letter-spacing: .14em;
 }
 
@@ -86,8 +86,8 @@
 
   .globeHint {
     top: 10px;
-    left: 16px;
-    font-size: 9px;
+    left: 32px;
+    font-size: 10px !important;
   }
 
   .photoBubble {

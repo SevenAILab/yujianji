@@ -53,6 +53,27 @@
   letter-spacing: .06em;
 }
 
+/* 连接真实文字与 CTA 的轻量注解线，避免用固定坐标破坏响应式对齐。 */
+.annotationLine {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.annotationLine path {
+  fill: none;
+  stroke: rgba(39, 137, 126, .58);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.annotationLine circle { fill: #27897e; }
+
 .globeReset {
   display: grid;
   width: 54px;
@@ -72,6 +93,8 @@
 .globeReset:hover { background: #fff; transform: rotate(12deg); }
 
 .headerActions {
+  position: relative;
+  z-index: 3;
   display: flex;
   gap: 10px;
 }
@@ -121,12 +144,29 @@
 }
 
 .captureActions {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+}
+
+/* 连接三枚按钮的线藏在圆形按钮下方，只在按钮之间露出。 */
+.captureActions::before {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  right: 25%;
+  left: 25%;
+  height: 1px;
+  background: rgba(39, 137, 126, .42);
+  content: "";
+  transform: translateY(-.5px);
+  transform-origin: center;
 }
 
 .captureAction {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -147,6 +187,25 @@
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* 三个圆按钮的圆心落在下方四列统计的三条分隔线上。 */
+.captureAction:nth-child(1) {
+  grid-column: 2;
+  justify-self: start;
+  margin-left: -32px;
+}
+
+.captureAction:nth-child(2) {
+  grid-column: 3;
+  justify-self: start;
+  margin-left: -32px;
+}
+
+.captureAction:nth-child(3) {
+  grid-column: 4;
+  justify-self: start;
+  margin-left: -32px;
 }
 
 .captureAction:active {
@@ -192,8 +251,19 @@
   content: "";
 }
 
-.stats strong { color: #095b5e; font-size: 28px; line-height: 1; }
-.stats span { color: #7e999a; font-family: var(--serif); font-size: 13px; }
+.stats strong {
+  color: #095b5e;
+  font-family: Arial, "PingFang SC", "Hiragino Sans GB", sans-serif !important;
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  line-height: 1;
+}
+
+.stats span {
+  color: #7e999a;
+  font-family: var(--serif);
+  font-size: 13px !important;
+}
 
 .textEntry {
   display: block;
@@ -265,8 +335,8 @@
   .heroHeader { padding: 28px 24px 6px; }
   .globeReset { width: 50px; height: 50px; flex-basis: 50px; }
   .dashboard { padding-right: 17px; padding-left: 17px; }
-  .stats strong { font-size: 25px; }
-  .stats span { font-size: 12px; }
+  .stats strong { font-size: 25px !important; }
+  .stats span { font-size: 12px !important; }
 }
 
 @media (max-width: 560px) {
@@ -314,12 +384,15 @@
     padding: 6px 17px 8px;
   }
 
-  .captureActions { gap: 14px; }
+  .captureActions { gap: 0; }
   .captureAction { width: 58px; height: 58px; font-size: 10px; }
+  .captureAction:nth-child(1),
+  .captureAction:nth-child(2),
+  .captureAction:nth-child(3) { margin-left: -29px; }
   .stats { margin-top: 8px; }
   .stats > div { gap: 4px; }
-  .stats strong { font-size: 23px; }
-  .stats span { font-size: 11px; }
+  .stats strong { font-size: 23px !important; }
+  .stats span { font-size: 11px !important; }
   .insight { margin-top: 7px; }
   .insight :global(.insight-line) { font-size: 11px; line-height: 1.45; }
 }

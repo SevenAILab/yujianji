@@ -14,7 +14,7 @@ export function AppNav() {
   // 注意 "/memo".startsWith("/me") 也是真的——以前「手记」和「我的」会同时高亮
   const onMe = pathname === "/me" || pathname.startsWith("/me/") || pathname.startsWith("/devices") || pathname === "/memo/me" || pathname.startsWith("/memo/enroll");
   return (
-    <nav className="bottom-nav" aria-label="主导航">
+    <nav className="bottom-nav bottom-nav--home-style" aria-label="主导航">
       <Link className={onJourneys ? "active" : ""} href="/journeys">
         <NotebookText size={19} strokeWidth={1.8} />
         旅途
