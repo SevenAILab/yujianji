@@ -11,6 +11,7 @@ import { CopyButton } from "@/components/memo/CopyButton";
 import { DiaryReceipt } from "@/components/memo/DiaryReceipt";
 import { useModelIds } from "@/components/universe/useModelIds";
 import { AGENT_NAME } from "@/lib/agent-persona";
+import { itemHref } from "@/lib/app-mode";
 import { db } from "@/lib/db";
 import { buildDayStops, dayCollage, journalDay, routeKm } from "@/lib/journey-days";
 import { describeMemoError } from "@/lib/memo/client/api";
@@ -227,7 +228,13 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
                 <h3 className={styles.diaryStamp}>
                   {clockIn(entry.at, timeZone)} · {entry.place || "地点未知"}
                 </h3>
-                <img className={styles.diaryPhoto} src={item.photo} alt={entry.name} loading="lazy" />
+                <Link
+                  className={styles.diaryPhotoLink}
+                  href={itemHref(item.id)}
+                  aria-label={`查看「${entry.name}」详情`}
+                >
+                  <img className={styles.diaryPhoto} src={item.photo} alt={entry.name} loading="lazy" />
+                </Link>
                 <p className={styles.photoCaption}>{entry.name}</p>
               </article>
             ) : null;
@@ -425,7 +432,13 @@ function ParagraphCard(props: {
       <h3 className={styles.diaryStamp}>{p.heading}</h3>
       {photo ? (
         // 没配到图就什么都不放——留白好过占位灰块
-        <img className={styles.diaryPhoto} src={photo.photo} alt={photo.name} loading="lazy" />
+        <Link
+          className={styles.diaryPhotoLink}
+          href={itemHref(photo.id)}
+          aria-label={`查看「${photo.name}」详情`}
+        >
+          <img className={styles.diaryPhoto} src={photo.photo} alt={photo.name} loading="lazy" />
+        </Link>
       ) : null}
       {backfill ? (
         <p className={`${styles.small} ${styles.muted}`} style={{ margin: "0 0 6px" }}>

@@ -233,8 +233,7 @@ export default function Home() {
         <header ref={heroHeaderRef} className={styles.heroHeader}>
           <div>
             <p className={styles.wordmark}>遇见集<sup>®</sup></p>
-            <p className={styles.subtitle}>A COLLECTION OF ENCOUNTERS</p>
-            <p ref={taglineRef} className={styles.tagline}>每一次新的遇见，都是一个人精神图景的扩张</p>
+            <p ref={taglineRef} className={styles.subtitle}>A COLLECTION OF ENCOUNTERS</p>
           </div>
           <div className={styles.headerActions}>
             {/* 精神图景入口：评委不一定会去捏合地球，这里给一个看得见、带字的门 */}
@@ -258,10 +257,13 @@ export default function Home() {
           ) : null}
         </header>
 
-        <div className={styles.globeStage}>
-          <MapErrorBoundary>
-            <MemoryGlobe pins={mapPins} />
-          </MapErrorBoundary>
+        <div className={styles.globeArea}>
+          <p className={styles.globeInstruction}>地球可拖动旋转 · 双指缩放</p>
+          <div className={styles.globeStage}>
+            <MapErrorBoundary>
+              <MemoryGlobe pins={mapPins} />
+            </MapErrorBoundary>
+          </div>
         </div>
 
         <section className={styles.dashboard} aria-label="开始一次遇见">

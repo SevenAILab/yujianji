@@ -905,24 +905,27 @@ body :is(h2, h3, .page-title, .section-title, .detail-title h1, .journey-title-r
   gap: 8px;
   align-items: flex-start;
   padding: 11px 12px;
-  border-radius: 13px;
-  background: #eff8f6;
-  color: var(--teal-dark);
+  border: 0;
+  border-radius: 0;
+  background: #f8f1dd;
+  color: #454471;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
   font-size: 12px;
   line-height: 1.55;
 }
 
 .status-note.warning {
-  background: #fff4e8;
-  color: var(--warning);
+  background: #ef655f;
+  color: #1b1715;
 }
 
 .error-box {
   padding: 13px;
-  border: 1px solid #efc3b5;
-  border-radius: 14px;
-  background: #fff4f0;
-  color: #a34f3e;
+  border: 0;
+  border-radius: 0;
+  background: #ef655f;
+  color: #1b1715;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
   font-size: 13px;
   line-height: 1.55;
 }
@@ -934,15 +937,19 @@ body :is(h2, h3, .page-title, .section-title, .detail-title h1, .journey-title-r
   display: grid;
   place-items: center;
   padding: 26px;
-  background: rgba(229, 245, 244, 0.94);
+  background: rgba(238, 232, 218, 0.94);
 }
 
 .loading-inner {
   display: grid;
   justify-items: center;
   gap: 15px;
-  color: var(--teal-dark);
+  min-width: min(100%, 280px);
+  padding: 24px;
+  background: #f8f1dd;
+  color: #454471;
   text-align: center;
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px));
 }
 
 .loading-orb {
@@ -971,20 +978,25 @@ body :is(h2, h3, .page-title, .section-title, .detail-title h1, .journey-title-r
 
 .toast {
   position: fixed;
-  top: 72px;
-  left: 50%;
-  z-index: 50;
-  width: min(calc(100% - 36px), 390px);
-  padding: 12px 15px;
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  border-radius: 14px;
-  background: rgba(31, 84, 85, 0.95);
-  color: #fff;
-  font-size: 12px;
+  right: auto;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  left: 0;
+  z-index: 60;
+  width: min(calc(100% - 34px), 480px);
+  min-height: 48px;
+  padding: 11px 42px 11px 24px;
+  border: 0;
+  border-radius: 0;
+  background: #454471;
+  color: #f8f1dd;
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px));
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 800;
   line-height: 1.5;
-  text-align: center;
-  transform: translateX(-50%);
-  box-shadow: var(--shadow);
+  text-align: left;
+  box-shadow: none;
+  animation: system-notice-in 360ms cubic-bezier(.2, .8, .2, 1) both;
 }
 
 /* 系统完成提示：贴边滑入的斜切信息窗，不使用居中的浮动胶囊。 */
@@ -1010,6 +1022,11 @@ body :is(h2, h3, .page-title, .section-title, .detail-title h1, .journey-title-r
 }
 
 @keyframes diary-ready-notice-in {
+  from { transform: translateX(-110%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes system-notice-in {
   from { transform: translateX(-110%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
@@ -1733,6 +1750,8 @@ body :is(h2, h3, .page-title, .section-title, .detail-title h1, .journey-title-r
   box-shadow: none !important;
   background: var(--ui-indigo) !important;
   color: var(--ui-cream) !important;
+  /* 45° 左下切角会吞掉过窄按钮的首个图标；给文字和图标留出安全内边距。 */
+  padding-inline: 18px !important;
   clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
 }
 

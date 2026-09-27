@@ -125,10 +125,11 @@
   gap: 9px;
   margin-bottom: 14px;
   padding: 13px 14px;
-  border: 1px solid var(--line);
-  border-radius: 15px;
-  background: var(--mint);
-  color: var(--teal-dark);
+  border: 0;
+  border-radius: 0;
+  background: var(--ui-cream, #f8f1dd);
+  color: var(--ui-indigo, #454471);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
   font-size: 13px;
   line-height: 1.6;
 }
