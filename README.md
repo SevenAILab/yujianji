@@ -207,3 +207,11 @@ PORT=3001 ./scripts/lan.sh
 脚本会打印本机局域网地址。手机和电脑连接同一 Wi-Fi 后，用二维码或该地址打开。
 
 > 照片和记录默认只保存在用户浏览器中。识别时图片会临时发送给模型，应用服务端不保存原图；地点名称会发送给地点服务用于坐标校准；AI 生成内容仍需用户核实。
+
+## 开源许可
+
+遇见集的源代码以 [Apache License 2.0](LICENSE) 开源，版权与第三方内容说明见 [NOTICE](NOTICE)。
+
+`public/demo/`、`public/seed/` 里的示例照片和由它们生成的示例 3D 模型不属于 Apache 2.0 授权范围，沿用各自的原始授权，出处见 [public/demo/CREDITS.md](public/demo/CREDITS.md) 和上文的素材说明。
+
+欢迎提交 Issue 和 Pull Request。提交代码即表示你同意以 Apache License 2.0 授权你的贡献。
