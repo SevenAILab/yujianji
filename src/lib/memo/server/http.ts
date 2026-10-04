@@ -81,6 +81,7 @@ const AGENT_MESSAGES: Record<AgentError["code"], string> = {
   BUDGET_EXCEEDED: "今天遇见手记的模型费用到上限了，演示前可以调高 MEMO_DAILY_BUDGET_YUAN。",
   MODEL_ERROR: "模型服务暂时不可用，请重试。",
   MODEL_RATE_LIMITED: "模型服务限流了，过一会儿再试。",
+  MODEL_UNAVAILABLE: "判断和写作用的模型服务拒绝调用（额度用完或密钥失效），录音已保存，换模型服务后可以重跑。",
 };
 
 /** 失败也带回 trace：过程页要能看到失败在哪一步（D12） */

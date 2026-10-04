@@ -21,11 +21,20 @@ import styles from "../../memo.module.css";
 const ME_SOURCE_TEXT: Record<string, string> = {
   enrolled: "认出了你注册过的声音。",
   opening: "录音一开始说话的是你。",
+  feishu: "飞书认出了你的声音。",
   loudness: "按音量判断：手机在你身上，最响的通常是你。",
   loudness_weak: "几位说话人音量接近，先按最响的当你——认错了就改。",
   single_speaker: "只有一位说话人，默认是你。",
   user: "你手动指定过。",
   unavailable: "这次算不出响度。",
+};
+
+const START_SOURCE_TEXT: Record<string, string> = {
+  recorder: "录音时钟",
+  file_metadata: "文件里的录制时间",
+  user: "你确认的时间",
+  feishu_note: "飞书文字记录里的录音时间",
+  device_clock: "录音设备的时钟",
 };
 
 const STAGE_LABEL = { upload: "上传", prepare: "转码+临时存储", transcribe: "转文字", triage: "粗筛", judge: "判断", write: "写作" } as const;
@@ -119,7 +128,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
       </h1>
       {demoSession ? <div className={styles.notice} style={{ marginTop: 8 }}>示例内容 · 以下为整理好的转写，不含原始音频。</div> : null}
       <p className={styles.subtitle}>
-        {placeLabel(session.place)} · {formatDuration(session.durationSec)} · 时间来源：{session.startedAtSource === "recorder" ? "录音时钟" : session.startedAtSource === "file_metadata" ? "文件里的录制时间" : "你确认的时间"} · {session.timeZone}
+        {placeLabel(session.place)} · {formatDuration(session.durationSec)} · 时间来源：{START_SOURCE_TEXT[session.startedAtSource] ?? "你确认的时间"} · {session.timeZone}
       </p>
 
       <section className={styles.card} style={{ marginTop: 14 }}>

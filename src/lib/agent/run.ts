@@ -20,6 +20,7 @@ import type { z } from "zod";
 import { extractJsonObject } from "../json";
 import { assertBudget, recordSpend } from "./budget";
 import { AgentError, toAgentError } from "./errors";
+import { acquireModelSlot, modelConcurrency } from "./limiter";
 import { tokenCostYuan } from "./pricing";
 import { languageModelFor, numberEnv, type AgentRole } from "./provider";
 import type { TraceBuilder } from "./trace";
@@ -90,8 +91,32 @@ export function parseModelJson<T>(text: string, schema: z.ZodType<T>): { ok: tru
   }
 }
 
+/** 429 / 5xx / 单次请求超时时 AI SDK 的重试次数（指数退避，尊重 retry-after）。智谱免费模型建议 3 */
+export function modelMaxRetries(): number {
+  const raw = Number(process.env.MEMO_MODEL_MAX_RETRIES);
+  return Number.isFinite(raw) && raw >= 0 ? Math.min(5, Math.floor(raw)) : 1;
+}
+
 export async function runAgent<T>(opts: RunAgentOptions<T>): Promise<RunAgentResult<T>> {
   assertBudget();
+  // 整轮占一个名额（包括多步工具循环），排到了才开始计截止时间：排队不该吃掉干活的时间
+  const queuedAt = Date.now();
+  let release: () => void;
+  try {
+    release = await acquireModelSlot();
+  } catch (error) {
+    throw toAgentError(error);
+  }
+  const waitedMs = Date.now() - queuedAt;
+  if (waitedMs > 1_000) opts.trace.push({ kind: "check", name: "model_queue", ms: waitedMs, summary: `模型调用排队 ${Math.round(waitedMs / 100) / 10} 秒（MEMO_MODEL_CONCURRENCY=${modelConcurrency()}）` });
+  try {
+    return await runAgentInSlot(opts);
+  } finally {
+    release();
+  }
+}
+
+async function runAgentInSlot<T>(opts: RunAgentOptions<T>): Promise<RunAgentResult<T>> {
   const { model, modelId, providerOptions } = languageModelFor(opts.role, opts.modelOverride);
   const trace = opts.trace;
   trace.setModel(modelId);
@@ -131,7 +156,7 @@ export async function runAgent<T>(opts: RunAgentOptions<T>): Promise<RunAgentRes
   const common = {
     model,
     system: opts.system,
-    maxRetries: 1,
+    maxRetries: modelMaxRetries(),
     temperature: opts.temperature ?? 0.2,
     ...(opts.maxOutputTokens ? { maxOutputTokens: opts.maxOutputTokens } : {}),
     providerOptions,

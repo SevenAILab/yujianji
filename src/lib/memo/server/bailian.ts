@@ -8,7 +8,9 @@ export type BailianErrorCode =
   | "ASR_SUBMIT_FAILED"
   | "ASR_QUERY_FAILED"
   | "ASR_FAILED"
-  | "ASR_RESULT_FETCH_FAILED";
+  | "ASR_RESULT_FETCH_FAILED"
+  /** 额度用完 / 欠费 / 只允许免费额度：重试没用，要充值或换来源（例如飞书导入） */
+  | "ASR_UNAVAILABLE";
 
 export class BailianError extends Error {
   readonly code: BailianErrorCode;
@@ -36,6 +38,11 @@ function authHeader(): Record<string, string> {
   return { Authorization: `Bearer ${key}` };
 }
 
+/** 百炼的额度类错误码（2026-10-03 实测：AllocationQuota.FreeTierOnly，HTTP 403） */
+export function isQuotaError(code: string | undefined | null): boolean {
+  return Boolean(code && /AllocationQuota|FreeTierOnly|Arrearage|InsufficientBalance|QuotaExhausted/i.test(code));
+}
+
 async function withRetry<T>(times: number, fn: (attempt: number) => Promise<T>): Promise<T> {
   let last: unknown;
   for (let attempt = 1; attempt <= times; attempt += 1) {
@@ -58,7 +65,8 @@ export async function uploadToTempStorage(file: string, model = asrModel()): Pro
       headers: authHeader(),
       signal: AbortSignal.timeout(15_000),
     });
-    const json = (await res.json().catch(() => null)) as { data?: Record<string, string> } | null;
+    const json = (await res.json().catch(() => null)) as { data?: Record<string, string>; code?: string } | null;
+    if (isQuotaError(json?.code)) throw new BailianError("ASR_UNAVAILABLE", `getPolicy ${json?.code}`);
     if (!res.ok || !json?.data?.upload_host) throw new BailianError("UPLOAD_POLICY_FAILED", `getPolicy HTTP ${res.status}`);
     return json.data;
   }).catch((error) => {
@@ -107,6 +115,7 @@ export async function submitTranscription(ossUrl: string, model = asrModel()): P
     throw new BailianError("ASR_SUBMIT_FAILED", String((error as Error)?.message ?? error), true);
   }
   const json = (await res.json().catch(() => null)) as { output?: { task_id?: string }; code?: string; message?: string } | null;
+  if (isQuotaError(json?.code)) throw new BailianError("ASR_UNAVAILABLE", `HTTP ${res.status} ${json?.code}`);
   if (!res.ok || !json?.output?.task_id) {
     throw new BailianError("ASR_SUBMIT_FAILED", `HTTP ${res.status} ${json?.code ?? ""}`.trim());
   }

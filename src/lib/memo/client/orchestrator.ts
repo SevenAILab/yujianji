@@ -26,6 +26,7 @@ import type {
   TraceStep,
   Utterance,
 } from "../types";
+import { windowHasMarker } from "../marker";
 import { shouldSkipWithoutModel, splitWindows } from "../windows";
 import { describeMemoError, MemoApiError, memoApi, type JudgeResponse } from "./api";
 import { buildJudgeRequest, buildWriteRequest, windowPayload } from "./context";
@@ -175,6 +176,8 @@ async function pipeline(sessionId: string, opts: PipelineOptions): Promise<MemoS
           session = (await db.memoSessions.get(sessionId))!;
           break;
         case "transcribing":
+          // 飞书导入的会话没有音频和识别任务号：逐字稿没写进去就只能重新导入，不能去调语音识别
+          if (session.kind === "feishu") throw new MemoApiError("FEISHU_REIMPORT", 0, "这段飞书录音没有导入完整，删掉后重新从飞书导入");
           progress("transcribing", "分说话人转文字");
           await timed(sessionId, "transcribe", () => doTranscribe(session!, progress, Boolean(opts.forceResubmit)));
           session = (await db.memoSessions.get(sessionId))!;
@@ -312,12 +315,14 @@ async function storeTranscript(session: MemoSession, status: Awaited<ReturnType<
   // 1) 声纹注册——服务端把注册音频拼在每个分段前，直接告诉我们每段哪个说话人是"我"，最可靠
   // 2) App 内录音的"开头自报家门"——用户按下录音键后先开口
   // 3) 都没有（比如导入的语音备忘录）→ 退回响度
+  // 外部来源（飞书）给的"我"来自飞书认出的本人，不是声纹注册
   const enrolled = status.meSpeakerKeys ?? [];
   const opening = !enrolled.length && session.kind === "in_app" ? openingSpeakerKey(status.sentences ?? []) : null;
   const meKeys = enrolled.length ? enrolled : opening ? [opening] : [];
-  const assignment = status.speakersDegraded
+  // 响度算不出来时一律拿不准；但飞书已经认出本人的，本人照样算"我"（其余按段内规则）
+  const assignment = status.speakersDegraded && !(session.kind === "feishu" && enrolled.length)
     ? { speakers: stats.map((s) => ({ ...s, role: "uncertain" as const })), meSource: "unavailable" as const, meUncertain: true }
-    : assignSpeakerRoles(stats, { meKeys, meKeySource: enrolled.length ? "enrolled" : "opening" });
+    : assignSpeakerRoles(stats, { meKeys, meKeySource: enrolled.length ? (session.kind === "feishu" ? "feishu" : "enrolled") : "opening" });
   const roleOf = new Map(assignment.speakers.map((s) => [s.key, s.role]));
   const expiresAt = new Date(Date.now() + UTTERANCE_TTL_MS).toISOString();
   const utterances: Utterance[] = (status.sentences ?? []).map((s, index) => ({
@@ -382,6 +387,18 @@ async function storeTranscript(session: MemoSession, status: Awaited<ReturnType<
     meUncertain: assignment.meUncertain,
     ...(session.durationSec ? {} : { durationSec: asrSeconds }),
   });
+}
+
+/**
+ * 外部来源已经转好文字（飞书妙记等）：直接写进逐字稿和窗口，跳过上传、转码、语音识别，
+ * 然后照常进初筛 → 判断（外部设备接入工单 v2 Gate 1）。会话必须是刚建好、还没有逐字稿的。
+ */
+export async function ingestExternalTranscript(sessionId: string, status: Awaited<ReturnType<typeof memoApi.transcribeStatus>>): Promise<MemoSession> {
+  const session = await db.memoSessions.get(sessionId);
+  if (!session) throw new Error("会话不存在");
+  if (status.status !== "succeeded") throw new MemoApiError(status.code ?? "EXTERNAL_TRANSCRIPT_FAILED", 0, status.error ?? "外部转写结果不完整");
+  await storeTranscript(session, status, 0);
+  return (await db.memoSessions.get(sessionId))!;
 }
 
 function toMoment(
@@ -460,7 +477,11 @@ async function doJudge(session: MemoSession, progress: (s: PipelineProgress["sta
   await Promise.all(
     Array.from({ length: Math.min(4, queue.length) }, async () => {
       for (let w = queue.shift(); w; w = queue.shift()) {
-        if (shouldSkipWithoutModel(w)) {
+        const mine = w.utteranceIds.map((id) => utterances.get(id)).filter((u): u is Utterance => Boolean(u));
+        if (windowHasMarker(mine)) {
+          // 口令：用户主动标记了这里，跳过粗筛直接交给判断（工单 v2 Gate 1）
+          w.triage = { action: "judge", reason: "你说了口令（记一下 / 小遇），直接交给判断", runId: `t_${w.id}_marker` };
+        } else if (shouldSkipWithoutModel(w)) {
           w.triage = { action: "skip", reason: "你在这段几乎没说话", runId: `t_${w.id}_local` };
         } else {
           try {

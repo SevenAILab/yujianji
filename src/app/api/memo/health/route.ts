@@ -3,7 +3,8 @@ import { constants } from "node:fs";
 import { NextResponse } from "next/server";
 import { dailyBudgetYuan, spentTodayYuan } from "@/lib/agent/budget";
 import { inflightCount } from "@/lib/agent/inflight";
-import { memoBaseUrl, memoKeySource, modelIdFor, structuredOutputsEnabled } from "@/lib/agent/provider";
+import { mainProvider, memoBaseUrl, memoKeySource, modelIdFor, structuredOutputsEnabled } from "@/lib/agent/provider";
+import { modelConcurrency } from "@/lib/agent/limiter";
 import { asrBaseUrl, asrModel } from "@/lib/memo/server/bailian";
 import { ffmpegAvailable } from "@/lib/memo/server/ffmpeg";
 import { tmpRoot } from "@/lib/memo/server/tmp-store";
@@ -24,6 +25,8 @@ export async function GET() {
     ffmpeg: await ffmpegAvailable(),
     tmpWritable,
     apiKey: memoKeySource(),
+    llmProvider: mainProvider(),
+    modelConcurrency: modelConcurrency(),
     modelHost: (() => { try { return new URL(memoBaseUrl()).host; } catch { return "invalid"; } })(),
     asr: { model: asrModel(), host: new URL(asrBaseUrl()).host },
     models: {

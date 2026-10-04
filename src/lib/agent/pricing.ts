@@ -12,6 +12,12 @@ const PRICES: Record<string, ModelPrice> = {
   "qwen3.5-plus": { inputPerM: 0.8, outputPerM: 4.8, outputEstimated: false },
   "qwen3.5-flash": { inputPerM: 0.2, outputPerM: 1.2, outputEstimated: true }, // 估算
   "qwen3-max": { inputPerM: 2.5, outputPerM: 15, outputEstimated: true }, // 输入价"2.5 元起"，输出估算
+  // 智谱免费模型（2026-10-03 实测可调用；glm-4.5v / glm-4.6 / glm-asr 要付费，不在这里）
+  "glm-4.5-flash": { inputPerM: 0, outputPerM: 0, outputEstimated: false },
+  "glm-4-flash-250414": { inputPerM: 0, outputPerM: 0, outputEstimated: false },
+  "glm-4.7-flash": { inputPerM: 0, outputPerM: 0, outputEstimated: false },
+  "glm-4.6v-flash": { inputPerM: 0, outputPerM: 0, outputEstimated: false },
+  "glm-4.1v-thinking-flash": { inputPerM: 0, outputPerM: 0, outputEstimated: false },
 };
 
 /** 未登记的模型（eval 对比用的外部模型等）一律按 qwen3-max 档估算 */

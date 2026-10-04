@@ -15,6 +15,8 @@ export const KIND_LABEL: Record<AudioSourceKind, string> = {
   in_app: "App 内录音",
   import: "导入的录音",
   backfill: "补一段",
+  feishu: "飞书导入（录音豆）",
+  bean_ble: "录音豆直连",
 };
 
 export const SPEAKER_LABEL: Record<SpeakerRole, string> = {

@@ -5,7 +5,9 @@ export type AgentErrorCode =
   | "INVALID_MODEL_OUTPUT"
   | "BUDGET_EXCEEDED"
   | "MODEL_ERROR"
-  | "MODEL_RATE_LIMITED";
+  | "MODEL_RATE_LIMITED"
+  /** 401 / 403：额度用完、密钥失效。重试没用，要换服务商或充值 */
+  | "MODEL_UNAVAILABLE";
 
 const STATUS: Record<AgentErrorCode, number> = {
   AGENT_BUDGET_EXCEEDED: 504,
@@ -13,6 +15,7 @@ const STATUS: Record<AgentErrorCode, number> = {
   BUDGET_EXCEEDED: 503,
   MODEL_ERROR: 502,
   MODEL_RATE_LIMITED: 429,
+  MODEL_UNAVAILABLE: 503,
 };
 
 export class AgentError extends Error {
@@ -45,6 +48,7 @@ export function toAgentError(error: unknown): AgentError {
   const status = (error as { statusCode?: number; lastError?: { statusCode?: number } })?.statusCode
     ?? (error as { lastError?: { statusCode?: number } })?.lastError?.statusCode;
   if (status === 429) return new AgentError("MODEL_RATE_LIMITED", "模型服务限流");
+  if (status === 401 || status === 403) return new AgentError("MODEL_UNAVAILABLE", "模型服务拒绝调用（额度用完或密钥失效）");
   const cause = (error as { lastError?: unknown })?.lastError;
   if (cause && isAbort(cause)) return new AgentError("AGENT_BUDGET_EXCEEDED", "整轮截止时间到了", { limitHit: "deadline" });
   return new AgentError("MODEL_ERROR", error instanceof Error ? error.message.slice(0, 200) : "模型调用失败");

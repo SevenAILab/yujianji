@@ -22,14 +22,32 @@ interface CallOmniOptions {
   timeoutMs?: number;
 }
 
-function getClient(timeoutMs = 55_000): OpenAI {
-  const apiKey = process.env.DASHSCOPE_API_KEY;
+/**
+ * 识图服务商可切换（外部设备接入工单 v2 Gate 0）：VISION_PROVIDER=dashscope（默认）| zhipu。
+ * 智谱用 ZHIPU_API_KEY / ZHIPU_BASE_URL，默认模型 glm-4.6v-flash（免费，2026-10-03 实测可用）。
+ * callOmni（视频理解）不受影响，永远走 DashScope。
+ */
+export type VisionProvider = "dashscope" | "zhipu";
+
+export function visionProvider(): VisionProvider {
+  return process.env.VISION_PROVIDER?.trim() === "zhipu" ? "zhipu" : "dashscope";
+}
+
+export function defaultVisionModel(provider = visionProvider()): string {
+  return provider === "zhipu"
+    ? process.env.ZHIPU_VISION_MODEL?.trim() || "glm-4.6v-flash"
+    : process.env.VISION_MODEL ?? "qwen3-vl-plus";
+}
+
+function getClient(timeoutMs = 55_000, provider: VisionProvider = "dashscope"): OpenAI {
+  const apiKey = provider === "zhipu" ? process.env.ZHIPU_API_KEY?.trim() : process.env.DASHSCOPE_API_KEY;
   const baseURL =
-    process.env.DASHSCOPE_BASE_URL ??
-    "https://dashscope.aliyuncs.com/compatible-mode/v1";
+    provider === "zhipu"
+      ? process.env.ZHIPU_BASE_URL?.trim() || "https://open.bigmodel.cn/api/paas/v4"
+      : process.env.DASHSCOPE_BASE_URL ?? "https://dashscope.aliyuncs.com/compatible-mode/v1";
 
   if (!apiKey) {
-    throw new Error("缺少 DASHSCOPE_API_KEY，请配置 .env.local");
+    throw new Error(provider === "zhipu" ? "缺少 ZHIPU_API_KEY，请配置 .env.local" : "缺少 DASHSCOPE_API_KEY，请配置 .env.local");
   }
 
   return new OpenAI({
@@ -40,7 +58,9 @@ function getClient(timeoutMs = 55_000): OpenAI {
   });
 }
 
-function getVisionModels(primaryModel: string): string[] {
+function getVisionModels(primaryModel: string, provider: VisionProvider): string[] {
+  // 备用模型名单是千问的，换到智谱时不用
+  if (provider === "zhipu") return [primaryModel];
   const fallbacks = (process.env.VISION_FALLBACK_MODELS ?? "")
     .split(",")
     .map((model) => model.trim())
@@ -62,6 +82,7 @@ async function requestVision(
   systemPrompt: string,
   enableThinking: boolean,
   jsonMode: boolean,
+  provider: VisionProvider = "dashscope",
 ): Promise<string> {
   const request: Record<string, unknown> = {
     model,
@@ -74,7 +95,10 @@ async function requestVision(
     max_tokens: 1500,
   };
 
-  if (enableThinking) {
+  if (provider === "zhipu") {
+    // 智谱默认会先思考，识图不需要，显式关掉（写法与千问不同）
+    request.thinking = { type: enableThinking ? "enabled" : "disabled" };
+  } else if (enableThinking) {
     request.enable_thinking = true;
   }
   if (jsonMode) {
@@ -94,7 +118,7 @@ export async function callVision({
   systemPrompt,
   userText,
   imageDetail = "high",
-  model = process.env.VISION_MODEL ?? "qwen3-vl-plus",
+  model = defaultVisionModel(),
   enableThinking = process.env.LLM_THINKING === "true",
   jsonMode = process.env.LLM_JSON_MODE === "true",
   timeoutMs = 55_000,
@@ -110,13 +134,14 @@ export async function callVision({
       ]
     : [{ type: "text" as const, text: userText }];
 
-  const models = getVisionModels(model);
+  const provider = visionProvider();
+  const models = getVisionModels(model, provider);
   let lastError: unknown = null;
 
   for (const candidate of models) {
     const candidateTimeout =
       candidate === model ? timeoutMs : Math.min(timeoutMs, 20_000);
-    const client = getClient(candidateTimeout);
+    const client = getClient(candidateTimeout, provider);
     try {
       const content = await requestVision(
         client,
@@ -125,6 +150,7 @@ export async function callVision({
         systemPrompt,
         enableThinking,
         jsonMode,
+        provider,
       );
       console.info(
         JSON.stringify({

@@ -15,7 +15,7 @@ export interface SpeakerStat {
 
 export interface SpeakerAssignment {
   speakers: SessionSpeaker[];
-  meSource: "enrolled" | "opening" | "loudness" | "loudness_weak" | "single_speaker" | "unavailable";
+  meSource: "enrolled" | "opening" | "feishu" | "loudness" | "loudness_weak" | "single_speaker" | "unavailable";
   meUncertain: boolean;
 }
 
@@ -57,7 +57,7 @@ export function assignSpeakerRoles(
     /** 每个分段各自的"我"（声纹注册命中 / 开头自报家门）。分段之间的 speakerId 不可比，所以是一组不是一个 */
     meKeys?: readonly string[] | null;
     /** 这些 key 是怎么来的，只影响 meSource 的取值 */
-    meKeySource?: "enrolled" | "opening";
+    meKeySource?: "enrolled" | "opening" | "feishu";
   } = {},
 ): SpeakerAssignment {
   if (stats.length === 0) return { speakers: [], meSource: "unavailable", meUncertain: true };

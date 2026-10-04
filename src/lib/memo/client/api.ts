@@ -40,10 +40,23 @@ const MESSAGES: Record<string, string> = {
   ASR_SUBMIT_UNKNOWN: "上次提交语音识别时连接中断，不确定是否已提交。重新提交可能重复计费（约 0.013 元/分钟）。",
   ASR_FAILED: "语音识别失败，可以重试或换 paraformer-v2。",
   ASR_RESULT_FETCH_FAILED: "取语音识别结果失败，可以重试。",
+  FEISHU_AUTH_REQUIRED: "还没有授权飞书。",
+  FEISHU_AUTH_EXPIRED: "飞书授权过期了，请重新授权。",
+  FEISHU_FORBIDDEN: "飞书授权的权限不够，请重新授权。",
+  FEISHU_NOT_READY: "飞书还在整理这段录音的文字记录，过几分钟再试。",
+  FEISHU_NOT_CONFIGURED: "服务器还没配置飞书应用，暂时不能从飞书导入。",
+  FEISHU_RATE_LIMITED: "飞书接口限流了，稍后再试。",
+  FEISHU_ALREADY_IMPORTED: "这段录音已经导入过了。",
+  FEISHU_TIME_REQUIRED: "文字记录里读不到录音时间，请先填开始录音的时间。",
+  FEISHU_HANDOFF_MISSING: "授权结果已经领取过或过期了，请重新授权。",
+  FEISHU_MEDIA_TOO_LARGE: "这段录音太大，暂时处理不了。",
+  FEISHU_REIMPORT: "这段飞书录音没有导入完整：删掉它，再从飞书导入一次。",
+  ASR_UNAVAILABLE: "语音转文字服务的额度用完了，这段录音暂时转不了文字（录音还在手机里）。录音豆的录音可以改用「从飞书导入」，飞书已经转好了文字。",
   AGENT_BUDGET_EXCEEDED: "Agent 超过了步数、工具次数或时间上限，这一段可以单独重跑。",
   INVALID_MODEL_OUTPUT: "模型交回的结果格式不对，重试一次通常就好。",
   MODEL_ERROR: "模型服务暂时不可用，请重试。",
   MODEL_RATE_LIMITED: "模型服务限流了，过一会儿再试。",
+  MODEL_UNAVAILABLE: "判断和写作用的模型服务拒绝调用（额度用完或密钥失效），录音已保存，换模型服务后可以重跑。",
   INVALID_REQUEST: "请求内容格式不对。",
   REQUEST_TOO_LARGE: "请求内容太长。",
 };
@@ -166,6 +179,22 @@ export const memoApi = {
   },
   match(body: MatchRequest) {
     return call<{ matches: { momentId: string; photoId: string; reason: string }[]; trace: AgentTrace }>("POST", "/api/memo/match", { json: body });
+  },
+  // ── 飞书妙记导入（外部设备接入工单 v2 Gate 1）：令牌只放请求头，不进 URL ──
+  feishuClaim() {
+    return call<{ tokens: { accessToken: string; refreshToken?: string; expiresAt: number; refreshExpiresAt?: number }; names?: string[] }>("POST", "/api/memo/feishu/claim", { json: {} });
+  },
+  feishuRefresh(refreshToken: string) {
+    return call<{ tokens: { accessToken: string; refreshToken?: string; expiresAt: number; refreshExpiresAt?: number } }>("POST", "/api/memo/feishu/refresh", { json: { refreshToken } });
+  },
+  feishuMinutes(accessToken: string, range: { startIso: string; endIso: string }) {
+    return call<{ items: { token: string; title: string; description: string }[]; hasMore: boolean }>("POST", "/api/memo/feishu/minutes", { json: range, headers: { authorization: `Bearer ${accessToken}` } });
+  },
+  feishuPreview(accessToken: string, token: string) {
+    return call<import("./feishu").FeishuPreview>("POST", "/api/memo/feishu/preview", { json: { token }, headers: { authorization: `Bearer ${accessToken}` } });
+  },
+  feishuTranscript(accessToken: string, token: string, ownerNames: string[]) {
+    return call<import("./feishu").FeishuTranscriptResponse>("POST", "/api/memo/feishu/transcript", { json: { token, ownerNames: ownerNames.slice(0, 2) }, headers: { authorization: `Bearer ${accessToken}` } });
   },
   write(body: WriteRequest) {
     return call<{ title: string; quotes: { momentId: string; text: string }[]; paragraphs: DiaryParagraph[]; trace: AgentTrace }>("POST", "/api/memo/write", { json: body });

@@ -88,6 +88,12 @@ export async function probe(input: string): Promise<{ durationSec: number | null
   return parseProbe(stderr);
 }
 
+/** 只出 8kHz 单声道 s16le PCM（算响度）：外部来源已经有转写，不需要识别用的那一份（外部设备接入工单 v2） */
+export async function decodePcm8k(input: string, outPcm8k: string, durationSec: number | null): Promise<void> {
+  const timeoutMs = Math.max(60_000, (durationSec ?? 600) * 1000 * 0.3);
+  await run(ffmpegPath(), ["-y", "-hide_banner", "-loglevel", "error", "-i", input, "-vn", "-ac", "1", "-ar", "8000", "-f", "s16le", outPcm8k], timeoutMs);
+}
+
 /** 一次 ffmpeg 同时产出：16kHz 单声道 AAC（识别）+ 8kHz 单声道 s16le PCM（响度） */
 export async function transcode(input: string, out16k: string, outPcm8k: string, durationSec: number | null): Promise<void> {
   const timeoutMs = Math.max(60_000, (durationSec ?? 600) * 1000 * 0.5);

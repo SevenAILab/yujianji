@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { defaultVisionModel, visionProvider } from "@/lib/llm";
 import { KV_BACKEND, LIMITS, readTodayUsage } from "@/lib/api-guard";
 import { kvHealthy } from "@/lib/kv";
 import { APP_VERSION } from "@/lib/version";
@@ -30,7 +31,8 @@ export async function GET() {
       version: APP_VERSION,
       commit: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || process.env.BUILD_COMMIT || null,
       model: {
-        vision: process.env.VISION_MODEL ?? "qwen3-vl-plus",
+        vision: defaultVisionModel(),
+        visionProvider: visionProvider(),
         omni: process.env.OMNI_MODEL ?? "qwen3.5-omni-plus",
         fallbacks: (process.env.VISION_FALLBACK_MODELS ?? "")
           .split(",")

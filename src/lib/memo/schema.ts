@@ -82,7 +82,7 @@ export const judgeRequestSchema = z.object({
   mode: z.enum(["session", "backfill"]),
   session: z.object({
     id: idSchema,
-    kind: z.enum(["in_app", "import", "backfill"]),
+    kind: z.enum(["in_app", "import", "backfill", "feishu", "bean_ble"]),
     startedAt: z.string().max(40),
     timeZone: z.string().max(60),
     place: z.string().max(80).optional(),

@@ -2,7 +2,7 @@ import { generateText, tool } from "ai";
 import { z } from "zod";
 import { recordSpend } from "../budget";
 import { tokenCostYuan } from "../pricing";
-import { languageModelFor, withSearch } from "../provider";
+import { languageModelFor, mainProvider, withSearch } from "../provider";
 import { clip } from "../redact";
 import type { TraceBuilder } from "../trace";
 
@@ -23,6 +23,8 @@ export function lookupFactTool(ctx: { trace: TraceBuilder; ledger: Map<string, s
     }),
     execute: async ({ entity, question }) => {
       if (process.env.MEMO_ENABLE_SEARCH === "false") return { error: "SEARCH_DISABLED" };
+      // 联网搜索只有千问兼容接口的 enable_search；别家没搜索时模型只能凭记忆答，容易编，宁可不补
+      if (mainProvider() !== "dashscope") return { error: "SEARCH_UNAVAILABLE", hint: "当前模型服务没有联网搜索，不补充事实，直接交卷" };
       const budget = ctx.deadlineAt - Date.now() - 4_000;
       if (budget < 3_000) return { error: "NO_TIME", hint: "剩余时间不够查资料，请直接交卷" };
       const { model, modelId, providerOptions } = languageModelFor("fact");

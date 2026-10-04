@@ -1,7 +1,11 @@
 // 遇见手记数据模型。v3（2026-09-16）：说话人三态、时间区间与时区、地点来源与锁定、反馈事件联合类型、trace 结局与上限原因。
 // 改动先在群里说；改字段要同步 spec §4.2。
 
-export type AudioSourceKind = "in_app" | "import" | "backfill";
+/**
+ * 声音来源。"import" 是本地音频文件导入（名字保留不改，已存的会话在用）。
+ * 外部设备接入工单 v2：feishu = 飞书妙记导入（录音豆飞书版）；bean_ble = 录音豆蓝牙直连（预留，Gate 3 之后）。
+ */
+export type AudioSourceKind = "in_app" | "import" | "backfill" | "feishu" | "bean_ble";
 
 /** 说话人三态。uncertain = 响度判不开，只能折叠，用户确认后才算"我"。 */
 export type SpeakerRole = "me" | "other" | "uncertain";
@@ -75,7 +79,9 @@ export interface MemoSession {
   timeZone: string;
   tzOffsetMin: number;
   /** recorder = App 内录音时钟；file_metadata = m4a mvhd（可能是文件创建时间，非精确开录时间）；user = 用户确认 */
-  startedAtSource: "recorder" | "file_metadata" | "user";
+  startedAtSource: "recorder" | "file_metadata" | "user" | "feishu_note" | "device_clock";
+  /** 外部来源的唯一标识，用来防重复导入：飞书是 `feishu:<minute_token>` */
+  externalId?: string;
   place?: PlaceRef;
   status: SessionStatus;
   error?: { step: PipelineStage | "record" | "import"; code: string; message: string; retryable: boolean };
@@ -87,7 +93,7 @@ export interface MemoSession {
   parts?: { partIndex: number; offsetMs: number; durationMs: number }[];
   asrTaskIds?: string[];
   speakers?: SessionSpeaker[];
-  meSource?: "enrolled" | "opening" | "loudness" | "loudness_weak" | "single_speaker" | "user" | "unavailable";
+  meSource?: "enrolled" | "opening" | "feishu" | "loudness" | "loudness_weak" | "single_speaker" | "user" | "unavailable";
   meUncertain?: boolean;
   interruptions?: string[];
   timings?: StageTiming[];

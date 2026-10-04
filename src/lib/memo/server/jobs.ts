@@ -271,6 +271,7 @@ export async function startTranscribe(uploadId: string, deviceId: string, force 
         await patchState(uploadId, { phase: "failed", failedAt: "submit", error: { code: bailian?.code ?? "ASR_SUBMIT_FAILED", message: String(error?.message ?? error).slice(0, 200) } }).catch(() => undefined);
       }
       // uncertain：状态保持 submitting，下次必须 force
+      if (bailian?.code === "ASR_UNAVAILABLE") throw new JobError("ASR_UNAVAILABLE", 503, "语音转文字服务的额度用完了");
       throw new JobError(bailian?.uncertain ? "ASR_SUBMIT_UNKNOWN" : "ASR_SUBMIT_FAILED", 502, bailian?.uncertain ? "提交语音识别时连接中断，结果不明" : "提交语音识别失败，可以重试", bailian?.uncertain ? { canForce: true } : undefined);
     })
     .finally(() => submitting.delete(uploadId));

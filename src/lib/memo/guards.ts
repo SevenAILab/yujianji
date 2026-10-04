@@ -1,4 +1,5 @@
 // 代码守卫：模型交卷后的硬规则。每次改判都作为事件返回，由调用方写进 trace（spec §4.6 + v3 说话人三态）。
+import { stripMarker } from "./marker";
 import { DROP_CATEGORIES, type ModelMoment } from "./schema";
 import type { Decision, MomentCategory, SpeakerRole } from "./types";
 import { normalizeForMatch } from "./fillers";
@@ -203,7 +204,8 @@ export function applyGuards(
       backfillTarget: isDrop ? undefined : backfillTarget,
       photoId,
       // G4（D8）：原话由代码按 id 取，模型不产出。drop 的片段不长期保存原话（隐私：只在 7 天内的逐字稿里可见）
-      myQuotes: isDrop ? [] : mine.map((u) => u.text),
+      // 口令（记一下 / 小遇）不进原话
+      myQuotes: isDrop ? [] : mine.map((u) => stripMarker(u.text)).filter(Boolean),
       uncertainQuotes: isDrop ? [] : uncertain.map((u) => u.text),
       speakerUncertain,
       needsPlacePick,

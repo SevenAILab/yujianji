@@ -1,7 +1,8 @@
 "use client";
 
 // 「我的」里的可接入设备（工单 Gate 5.1）：只列支持的类型，没接入就只有名字和「接入」，
-// 接入之后才显示详情。录音豆、眼镜还不能直连，「接入」= 一句说明 + 去首页导入。
+// 接入之后才显示详情。录音豆、眼镜还不能直连，「接入」= 一句说明 + 去导入。
+// 外部设备接入工单 v2：录音豆只写真实能力——飞书同步（可用）、文件导入（可用）、蓝牙直连（未开放）。
 // 声音注册和「小遇眼中的你」挪到了「我的」第一张卡（XiaoyuCard）。
 import Link from "next/link";
 import { useState } from "react";
@@ -40,7 +41,8 @@ export function DeviceSection() {
           </li>
           {open === "bean" ? (
             <li className={styles.note}>
-              录完之后，在<Link href="/">首页点「导入」</Link>选这段录音就能加进来。设备直连还在做。
+              飞书版录音豆：录音同步到飞书后，<Link href="/memo/feishu">从飞书导入</Link>（直接用飞书转好的文字）。
+              其他录音：在<Link href="/">首页点「导入」</Link>选音频文件。蓝牙直连还没开放。
             </li>
           ) : null}
           <li>

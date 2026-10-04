@@ -133,6 +133,11 @@ function ImportInner() {
         </div>
         <h1 className={styles.title}>{backfill ? "导入一段事后感想" : "导入录音"}</h1>
         <p className={styles.subtitle}>语音备忘录 → 分享 → 存储到「文件」，再在这里选择。支持 m4a、mp3、wav。</p>
+        {backfill ? null : (
+          <p className={`${styles.small} ${styles.muted}`}>
+            录音豆（飞书版）的录音？<Link href="/memo/feishu">从飞书导入</Link>更省事：飞书已经转好了文字，开录时间也准。
+          </p>
+        )}
 
         <section className={styles.card} style={{ marginTop: 16 }}>
           <label className={styles.label}>

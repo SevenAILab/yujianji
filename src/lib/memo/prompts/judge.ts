@@ -1,5 +1,6 @@
 // 判断提示词（spec §4.6）：结构借鉴 Omi extract_memories_prompt —— 按顺序回答判定题、每类配 ✅ / ❌ 例子、输出不写说话人编号；
 // 标准逐字取自方案 §3（criteria.ts）。只借结构，不照搬：我们的标准更严，别人说的、用户没回应的一律丢。
+import { windowHasMarker } from "../marker";
 import { CRITERIA_TEXT, renderFewShots } from "../criteria";
 import type { LearnedExample } from "../learning";
 import { CATEGORY_LABELS, type JudgeRequest } from "../schema";
@@ -128,7 +129,7 @@ function mmss(ms: number): string {
 
 /** 句子 id 换成 u0、u1…，模型只抄短 id，服务端再换回真实 id */
 export function buildJudgeUserPrompt(req: JudgeRequest, shortIds: Map<string, string>): string {
-  const kindLabel = { in_app: "App 内录音", import: "导入的录音", backfill: "补一段（事后感想）" }[req.session.kind];
+  const kindLabel = { in_app: "App 内录音", import: "导入的录音", backfill: "补一段（事后感想）", feishu: "随身录音豆的录音（飞书转写）", bean_ble: "随身录音豆的录音" }[req.session.kind];
   const started = `${dayKeyIn(req.session.startedAt, req.session.timeZone)} ${clockIn(req.session.startedAt, req.session.timeZone)}`;
   const lines = req.window.utterances.map((u) => `${shortIds.get(u.id)} [${mmss(u.offsetMs)}] [${u.speaker}] ${u.text}`);
   return [
@@ -149,6 +150,12 @@ export function buildJudgeUserPrompt(req: JudgeRequest, shortIds: Map<string, st
     "",
     `## 窗口（按时间顺序，[mm:ss] 是相对录音开始的时间）`,
     ...lines,
+    ...(windowHasMarker(req.window.utterances)
+      ? [
+          "",
+          "注意：用户在这个窗口里说了口令（「记一下」「小遇」等），表示主动标记了这里。口令附近用户自己说的话倾向 keep（至少 fold）；口令本身不算内容。唯一前提（必须是用户自己说的）和隐私底线照常优先。",
+        ]
+      : []),
     "",
     `请按判定题逐个判断，最后调用 ${JUDGE_SUBMIT_NAME} 交卷。`,
   ].join("\n");
