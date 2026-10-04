@@ -16,6 +16,7 @@ import { buildDayStops, dayCollage, journalDay, routeKm } from "@/lib/journey-da
 import { describeMemoError } from "@/lib/memo/client/api";
 import { copyFeedback, deleteMoment, editParagraph, restoreMoment, runReflect, shouldAutoReflect, undoDeleteMoment } from "@/lib/memo/client/learn";
 import { confirmBackfill, generateDiary } from "@/lib/memo/client/orchestrator";
+import { AssetPoolCard } from "@/components/memo/AssetPoolCard";
 import { placeLabel } from "@/lib/memo/place";
 import { diaryReceipt } from "@/lib/memo/receipt";
 import { CATEGORY_LABELS } from "@/lib/memo/schema";
@@ -292,6 +293,7 @@ export default function DayPage({ params }: { params: Promise<{ dayKey: string }
         ) : null}
       </div>
       {error ? <div className={styles.warning} style={{ marginTop: 10 }}>{error}</div> : null}
+      {!hasDemoMaterial ? <AssetPoolCard dayKey={dayKey} hasDiary={Boolean(diary)} /> : null}
 
       {folded.length && showFolded ? (
         <>

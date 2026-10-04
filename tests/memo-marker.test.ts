@@ -41,8 +41,8 @@ describe("口令", () => {
       {
         mode: "session",
         utterances: [
-          { id: "u1", speaker: "me", text: "记一下。" },
-          { id: "u2", speaker: "me", text: "这里的风是咸的，好像能尝到海。" },
+          { id: "u1", speaker: "me", offsetMs: 0, text: "记一下。" },
+          { id: "u2", speaker: "me", offsetMs: 1_000, text: "这里的风是咸的，好像能尝到海。" },
         ],
       },
     );

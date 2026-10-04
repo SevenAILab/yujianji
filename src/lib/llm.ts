@@ -113,6 +113,25 @@ async function requestVision(
   return content;
 }
 
+/** 429 时等一等再试（智谱免费模型连续两次识图就会限流，2026-10-04 实测）。次数和文字模型共用 MEMO_MODEL_MAX_RETRIES */
+function visionRetries(): number {
+  const raw = Number(process.env.MEMO_MODEL_MAX_RETRIES);
+  return Number.isFinite(raw) && raw >= 0 ? Math.min(5, Math.floor(raw)) : 1;
+}
+
+async function withRateLimitRetry<T>(fn: () => Promise<T>, retries = visionRetries()): Promise<T> {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (!isRateLimitError(error) || attempt >= retries) throw error;
+      const waitMs = [1_500, 4_000, 8_000, 12_000, 16_000][attempt] ?? 16_000;
+      console.info(JSON.stringify({ event: "vision_rate_limited_retry", attempt: attempt + 1, waitMs }));
+      await new Promise((resolve) => setTimeout(resolve, waitMs));
+    }
+  }
+}
+
 export async function callVision({
   imageDataUrl,
   systemPrompt,
@@ -143,14 +162,16 @@ export async function callVision({
       candidate === model ? timeoutMs : Math.min(timeoutMs, 20_000);
     const client = getClient(candidateTimeout, provider);
     try {
-      const content = await requestVision(
-        client,
-        candidate,
-        userContent,
-        systemPrompt,
-        enableThinking,
-        jsonMode,
-        provider,
+      const content = await withRateLimitRetry(() =>
+        requestVision(
+          client,
+          candidate,
+          userContent,
+          systemPrompt,
+          enableThinking,
+          jsonMode,
+          provider,
+        ),
       );
       console.info(
         JSON.stringify({

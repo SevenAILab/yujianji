@@ -29,6 +29,7 @@ import type {
 import { windowHasMarker } from "../marker";
 import { shouldSkipWithoutModel, splitWindows } from "../windows";
 import { describeMemoError, MemoApiError, memoApi, type JudgeResponse } from "./api";
+import { runVoiceMatch } from "./assets";
 import { buildJudgeRequest, buildWriteRequest, windowPayload } from "./context";
 import { mergeChunks } from "./recorder";
 import { addTimelineEvent, latestProfile, patchSession, saveTrace, UTTERANCE_TTL_MS } from "./repo";
@@ -616,6 +617,8 @@ export async function generateDiary(dayKey: string, opts: { budgetMs?: number } 
 
 async function generateDiaryOnce(dayKey: string, opts: { budgetMs?: number } = {}): Promise<DiaryDay> {
   const previous = await db.diaryDays.get(dayKey);
+  // 以声定图先跑（素材池里按时间对上的照片，工单 v2 Gate 2）；没配上的再交给原有的日终补配图兜底
+  await runVoiceMatch(dayKey).catch((error) => console.warn("voice match failed", describeMemoError(error)));
   const photoMatch = await runDayMatch(dayKey, previous?.photoMatch);
   const moments = await db.moments.where("dayKey").equals(dayKey).toArray();
   const sessionIds = [...new Set(moments.map((m) => m.sessionId))];

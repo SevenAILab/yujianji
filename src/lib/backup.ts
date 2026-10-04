@@ -223,6 +223,8 @@ function memoTables() {
     db.profiles,
     db.feedbackEvents,
     db.agentTraces,
+    // 素材池：清空本地数据时一起清掉（不进备份：图片大，且没被选中的只是待选素材）
+    db.mediaAssets,
   ];
 }
 

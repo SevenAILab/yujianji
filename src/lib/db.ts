@@ -10,6 +10,7 @@ import type {
   AgentTrace,
   DiaryDay,
   FeedbackEvent,
+  MediaAsset,
   MemoAudio,
   MemoVoiceprint,
   MemoChunk,
@@ -66,6 +67,7 @@ class YujianjiDatabase extends Dexie {
   feedbackEvents!: Table<FeedbackEvent, string>;
   agentTraces!: Table<AgentTrace, string>;
   models3d!: Table<Model3dRow, string>;
+  mediaAssets!: Table<MediaAsset, string>;
 
   constructor() {
     super("yujianji");
@@ -91,6 +93,8 @@ class YujianjiDatabase extends Dexie {
     this.version(7).stores({ memoVoiceprint: "id" });
     // v8：照片建成的 3D 模型。只新增一张表，老数据不动。
     this.version(8).stores({ models3d: "itemId, state" });
+    // v9：素材池（外部设备接入工单 v2 Gate 2）。只新增一张表，老数据不动。
+    this.version(9).stores({ mediaAssets: "id, capturedAt, contentHash, status" });
   }
 }
 

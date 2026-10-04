@@ -212,7 +212,9 @@ export interface Moment {
    */
   photoId?: string;
   /** 配图从哪来：judge 阶段配的没有这个字段；日终补配的是 day_match（只补空白，从不覆盖 judge 的） */
-  photoSource?: "day_match";
+  photoSource?: "day_match" | "voice_match";
+  /** 以声定图（工单 v2 Gate 2）选中的素材池记录；配图来源是 voice_match 时有值 */
+  assetId?: string;
   linkedItemIds?: string[];
   backfill?: BackfillInfo;
   guardNotes?: string[];
@@ -325,4 +327,37 @@ export interface AgentTrace {
   outcome: "ok" | "degraded" | "failed";
   limitHit?: "steps" | "tool_calls" | "deadline";
   steps: TraceStep[];
+}
+
+/**
+ * 素材池（外部设备接入工单 v2 Gate 2）：照片先按拍摄时间进池，不识别、不花钱；
+ * 只有和"我说的话"时间对得上、被选中的那张才去识别，变成藏品（Item）。
+ * 是否被用过不单独存：看有没有片段的 assetId 指向它。不存原图，只存识别用的工作图和缩略图。
+ */
+export interface MediaAsset {
+  id: string;
+  /** 本期只有手机照片；looki / insta360 等设备到手、实测时间可靠后再加 */
+  source: "phone" | "looki" | "insta360";
+  /** 拍摄时间（UTC ISO）。读不到为 null：不参与自动配图，等用户确认 */
+  capturedAt: string | null;
+  capturedAtSource: "exif" | "user" | "none";
+  /** 读不到拍摄时间时的参考值（文件修改时间），用户确认时用 */
+  capturedAtHint?: string;
+  /** 导入时的设备时区，用来判断属于哪一天 */
+  timeZone: string;
+  lat: number | null;
+  lng: number | null;
+  mime: string;
+  /** 原文件 SHA-256：同一张图重复导入只留一条 */
+  contentHash: string;
+  /** 约 320px JPEG（ArrayBuffer：Safari 无痕模式的 IndexedDB 不收 Blob） */
+  thumb: ArrayBuffer;
+  /** 约 1024px JPEG，识别和展示用 */
+  work: ArrayBuffer;
+  width: number;
+  height: number;
+  status: "pooled" | "recognized" | "unrecognized";
+  /** 识别后对应的藏品 */
+  itemId?: string;
+  createdAt: string;
 }

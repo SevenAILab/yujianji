@@ -1,0 +1,3792 @@
+{
+  "summary": {
+    "suite": "judge",
+    "model": "glm-4.5-flash",
+    "cases": 56,
+    "entries": 61,
+    "accuracy": 1,
+    "categoryAccuracy": 0.7868852459016393,
+    "keepPrecision": 1,
+    "keepRecall": 1,
+    "byTag": {
+      "background": {
+        "total": 3,
+        "correct": 3
+      },
+      "boundary1": {
+        "total": 2,
+        "correct": 2
+      },
+      "boundary2": {
+        "total": 2,
+        "correct": 2
+      },
+      "boundary3": {
+        "total": 3,
+        "correct": 3
+      },
+      "boundary4": {
+        "total": 6,
+        "correct": 6
+      },
+      "companion": {
+        "total": 26,
+        "correct": 26
+      },
+      "complaint": {
+        "total": 3,
+        "correct": 3
+      },
+      "difference": {
+        "total": 3,
+        "correct": 3
+      },
+      "drop": {
+        "total": 22,
+        "correct": 22
+      },
+      "first_experience": {
+        "total": 3,
+        "correct": 3
+      },
+      "functional": {
+        "total": 3,
+        "correct": 3
+      },
+      "guide": {
+        "total": 4,
+        "correct": 4
+      },
+      "hackathon": {
+        "total": 6,
+        "correct": 6
+      },
+      "keep": {
+        "total": 19,
+        "correct": 19
+      },
+      "memory": {
+        "total": 3,
+        "correct": 3
+      },
+      "noise_or_functional": {
+        "total": 6,
+        "correct": 6
+      },
+      "observation": {
+        "total": 3,
+        "correct": 3
+      },
+      "others_only": {
+        "total": 3,
+        "correct": 3
+      },
+      "private": {
+        "total": 3,
+        "correct": 3
+      },
+      "reflection": {
+        "total": 3,
+        "correct": 3
+      },
+      "retold_fact": {
+        "total": 4,
+        "correct": 4
+      },
+      "speaker_uncertain": {
+        "total": 2,
+        "correct": 2
+      },
+      "work_task": {
+        "total": 3,
+        "correct": 3
+      }
+    },
+    "errors": 0,
+    "degraded": 0,
+    "toolCalls": {
+      "lookup_fact": 6
+    },
+    "p50Ms": 11126,
+    "p95Ms": 20910,
+    "costYuan": 0,
+    "wrong": []
+  },
+  "results": [
+    {
+      "id": "k-diff-1",
+      "tags": [
+        "keep",
+        "difference"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "difference",
+          "got": "keep",
+          "gotCategory": "difference",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 10785,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-diff-1:u1"
+          ],
+          "decision": "keep",
+          "category": "difference",
+          "salience": 0.7,
+          "trigger": "伦敦地铁里的安静氛围",
+          "why": "你注意到了伦敦地铁里人们安静习惯与自己熟悉的地方的文化差异",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 10728,
+          "inputTokens": 3966,
+          "outputTokens": 381,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 10785,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-diff-2",
+      "tags": [
+        "keep",
+        "difference",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "difference",
+          "got": "keep",
+          "gotCategory": "difference",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 10560,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-diff-2:u2"
+          ],
+          "decision": "keep",
+          "category": "difference",
+          "salience": 0.7,
+          "trigger": "看到英国排队文化",
+          "why": "你注意到了中外排队习惯的差异",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 10551,
+          "inputTokens": 3983,
+          "outputTokens": 399,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 10560,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-diff-3",
+      "tags": [
+        "keep",
+        "difference"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "difference",
+          "got": "keep",
+          "gotCategory": "difference",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 12264,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [
+        "lookup_fact"
+      ],
+      "moments": [
+        {
+          "ids": [
+            "k-diff-3:u1"
+          ],
+          "decision": "keep",
+          "category": "difference",
+          "salience": 0.7,
+          "trigger": "英国超市营业时间",
+          "why": "你注意到了与国内习惯的差异",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "tool",
+          "name": "lookup_fact",
+          "ms": 1,
+          "summary": "entity=英国超市，question=英国超市营业时间特点 → 业务失败 SEARCH_UNAVAILABLE"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 8695,
+          "inputTokens": 3969,
+          "outputTokens": 304,
+          "summary": "第 1 步：调用 lookup_fact；模型结束信号 tool_calls（只记录）",
+          "reason": "有 1 个工具调用 → 执行后继续"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 3562,
+          "inputTokens": 4305,
+          "outputTokens": 120,
+          "summary": "第 2 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 12264,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-obs-1",
+      "tags": [
+        "keep",
+        "observation"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "observation",
+          "got": "keep",
+          "gotCategory": "observation",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 10961,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-obs-1:u1"
+          ],
+          "decision": "keep",
+          "category": "observation",
+          "salience": 0.7,
+          "trigger": "卖花阿姨的工作状态",
+          "why": "你观察到卖花阿姨的工作状态并表达了个人感受",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 10957,
+          "inputTokens": 3967,
+          "outputTokens": 382,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 10960,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-obs-2",
+      "tags": [
+        "keep",
+        "observation"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "observation",
+          "got": "keep",
+          "gotCategory": "observation",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 10008,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-obs-2:u1"
+          ],
+          "decision": "keep",
+          "category": "observation",
+          "salience": 0.7,
+          "trigger": "河边钓鱼场景",
+          "why": "你被安静的钓鱼场景触动，感受到内心的平静",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 10003,
+          "inputTokens": 3966,
+          "outputTokens": 360,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 10007,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-obs-3",
+      "tags": [
+        "keep",
+        "observation",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "observation",
+          "got": "keep",
+          "gotCategory": "observation",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 12897,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-obs-3:u2"
+          ],
+          "decision": "keep",
+          "category": "observation",
+          "salience": 0.7,
+          "trigger": "看到一对老夫妻",
+          "why": "你对老夫妻互动的温馨观察",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 12892,
+          "inputTokens": 3982,
+          "outputTokens": 464,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 12897,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-mem-1",
+      "tags": [
+        "keep",
+        "memory"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "memory",
+          "got": "keep",
+          "gotCategory": "memory",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 11568,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [
+        "lookup_fact"
+      ],
+      "moments": [
+        {
+          "ids": [
+            "k-mem-1:u1"
+          ],
+          "decision": "keep",
+          "category": "memory",
+          "salience": 0.7,
+          "trigger": "闻到巷子里的味道",
+          "why": "你闻到气味触发了童年记忆",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "tool",
+          "name": "lookup_fact",
+          "ms": 0,
+          "summary": "entity=伦敦小巷，question=伦敦小巷有什么特别的气味或特色 → 业务失败 SEARCH_UNAVAILABLE"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 7879,
+          "inputTokens": 3961,
+          "outputTokens": 275,
+          "summary": "第 1 步：调用 lookup_fact；模型结束信号 tool_calls（只记录）",
+          "reason": "有 1 个工具调用 → 执行后继续"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 3685,
+          "inputTokens": 4268,
+          "outputTokens": 126,
+          "summary": "第 2 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 11568,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-mem-2",
+      "tags": [
+        "keep",
+        "memory"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "memory",
+          "got": "keep",
+          "gotCategory": "memory",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 9259,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-mem-2:u1"
+          ],
+          "decision": "keep",
+          "category": "memory",
+          "salience": 0.7,
+          "trigger": "看到绿皮火车",
+          "why": "眼前的火车让你想起大学春运的经历",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 9248,
+          "inputTokens": 3965,
+          "outputTokens": 327,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 9259,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-mem-3",
+      "tags": [
+        "keep",
+        "memory",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "memory",
+          "got": "keep",
+          "gotCategory": "memory",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 20910,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-mem-3:u2"
+          ],
+          "decision": "keep",
+          "category": "memory",
+          "salience": 0.7,
+          "trigger": "听到老歌回忆高中",
+          "why": "听到老歌让你想起高中偷偷听歌的青春记忆",
+          "guardNotes": [
+            "G10"
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 14722,
+          "inputTokens": 3978,
+          "outputTokens": 457,
+          "summary": "第 1 步：调用工具；1 个调用参数不合 schema，错误已回填给模型；模型结束信号 tool_calls（只记录）",
+          "reason": "有 1 个工具调用 → 执行后继续"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 6176,
+          "inputTokens": 4773,
+          "outputTokens": 191,
+          "summary": "第 2 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "guard",
+          "name": "G10",
+          "ms": 0,
+          "summary": "片段 #1：memory 讲的不是眼前的东西 → 不配图"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 20910,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-ref-1",
+      "tags": [
+        "keep",
+        "reflection"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "reflection",
+          "got": "keep",
+          "gotCategory": "reflection",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 10324,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-ref-1:u1"
+          ],
+          "decision": "keep",
+          "category": "reflection",
+          "salience": 0.7,
+          "trigger": "看到当地人在咖啡馆发呆",
+          "why": "你反思了自己的生活方式",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 10321,
+          "inputTokens": 3967,
+          "outputTokens": 356,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 10324,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-ref-2",
+      "tags": [
+        "keep",
+        "reflection"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "reflection",
+          "got": "keep",
+          "gotCategory": "reflection",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 10596,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-ref-2:u1"
+          ],
+          "decision": "keep",
+          "category": "reflection",
+          "salience": 0.7,
+          "trigger": "意识到自己在旅行中过度关注拍照分享",
+          "why": "你对自己旅行行为的反思，意识到真正体验的重要性",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 10593,
+          "inputTokens": 3965,
+          "outputTokens": 385,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 10596,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-ref-3",
+      "tags": [
+        "keep",
+        "reflection",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "reflection",
+          "got": "keep",
+          "gotCategory": "reflection",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 13799,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-ref-3:u2"
+          ],
+          "decision": "keep",
+          "category": "reflection",
+          "salience": 0.8,
+          "trigger": "观察到英国人工作态度",
+          "why": "对工作与生活平衡的反思和想做的改变",
+          "guardNotes": [
+            "G9"
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 13793,
+          "inputTokens": 3988,
+          "outputTokens": 496,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "guard",
+          "name": "G9",
+          "ms": 0,
+          "summary": "片段 #1：转述与他人原话连续相同过多，视为照抄，已移除"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 13799,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-first-1",
+      "tags": [
+        "keep",
+        "first_experience"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "first_experience",
+          "got": "keep",
+          "gotCategory": "first_experience",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 10118,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-first-1:u1"
+          ],
+          "decision": "keep",
+          "category": "first_experience",
+          "salience": 0.8,
+          "trigger": "第一次坐悬空缆车",
+          "why": "你对刺激体验的真实感受",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 10114,
+          "inputTokens": 3965,
+          "outputTokens": 330,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 10118,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-first-2",
+      "tags": [
+        "keep",
+        "first_experience"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "first_experience",
+          "got": "keep",
+          "gotCategory": "first_experience",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 11183,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "k-first-2:u1"
+          ],
+          "decision": "keep",
+          "category": "first_experience",
+          "salience": 0.7,
+          "trigger": "第一次吃树上现摘榴莲",
+          "why": "独特的食物体验和感受分享",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 11177,
+          "inputTokens": 3963,
+          "outputTokens": 363,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 11183,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-first-3",
+      "tags": [
+        "keep",
+        "first_experience"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "first_experience",
+          "got": "keep",
+          "gotCategory": "first_experience",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 28357,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [
+        "lookup_fact"
+      ],
+      "moments": [
+        {
+          "ids": [
+            "k-first-3:u1"
+          ],
+          "decision": "keep",
+          "category": "first_experience",
+          "salience": 0.8,
+          "trigger": "第一次看到极光的体验",
+          "why": "你描述了亲眼看到极光的独特感受",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "tool",
+          "name": "lookup_fact",
+          "ms": 0,
+          "summary": "entity=极光，question=极光形成的原因和特点 → 业务失败 SEARCH_UNAVAILABLE"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 9340,
+          "inputTokens": 3967,
+          "outputTokens": 308,
+          "summary": "第 1 步：调用 lookup_fact；模型结束信号 tool_calls（只记录）",
+          "reason": "有 1 个工具调用 → 执行后继续"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 4836,
+          "inputTokens": 4307,
+          "outputTokens": 170,
+          "summary": "第 2 步：调用工具；1 个调用参数不合 schema，错误已回填给模型；模型结束信号 tool_calls（只记录）",
+          "reason": "有 1 个工具调用 → 执行后继续"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 5033,
+          "inputTokens": 4716,
+          "outputTokens": 171,
+          "summary": "第 3 步：调用工具；1 个调用参数不合 schema，错误已回填给模型；模型结束信号 tool_calls（只记录）",
+          "reason": "有 1 个工具调用 → 执行后继续"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 4850,
+          "inputTokens": 5113,
+          "outputTokens": 170,
+          "summary": "第 4 步：调用工具；1 个调用参数不合 schema，错误已回填给模型；模型结束信号 tool_calls（只记录）",
+          "reason": "有 1 个工具调用 → 执行后继续"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 4290,
+          "inputTokens": 5522,
+          "outputTokens": 140,
+          "summary": "第 5 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 28357,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-retold-1",
+      "tags": [
+        "keep",
+        "retold_fact",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "guide",
+          "got": "drop",
+          "gotCategory": "(未交)",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": true
+        },
+        {
+          "expected": "keep",
+          "expectedCategory": "retold_fact",
+          "got": "keep",
+          "gotCategory": "retold_fact",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 13569,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [
+        "lookup_fact"
+      ],
+      "moments": [
+        {
+          "ids": [
+            "k-retold-1:u2"
+          ],
+          "decision": "keep",
+          "category": "retold_fact",
+          "salience": 0.6,
+          "trigger": "听到钟楼历史后的惊叹",
+          "why": "你复述了钟楼四百多年的历史，表达了你的惊叹",
+          "guardNotes": [
+            "G9"
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "tool",
+          "name": "lookup_fact",
+          "ms": 1,
+          "summary": "entity=钟楼，question=这座钟楼的历史和名称 → 业务失败 SEARCH_UNAVAILABLE"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 8760,
+          "inputTokens": 3993,
+          "outputTokens": 316,
+          "summary": "第 1 步：调用 lookup_fact；模型结束信号 tool_calls（只记录）",
+          "reason": "有 1 个工具调用 → 执行后继续"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 4802,
+          "inputTokens": 4341,
+          "outputTokens": 168,
+          "summary": "第 2 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "guard",
+          "name": "G9",
+          "ms": 0,
+          "summary": "片段 #1：转述与他人原话连续相同过多，视为照抄，已移除"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 13569,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-retold-2",
+      "tags": [
+        "keep",
+        "retold_fact"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "retold_fact",
+          "got": "keep",
+          "gotCategory": "difference",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 12549,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [
+        "lookup_fact"
+      ],
+      "moments": [
+        {
+          "ids": [
+            "k-retold-2:u1"
+          ],
+          "decision": "keep",
+          "category": "difference",
+          "salience": 0.6,
+          "trigger": "森林树木年龄观察",
+          "why": "你注意到了森林树木年龄的差异",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "tool",
+          "name": "lookup_fact",
+          "ms": 1,
+          "summary": "entity=古老森林，question=世界上最古老的森林平均树龄 → 业务失败 SEARCH_UNAVAILABLE"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 8973,
+          "inputTokens": 3968,
+          "outputTokens": 288,
+          "summary": "第 1 步：调用 lookup_fact；模型结束信号 tool_calls（只记录）",
+          "reason": "有 1 个工具调用 → 执行后继续"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 3569,
+          "inputTokens": 4288,
+          "outputTokens": 120,
+          "summary": "第 2 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 12549,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "k-retold-3",
+      "tags": [
+        "keep",
+        "retold_fact",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "retold_fact",
+          "got": "keep",
+          "gotCategory": "first_experience",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 23866,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [
+        "lookup_fact"
+      ],
+      "moments": [
+        {
+          "ids": [
+            "k-retold-3:u2"
+          ],
+          "decision": "keep",
+          "category": "first_experience",
+          "salience": 0.6,
+          "trigger": "冬天湖面结冰的景象",
+          "why": "你对冬季湖面结冰表达了向往和期待",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "tool",
+          "name": "lookup_fact",
+          "ms": 1,
+          "summary": "entity=湖，question=伦敦哪个湖冬天会结冰 → 业务失败 SEARCH_UNAVAILABLE"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 18610,
+          "inputTokens": 3990,
+          "outputTokens": 352,
+          "summary": "第 1 步：调用 lookup_fact；模型结束信号 tool_calls（只记录）",
+          "reason": "有 1 个工具调用 → 执行后继续"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 5249,
+          "inputTokens": 4374,
+          "outputTokens": 133,
+          "summary": "第 2 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 23866,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "d-func-1",
+      "tags": [
+        "drop",
+        "functional",
+        "noise_or_functional",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "functional",
+          "got": "drop",
+          "gotCategory": "functional",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 20666,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-func-1:u1"
+          ],
+          "decision": "drop",
+          "category": "functional",
+          "salience": 0.1,
+          "trigger": "购买车票",
+          "why": "功能性事务，问票",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 20659,
+          "inputTokens": 3974,
+          "outputTokens": 308,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 20666,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-func-2",
+      "tags": [
+        "drop",
+        "functional",
+        "noise_or_functional"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "functional",
+          "got": "drop",
+          "gotCategory": "functional",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 20167,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-func-2:u1"
+          ],
+          "decision": "drop",
+          "category": "functional",
+          "salience": 0.1,
+          "trigger": "砍价",
+          "why": "砍价是功能性事务，没有上升到对差异、感受或反思",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 20160,
+          "inputTokens": 3957,
+          "outputTokens": 306,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 20167,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-func-3",
+      "tags": [
+        "drop",
+        "functional",
+        "noise_or_functional",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "functional",
+          "got": "drop",
+          "gotCategory": "functional",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 18291,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-func-3:u1"
+          ],
+          "decision": "drop",
+          "category": "functional",
+          "salience": 0.1,
+          "trigger": "询问酒店提前入住",
+          "why": "功能性事务，没有情感或观察价值",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 18287,
+          "inputTokens": 3977,
+          "outputTokens": 303,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 18291,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-comp-1",
+      "tags": [
+        "drop",
+        "complaint"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "complaint",
+          "got": "drop",
+          "gotCategory": "complaint",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 12234,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-comp-1:u1"
+          ],
+          "decision": "drop",
+          "category": "complaint",
+          "salience": 0.1,
+          "trigger": "天气炎热防晒霜忘带",
+          "why": "针对当下不便的抱怨，没有上升到反思",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 12228,
+          "inputTokens": 3962,
+          "outputTokens": 348,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 12234,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-comp-2",
+      "tags": [
+        "drop",
+        "complaint"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "complaint",
+          "got": "drop",
+          "gotCategory": "complaint",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 14151,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-comp-2:u1"
+          ],
+          "decision": "drop",
+          "category": "complaint",
+          "salience": 0.1,
+          "trigger": "导航绕圈",
+          "why": "针对当下不便的抱怨，没有上升到反思",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 14140,
+          "inputTokens": 3961,
+          "outputTokens": 270,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 14151,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-comp-3",
+      "tags": [
+        "drop",
+        "complaint"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "complaint",
+          "got": "drop",
+          "gotCategory": "complaint",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 20663,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-comp-3:u1"
+          ],
+          "decision": "drop",
+          "category": "complaint",
+          "salience": 0.1,
+          "trigger": "鞋子磨脚",
+          "why": "针对当下不便的抱怨，没有上升到反思",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 20652,
+          "inputTokens": 3964,
+          "outputTokens": 373,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 20663,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-oth-1",
+      "tags": [
+        "drop",
+        "others_only",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "others_only",
+          "got": "drop",
+          "gotCategory": "others_only",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 8756,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-oth-1:u1",
+            "d-oth-1:u2"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0.1,
+          "trigger": "朋友讲述店主背景",
+          "why": "你只简单附和，没有表达自己的想法",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 8750,
+          "inputTokens": 3988,
+          "outputTokens": 286,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 8755,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-oth-2",
+      "tags": [
+        "drop",
+        "others_only",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "others_only",
+          "got": "drop",
+          "gotCategory": "others_only",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 8682,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-oth-2:u1",
+            "d-oth-2:u2",
+            "d-oth-2:u3"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0.1,
+          "trigger": "关于伦敦房价和假期的讨论",
+          "why": "别人说了精彩内容，你只回应了'嗯嗯'",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 3 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 8679,
+          "inputTokens": 3997,
+          "outputTokens": 267,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 8682,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-oth-3",
+      "tags": [
+        "drop",
+        "others_only",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "others_only",
+          "got": "drop",
+          "gotCategory": "others_only",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 10649,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-oth-3:u1",
+            "d-oth-3:u2"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0.1,
+          "trigger": "别人提到当地婚礼习俗",
+          "why": "精彩的是别人的话，你只回了一句",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 10642,
+          "inputTokens": 3981,
+          "outputTokens": 366,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 10649,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-guide-1",
+      "tags": [
+        "drop",
+        "guide"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "guide",
+          "got": "drop",
+          "gotCategory": "others_only",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 5376,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-guide-1:u1"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0,
+          "trigger": "导游讲解建筑历史",
+          "why": "这是导游的原话，用户没有表达自己的想法",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 5371,
+          "inputTokens": 3969,
+          "outputTokens": 189,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 5376,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-guide-2",
+      "tags": [
+        "drop",
+        "guide"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "guide",
+          "got": "drop",
+          "gotCategory": "others_only",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 5176,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-guide-2:u1"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0,
+          "trigger": "讲解员介绍青花瓷瓶",
+          "why": "这是讲解员的原话，用户没有表达自己的想法",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 5173,
+          "inputTokens": 3971,
+          "outputTokens": 185,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 5176,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-guide-3",
+      "tags": [
+        "drop",
+        "guide",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "guide",
+          "got": "drop",
+          "gotCategory": "others_only",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": false
+        },
+        {
+          "expected": "drop",
+          "expectedCategory": "functional",
+          "got": "drop",
+          "gotCategory": "functional",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 8995,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-guide-3:u2"
+          ],
+          "decision": "drop",
+          "category": "functional",
+          "salience": 0.1,
+          "trigger": "询问洗手间位置",
+          "why": "功能性事务，问路类",
+          "guardNotes": []
+        },
+        {
+          "ids": [
+            "d-guide-3:u1"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0.1,
+          "trigger": "街道历史讲解",
+          "why": "别人的讲解，用户没有表达自己的想法",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 8991,
+          "inputTokens": 3982,
+          "outputTokens": 299,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 8994,
+          "summary": "交卷 2 个片段，守卫后 keep 0 / fold 0 / drop 2"
+        }
+      ]
+    },
+    {
+      "id": "d-bg-1",
+      "tags": [
+        "drop",
+        "background"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "background",
+          "got": "drop",
+          "gotCategory": "others_only",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 8070,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-bg-1:u1"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0.1,
+          "trigger": "电话通话",
+          "why": "别人说的内容，用户没有表达自己的想法",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 8067,
+          "inputTokens": 3962,
+          "outputTokens": 277,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 8070,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-bg-2",
+      "tags": [
+        "drop",
+        "background"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "background",
+          "got": "drop",
+          "gotCategory": "others_only",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 9456,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-bg-2:u1"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0,
+          "trigger": "商家促销信息",
+          "why": "这是商家说的话，用户没有表达自己的想法",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 9452,
+          "inputTokens": 3960,
+          "outputTokens": 254,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 9456,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-bg-3",
+      "tags": [
+        "drop",
+        "background"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "background",
+          "got": "drop",
+          "gotCategory": "others_only",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 6808,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-bg-3:u1"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0,
+          "trigger": "列车员广播",
+          "why": "这是别人说的话，用户没有表达自己的想法",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 6806,
+          "inputTokens": 3957,
+          "outputTokens": 242,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 6808,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-priv-1",
+      "tags": [
+        "drop",
+        "private"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "private",
+          "got": "drop",
+          "gotCategory": "private",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 11126,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-priv-1:u1"
+          ],
+          "decision": "drop",
+          "category": "private",
+          "salience": 0.1,
+          "trigger": "提到工资收入",
+          "why": "具体的收入金额属于隐私",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 11120,
+          "inputTokens": 3962,
+          "outputTokens": 325,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 11126,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-priv-2",
+      "tags": [
+        "drop",
+        "private"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "private",
+          "got": "drop",
+          "gotCategory": "private",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 11106,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-priv-2:u1"
+          ],
+          "decision": "drop",
+          "category": "private",
+          "salience": 0.1,
+          "trigger": "健康检查结果",
+          "why": "具体的健康信息，属于隐私底线",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 11103,
+          "inputTokens": 3960,
+          "outputTokens": 306,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 11106,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-priv-3",
+      "tags": [
+        "drop",
+        "private"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "private",
+          "got": "drop",
+          "gotCategory": "private",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 11624,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-priv-3:u1"
+          ],
+          "decision": "drop",
+          "category": "private",
+          "salience": 0.1,
+          "trigger": "个人感情状况",
+          "why": "具体的感情关系和婚姻状况，属于隐私底线",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 11620,
+          "inputTokens": 3965,
+          "outputTokens": 279,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 11624,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-work-1",
+      "tags": [
+        "drop",
+        "work_task"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "work_task",
+          "got": "drop",
+          "gotCategory": "work_task",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 8286,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-work-1:u1"
+          ],
+          "decision": "drop",
+          "category": "work_task",
+          "salience": 0.1,
+          "trigger": "工作任务的安排",
+          "why": "事务性的工作讨论",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 8283,
+          "inputTokens": 3963,
+          "outputTokens": 296,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 8286,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-work-2",
+      "tags": [
+        "drop",
+        "work_task",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "work_task",
+          "got": "drop",
+          "gotCategory": "work_task",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 9213,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-work-2:u1",
+            "d-work-2:u2"
+          ],
+          "decision": "drop",
+          "category": "work_task",
+          "salience": 0.1,
+          "trigger": "合同条款讨论",
+          "why": "事务性的工作讨论",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 9199,
+          "inputTokens": 3979,
+          "outputTokens": 282,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 9213,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "d-work-3",
+      "tags": [
+        "drop",
+        "work_task"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "work_task",
+          "got": "drop",
+          "gotCategory": "work_task",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 9983,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "d-work-3:u1"
+          ],
+          "decision": "drop",
+          "category": "work_task",
+          "salience": 0.1,
+          "trigger": "工作安排",
+          "why": "纯工作事务讨论，没有个人感受或反思",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 9976,
+          "inputTokens": 3961,
+          "outputTokens": 321,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 9983,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "b1-1",
+      "tags": [
+        "boundary1"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "reflection",
+          "got": "keep",
+          "gotCategory": "reflection",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 16428,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b1-1:u1"
+          ],
+          "decision": "keep",
+          "category": "reflection",
+          "salience": 0.7,
+          "trigger": "等待公交时观察到当地人的态度差异",
+          "why": "你从公交等待中反思了自己的生活节奏和急躁习惯",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 12437,
+          "inputTokens": 3979,
+          "outputTokens": 457,
+          "summary": "第 1 步：调用工具；1 个调用参数不合 schema，错误已回填给模型；模型结束信号 tool_calls（只记录）",
+          "reason": "有 1 个工具调用 → 执行后继续"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 3934,
+          "inputTokens": 4657,
+          "outputTokens": 138,
+          "summary": "第 2 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 16428,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "b1-2",
+      "tags": [
+        "boundary1"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "complaint",
+          "got": "drop",
+          "gotCategory": "complaint",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 8070,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b1-2:u1"
+          ],
+          "decision": "drop",
+          "category": "complaint",
+          "salience": 0.1,
+          "trigger": "公交晚点",
+          "why": "针对当下公交晚点的抱怨，没有上升到反思",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 8064,
+          "inputTokens": 3965,
+          "outputTokens": 282,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 8070,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "b2-1",
+      "tags": [
+        "boundary2"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "reflection",
+          "got": "keep",
+          "gotCategory": "reflection",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 11045,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b2-1:u1"
+          ],
+          "decision": "keep",
+          "category": "reflection",
+          "salience": 0.7,
+          "trigger": "看到别人六点下班去接孩子",
+          "why": "你反思了自己的工作与生活平衡问题",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 11041,
+          "inputTokens": 3971,
+          "outputTokens": 398,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 11045,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "b2-2",
+      "tags": [
+        "boundary2"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "private",
+          "got": "drop",
+          "gotCategory": "private",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 8494,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b2-2:u1"
+          ],
+          "decision": "drop",
+          "category": "private",
+          "salience": 0.1,
+          "trigger": "提及前任和工作狂",
+          "why": "具体的感情关系，属于隐私内容",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 8490,
+          "inputTokens": 3961,
+          "outputTokens": 299,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 8494,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "b3-1",
+      "tags": [
+        "boundary3",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "guide",
+          "got": "drop",
+          "gotCategory": "guide",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        },
+        {
+          "expected": "keep",
+          "expectedCategory": "retold_fact",
+          "got": "keep",
+          "gotCategory": "retold_fact",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 12326,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b3-1:u1"
+          ],
+          "decision": "drop",
+          "category": "guide",
+          "salience": 0.1,
+          "trigger": "灯塔讲解",
+          "why": "讲解员的原话，没有用户自己的想法",
+          "guardNotes": []
+        },
+        {
+          "ids": [
+            "b3-1:u2"
+          ],
+          "decision": "keep",
+          "category": "retold_fact",
+          "salience": 0.7,
+          "trigger": "灯塔历史",
+          "why": "你被灯塔的历史打动，表达了自己的感想",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 12320,
+          "inputTokens": 3996,
+          "outputTokens": 431,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 12326,
+          "summary": "交卷 2 个片段，守卫后 keep 1 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "b3-2",
+      "tags": [
+        "boundary3"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "guide",
+          "got": "drop",
+          "gotCategory": "others_only",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 7431,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b3-2:u1",
+            "b3-2:u2"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0.1,
+          "trigger": "讲解员介绍瓷砖故事",
+          "why": "精彩的是讲解员的话，你只回了一句",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 7427,
+          "inputTokens": 3978,
+          "outputTokens": 263,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 7431,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "b4-1",
+      "tags": [
+        "boundary4",
+        "hackathon",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "work_task",
+          "got": "drop",
+          "gotCategory": "work_task",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 10014,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b4-1:u1"
+          ],
+          "decision": "drop",
+          "category": "work_task",
+          "salience": 0.1,
+          "trigger": "评审表打分项对齐",
+          "why": "事务性的工作讨论",
+          "guardNotes": []
+        },
+        {
+          "ids": [
+            "b4-1:u2"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0.1,
+          "trigger": "演示视频剪辑",
+          "why": "这是别人说的话",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 10011,
+          "inputTokens": 3975,
+          "outputTokens": 384,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 10014,
+          "summary": "交卷 2 个片段，守卫后 keep 0 / fold 0 / drop 2"
+        }
+      ]
+    },
+    {
+      "id": "b4-2",
+      "tags": [
+        "boundary4",
+        "hackathon"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "first_experience",
+          "got": "keep",
+          "gotCategory": "first_experience",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 12130,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b4-2:u1"
+          ],
+          "decision": "keep",
+          "category": "first_experience",
+          "salience": 0.7,
+          "trigger": "第一次参加黑客松的凌晨场景",
+          "why": "你描述了第一次参加黑客松的独特体验和感受",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 12127,
+          "inputTokens": 3974,
+          "outputTokens": 405,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 12130,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "b4-3",
+      "tags": [
+        "boundary4",
+        "hackathon",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "work_task",
+          "got": "drop",
+          "gotCategory": "work_task",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        },
+        {
+          "expected": "keep",
+          "expectedCategory": "reflection",
+          "got": "keep",
+          "gotCategory": "reflection",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 15488,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b4-3:u1"
+          ],
+          "decision": "drop",
+          "category": "work_task",
+          "salience": 0.1,
+          "trigger": "数据库字段讨论",
+          "why": "功能性工作事务讨论",
+          "guardNotes": []
+        },
+        {
+          "ids": [
+            "b4-3:u2"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0.1,
+          "trigger": "简单回应",
+          "why": "只是简单回应，没有自己的想法",
+          "guardNotes": []
+        },
+        {
+          "ids": [
+            "b4-3:u3"
+          ],
+          "decision": "keep",
+          "category": "reflection",
+          "salience": 0.7,
+          "trigger": "工作投入的感受",
+          "why": "表达了对工作投入的感受和反思",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 3 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 15483,
+          "inputTokens": 4000,
+          "outputTokens": 529,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 15487,
+          "summary": "交卷 3 个片段，守卫后 keep 1 / fold 0 / drop 2"
+        }
+      ]
+    },
+    {
+      "id": "b4-4",
+      "tags": [
+        "boundary4",
+        "hackathon",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "work_task",
+          "got": "drop",
+          "gotCategory": "work_task",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        },
+        {
+          "expected": "keep",
+          "expectedCategory": "observation",
+          "got": "keep",
+          "gotCategory": "observation",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 14238,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "b4-4:u1",
+            "b4-4:u2"
+          ],
+          "decision": "drop",
+          "category": "work_task",
+          "salience": 0.1,
+          "trigger": "技术接口讨论",
+          "why": "事务性工作讨论",
+          "guardNotes": []
+        },
+        {
+          "ids": [
+            "b4-4:u3"
+          ],
+          "decision": "keep",
+          "category": "observation",
+          "salience": 0.6,
+          "trigger": "评委耐心程度",
+          "why": "对评委行为的观察和感受",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 3 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 14234,
+          "inputTokens": 4000,
+          "outputTokens": 495,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 14238,
+          "summary": "交卷 2 个片段，守卫后 keep 1 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "n-noise-1",
+      "tags": [
+        "noise_or_functional"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "background",
+          "got": "drop",
+          "gotCategory": "background",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 11066,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "n-noise-1:u1",
+            "n-noise-1:u2",
+            "n-noise-1:u3"
+          ],
+          "decision": "drop",
+          "category": "background",
+          "salience": 0.1,
+          "trigger": "简单寒暄",
+          "why": "只是日常对话中的简单回应，没有实质内容",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 3 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 11063,
+          "inputTokens": 3980,
+          "outputTokens": 373,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 11066,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "n-noise-2",
+      "tags": [
+        "noise_or_functional"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "background",
+          "got": "drop",
+          "gotCategory": "others_only",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 16881,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "n-noise-2:u1",
+            "n-noise-2:u2",
+            "n-noise-2:u3"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0.1,
+          "trigger": "别人说话，用户简单回应",
+          "why": "精彩的是别人的话，你只回了一句",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 3 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 16877,
+          "inputTokens": 3979,
+          "outputTokens": 267,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 16881,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "s-uncertain-1",
+      "tags": [
+        "speaker_uncertain"
+      ],
+      "entries": [
+        {
+          "expected": "fold",
+          "expectedCategory": "first_experience",
+          "got": "fold",
+          "gotCategory": "observation",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 13770,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "s-uncertain-1:u1"
+          ],
+          "decision": "fold",
+          "category": "observation",
+          "salience": 0.3,
+          "trigger": "看到银河的震撼",
+          "why": "拿不准是不是你说的",
+          "guardNotes": [
+            "G2U"
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 1 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 13766,
+          "inputTokens": 3963,
+          "outputTokens": 413,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 13770,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 1 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "s-uncertain-2",
+      "tags": [
+        "speaker_uncertain",
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "fold",
+          "expectedCategory": "observation",
+          "got": "fold",
+          "gotCategory": "observation",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 8227,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "s-uncertain-2:u1",
+            "s-uncertain-2:u2"
+          ],
+          "decision": "fold",
+          "category": "observation",
+          "salience": 0.3,
+          "trigger": "面馆汤的体验",
+          "why": "拿不准是不是你说的",
+          "guardNotes": [
+            "G2U"
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 2 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 4365,
+          "inputTokens": 3985,
+          "outputTokens": 151,
+          "summary": "第 1 步：直接输出；模型结束信号 stop（只记录）",
+          "reason": "没有工具调用 → 停止"
+        },
+        {
+          "kind": "retry",
+          "name": "submit_judgement",
+          "ms": 0,
+          "summary": "还没有调用 submit_judgement 交卷 → 带着原因补跑一轮，只开放交卷工具",
+          "reason": "交卷有上限：最多补一次"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 3854,
+          "inputTokens": 4012,
+          "outputTokens": 118,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 8227,
+          "summary": "交卷 1 个片段，守卫后 keep 0 / fold 1 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "c-companion-1",
+      "tags": [
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "reflection",
+          "got": "keep",
+          "gotCategory": "observation",
+          "correct": true,
+          "categoryCorrect": false,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 16978,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "c-companion-1:u2"
+          ],
+          "decision": "keep",
+          "category": "observation",
+          "salience": 0.7,
+          "trigger": "街头艺人拉手风琴的专注状态",
+          "why": "你羡慕艺人不在乎他人眼光的专注状态",
+          "guardNotes": []
+        },
+        {
+          "ids": [
+            "c-companion-1:u4"
+          ],
+          "decision": "keep",
+          "category": "reflection",
+          "salience": 0.6,
+          "trigger": "对比街头艺人和自己",
+          "why": "你反思自己过于在意他人看法的性格",
+          "guardNotes": []
+        },
+        {
+          "ids": [
+            "c-companion-1:u1",
+            "c-companion-1:u3"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0.1,
+          "trigger": "街头艺人拉手风琴",
+          "why": "同伴的观察，用户没有表达自己的想法",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 4 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 16973,
+          "inputTokens": 4030,
+          "outputTokens": 570,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 16978,
+          "summary": "交卷 3 个片段，守卫后 keep 2 / fold 0 / drop 1"
+        }
+      ]
+    },
+    {
+      "id": "c-companion-2",
+      "tags": [
+        "companion"
+      ],
+      "entries": [
+        {
+          "expected": "keep",
+          "expectedCategory": "observation",
+          "got": "keep",
+          "gotCategory": "observation",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 12915,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "c-companion-2:u2"
+          ],
+          "decision": "keep",
+          "category": "observation",
+          "salience": 0.6,
+          "trigger": "当地人与陌生人交流",
+          "why": "你观察到当地人与陌生人交流的友好方式",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 3 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 12909,
+          "inputTokens": 4002,
+          "outputTokens": 422,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 12915,
+          "summary": "交卷 1 个片段，守卫后 keep 1 / fold 0 / drop 0"
+        }
+      ]
+    },
+    {
+      "id": "c-companion-3",
+      "tags": [
+        "companion",
+        "noise_or_functional"
+      ],
+      "entries": [
+        {
+          "expected": "drop",
+          "expectedCategory": "functional",
+          "got": "drop",
+          "gotCategory": "functional",
+          "correct": true,
+          "categoryCorrect": true,
+          "omitted": false
+        }
+      ],
+      "falseKeeps": 0,
+      "ms": 17155,
+      "cost": 0,
+      "outcome": "ok",
+      "tools": [],
+      "moments": [
+        {
+          "ids": [
+            "c-companion-3:u2"
+          ],
+          "decision": "drop",
+          "category": "functional",
+          "salience": 0.1,
+          "trigger": "讨论买水和伞",
+          "why": "功能性事务",
+          "guardNotes": []
+        },
+        {
+          "ids": [
+            "c-companion-3:u1"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0.1,
+          "trigger": "同伴提出建议",
+          "why": "用户没有表达自己的想法",
+          "guardNotes": []
+        },
+        {
+          "ids": [
+            "c-companion-3:u3"
+          ],
+          "decision": "drop",
+          "category": "others_only",
+          "salience": 0.1,
+          "trigger": "同伴提供信息",
+          "why": "用户没有表达自己的想法",
+          "guardNotes": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "stage",
+          "name": "context",
+          "ms": 0,
+          "summary": "窗口 3 句；画像 v1 规则 17 条；学到的例子 0 条；记忆索引 0 行；今天已留 0 条"
+        },
+        {
+          "kind": "model",
+          "name": "glm-4.5-flash",
+          "ms": 17151,
+          "inputTokens": 3992,
+          "outputTokens": 574,
+          "summary": "第 1 步：交卷；模型结束信号 tool_calls（只记录）",
+          "reason": "调用了交卷工具 → 停止"
+        },
+        {
+          "kind": "check",
+          "name": "result",
+          "ms": 17155,
+          "summary": "交卷 3 个片段，守卫后 keep 0 / fold 0 / drop 3"
+        }
+      ]
+    }
+  ],
+  "ranAt": "2026-10-04T06:16:54.064Z",
+  "wallMs": 696016,
+  "provider": "dashscope"
+}
