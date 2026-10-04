@@ -10,7 +10,30 @@ const KNOWN_PROVIDERS: Array<[RegExp, string]> = [
   [/agnes-ai\.com$/i, "Agnes AI"],
   [/openai\.com$/i, "OpenAI"],
   [/aiping\.cn$/i, "aiping.cn"],
+  [/bigmodel\.cn$/i, "智谱 AI"],
 ];
+
+function labelForHost(raw: string | undefined): string {
+  if (!raw) return "第三方大模型服务商";
+  try {
+    const host = new URL(raw).host;
+    return KNOWN_PROVIDERS.find(([pattern]) => pattern.test(host))?.[1] ?? host;
+  } catch {
+    return "第三方大模型服务商";
+  }
+}
+
+/** 识图（照片、视频帧）发给谁：VISION_PROVIDER=zhipu 时是智谱（外部设备接入工单 v2 Gate 0） */
+export function visionProviderLabel(): string {
+  if (process.env.VISION_PROVIDER?.trim() === "zhipu") return labelForHost(process.env.ZHIPU_BASE_URL?.trim() || "https://open.bigmodel.cn");
+  return modelProviderLabel();
+}
+
+/** 遇见手记的判断和写作（逐字稿片段）发给谁 */
+export function textProviderLabel(): string {
+  if (process.env.MEMO_LLM_PROVIDER?.trim() === "zhipu") return labelForHost(process.env.ZHIPU_BASE_URL?.trim() || "https://open.bigmodel.cn");
+  return labelForHost(process.env.MEMO_BASE_URL?.trim() || process.env.DASHSCOPE_BASE_URL || "https://dashscope.aliyuncs.com");
+}
 
 export function modelProviderLabel(): string {
   const raw = process.env.DASHSCOPE_BASE_URL;

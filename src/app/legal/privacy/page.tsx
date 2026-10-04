@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import styles from "../legal.module.css";
 import { PRIVACY_UPDATED_AT } from "@/lib/consent";
-import { modelProviderLabel } from "@/lib/model-provider";
+import { textProviderLabel, visionProviderLabel } from "@/lib/model-provider";
 
 export const metadata = {
   title: "隐私政策 · 遇见集",
@@ -111,19 +111,27 @@ export default function PrivacyPage() {
           </table>
 
           <h2>二、哪些数据会离开你的设备</h2>
-          <p>只有下面四种情况，且都不会在我们的服务端长期留存：</p>
+          <p>只有下面几种情况，且都不会在我们的服务端长期留存：</p>
           <ul>
             <li>
               <strong>遇见手记的录音</strong>：会上传到我们的服务器临时目录，转成单声道后立即删除原始音频，
               再上传到阿里云百炼的临时存储交给语音识别；拿到转写结果后删除服务器上的全部临时文件
               （处理失败时最多保留 2 小时供重试）。百炼临时存储中的文件由平台在 48 小时内自动清除，我们无法提前删除。
-              判断和写手记时，逐字稿中相关的片段会随请求发送给模型服务商，服务端不留存。
+              判断和写手记时，逐字稿中相关的片段会随请求发送给模型服务商（本站当前为{textProviderLabel()}），服务端不留存。
               <strong>所以遇见手记不是"数据始终只在手机里"</strong>：录音会经过我们的服务器和第三方语音识别服务处理。
             </li>
             <li>
               <strong>识别时的照片或视频帧</strong>：会通过我们的服务端转发给模型服务商
-              （本站当前为{modelProviderLabel()}）进行识别。我们的服务端<strong>不写入磁盘、不建立数据库记录</strong>，
+              （本站当前为{visionProviderLabel()}）进行识别。我们的服务端<strong>不写入磁盘、不建立数据库记录</strong>，
               转发完即释放。模型服务商如何处理，适用其自身的隐私条款。
+              你在手帐页「这天的照片」里放进来的照片先只存在你的设备上；写手帐时，只有拍摄时间和你某句话对得上的那几张
+              （每句话最多 3 张缩略图）会被发送去挑选和识别，其余照片不会离开你的设备。
+            </li>
+            <li>
+              <strong>从飞书导入录音（你主动授权时才有）</strong>：你授权后，我们的服务器会代你从飞书读取你选中的妙记的
+              文字记录和录音音频。文字记录用来生成手记素材，之后只保存在你的设备上；音频只用来判断哪句话是你说的，
+              计算完立即删除，不写入任何数据库。飞书的授权令牌只保存在你的设备上，服务器每次用完即丢弃。
+              你可以随时在「从飞书导入」页断开，或在飞书里撤销授权。
             </li>
             <li>
               <strong>结构化的记录摘要</strong>（名称、类别、地点文字、日期）：

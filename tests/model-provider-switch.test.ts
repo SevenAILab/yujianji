@@ -113,3 +113,19 @@ describe("失败分类", () => {
     expect(isQuotaError(undefined)).toBe(false);
   });
 });
+
+describe("隐私政策里点名的服务商跟着配置走", () => {
+  it("识图和判断写作分别按各自的服务商点名", async () => {
+    const { textProviderLabel, visionProviderLabel } = await import("@/lib/model-provider");
+    vi.stubEnv("DASHSCOPE_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1");
+    vi.stubEnv("VISION_PROVIDER", "");
+    vi.stubEnv("MEMO_LLM_PROVIDER", "");
+    vi.stubEnv("MEMO_BASE_URL", "");
+    expect(visionProviderLabel()).toBe("阿里云百炼");
+    expect(textProviderLabel()).toBe("阿里云百炼");
+    vi.stubEnv("VISION_PROVIDER", "zhipu");
+    vi.stubEnv("MEMO_LLM_PROVIDER", "zhipu");
+    expect(visionProviderLabel()).toBe("智谱 AI");
+    expect(textProviderLabel()).toBe("智谱 AI");
+  });
+});
