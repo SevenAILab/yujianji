@@ -5,7 +5,8 @@ import { agentErrorResponse, memoGuard, readJson } from "@/lib/memo/server/http"
 import { judgeWindow } from "@/lib/memo/service/judge";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+// 用智谱时判断截止时间可调到 90 秒（MEMO_JUDGE_DEADLINE_MS），平台的函数时长上限要留够
+export const maxDuration = 120;
 
 export async function POST(request: Request) {
   const gate = await memoGuard(request, "spend");

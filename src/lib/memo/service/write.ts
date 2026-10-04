@@ -1,4 +1,5 @@
 // 写作服务（spec §4.7）：写 → 确定性检查 → 独立检查员 → 带反馈重写一次 → 仍不过降级为整理后的原话；金句代码逐字校验。
+import { numberEnv } from "../../agent/provider";
 import { toAgentError } from "../../agent/errors";
 import { clip } from "../../agent/redact";
 import { runAgent } from "../../agent/run";
@@ -88,7 +89,9 @@ function deterministic(moment: WriteMoment, text: string | undefined): string[] 
 
 export async function writeDiary(req: WriteRequest, opts: WriteOptions = {}): Promise<WriteResult> {
   const trace = new TraceBuilder("write", req.dayKey, { runId: req.runId, dayKey: req.dayKey });
-  const deadlineAt = Date.now() + (req.budgetMs ?? 50_000);
+  // 时间预算可配：智谱免费模型写 5 段草稿要 30 秒以上（10/4 实测在 30 秒线上超时），用智谱时建议整轮 100 秒、草稿 60 秒
+  const deadlineAt = Date.now() + (req.budgetMs ?? numberEnv("MEMO_WRITE_BUDGET_MS", 50_000));
+  const draftCapMs = numberEnv("MEMO_WRITE_DRAFT_MS", 30_000);
   const remaining = () => deadlineAt - Date.now();
   const styleRules = req.profile.rules.filter((r) => r.kind === "style").map((r) => r.text);
 
@@ -115,7 +118,7 @@ export async function writeDiary(req: WriteRequest, opts: WriteOptions = {}): Pr
           system: writerSystem,
           prompt: buildWriterPrompt({ dayKey: req.dayKey, moments: toWrite.map(toWriterInput) }),
           submit: { name: WRITER_SUBMIT_NAME, description: "今日手记草稿", schema: writerOutputSchema },
-          deadlineMs: Math.max(8_000, Math.min(30_000, remaining() - 12_000)),
+          deadlineMs: Math.max(8_000, Math.min(draftCapMs, remaining() - 12_000)),
           trace,
           temperature: 0.3,
           maxOutputTokens: 2_500,

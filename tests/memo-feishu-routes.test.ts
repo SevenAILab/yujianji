@@ -7,7 +7,7 @@ import { GET as callback } from "@/app/api/memo/feishu/callback/route";
 import { POST as claim } from "@/app/api/memo/feishu/claim/route";
 import { POST as transcript } from "@/app/api/memo/feishu/transcript/route";
 import { POST as minutes } from "@/app/api/memo/feishu/minutes/route";
-import { base64urlJson, HANDOFF_COOKIE, STATE_COOKIE } from "@/lib/memo/server/feishu-http";
+import { HANDOFF_COOKIE, putHandoff, STATE_COOKIE } from "@/lib/memo/server/feishu-http";
 
 const DEVICE = "dev_test_feishu_routes_0001";
 // 全是虚构值
@@ -85,15 +85,18 @@ describe("授权", () => {
     expect(handoff).toContain("Path=/api/memo/feishu/claim");
     expect(handoff.toLowerCase()).toContain("httponly");
     expect(handoff).toMatch(/Max-Age=120/);
+    // cookie 里只有一次性编号，不含令牌（令牌太长会被浏览器丢掉，2026-10-04 实测）
+    expect(handoff).not.toContain(FAKE_USER_TOKEN);
+    expect(handoff.split(";")[0].length).toBeLessThan(80);
   });
 
   it("领取一次就清掉；没有 cookie 就要求重新授权", async () => {
-    const value = base64urlJson({ tokens: { accessToken: FAKE_USER_TOKEN, expiresAt: 1 }, names: ["Seven"] });
+    const value = putHandoff({ tokens: { accessToken: FAKE_USER_TOKEN, expiresAt: 1 }, names: ["Seven"] });
     const res = await claim(req("https://yujianji.example.com/api/memo/feishu/claim", { method: "POST", cookies: { [HANDOFF_COOKIE]: value }, body: {} }));
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ tokens: { accessToken: FAKE_USER_TOKEN, expiresAt: 1 }, names: ["Seven"] });
     expect(res.headers.get("set-cookie")).toMatch(new RegExp(`${HANDOFF_COOKIE}=;.*Max-Age=0`));
-    const again = await claim(req("https://yujianji.example.com/api/memo/feishu/claim", { method: "POST", body: {} }));
+    const again = await claim(req("https://yujianji.example.com/api/memo/feishu/claim", { method: "POST", cookies: { [HANDOFF_COOKIE]: value }, body: {} }));
     expect(again.status).toBe(404);
   });
 });
@@ -136,5 +139,15 @@ describe("导入接口", () => {
     expect(seen[0].url).toBe("https://open.feishu.cn/open-apis/minutes/v1/minutes/search?page_size=30");
     expect(seen[0].url).not.toContain(FAKE_USER_TOKEN);
     expect(seen[0].auth).toBe(`Bearer ${FAKE_USER_TOKEN}`);
+  });
+});
+
+describe("纪要里的文字记录文档", () => {
+  it("按 artifact_type=2 取；有直接字段时用直接字段；都没有返回 null", async () => {
+    const { verbatimTokenFromNote } = await import("@/lib/feishu/api");
+    expect(verbatimTokenFromNote({ artifacts: [{ artifact_type: 1, doc_token: "NoteDocToken0000000000000" }, { artifact_type: 2, doc_token: "VerbatimToken000000000000" }] })).toBe("VerbatimToken000000000000");
+    expect(verbatimTokenFromNote({ verbatim_doc_token: "DirectToken00000000000000" })).toBe("DirectToken00000000000000");
+    expect(verbatimTokenFromNote({ artifacts: [{ artifact_type: 1, doc_token: "NoteDocToken0000000000000" }] })).toBeNull();
+    expect(verbatimTokenFromNote(undefined)).toBeNull();
   });
 });

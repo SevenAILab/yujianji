@@ -5,7 +5,8 @@ import { agentErrorResponse, memoGuard, readJson } from "@/lib/memo/server/http"
 import { writeDiary } from "@/lib/memo/service/write";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+// 用智谱时写作预算可调到 100 秒（MEMO_WRITE_BUDGET_MS），平台的函数时长上限要留够
+export const maxDuration = 120;
 
 export async function POST(request: Request) {
   const gate = await memoGuard(request, "spend");

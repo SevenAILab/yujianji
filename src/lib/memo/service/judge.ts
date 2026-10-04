@@ -1,4 +1,5 @@
 // 判断服务（spec §4.6）：Agent 循环 + 工具 → 守卫 G1–G9 → facts 核对 → 补一段候选。路由、实验室、eval 共用。
+import { numberEnv } from "../../agent/provider";
 import type { ToolSet } from "ai";
 import { AgentError, toAgentError } from "../../agent/errors";
 import { clip } from "../../agent/redact";
@@ -54,7 +55,8 @@ function backfillCandidates(req: JudgeRequest, moment: GuardedMoment): NonNullab
 export async function judgeWindow(req: JudgeRequest, opts: JudgeOptions = {}): Promise<JudgeResult> {
   const trace = new TraceBuilder("judge", req.window.id, { runId: req.runId, sessionId: req.session.id });
   const startedAt = Date.now();
-  const deadlineMs = opts.deadlineMs ?? 45_000;
+  // 整轮截止时间可配：智谱免费模型判断真实长窗口要 34–45 秒（10/4 实测），45 秒会卡线超时，用智谱时建议 90 秒
+  const deadlineMs = opts.deadlineMs ?? numberEnv("MEMO_JUDGE_DEADLINE_MS", 45_000);
   const deadlineAt = startedAt + deadlineMs;
   const maxToolCalls = opts.maxToolCalls ?? defaultMaxToolCalls();
 

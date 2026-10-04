@@ -216,11 +216,22 @@ export async function getMinute(userToken: string, minuteToken: string): Promise
   };
 }
 
+/**
+ * 纪要里的「文字记录」文档。原始接口不直接给 verbatim_doc_token，要从 artifacts 里按类型取
+ * （2026-10-04 用 Seven 的妙记实测：artifact_type 1 = 智能纪要，2 = 文字记录；lark-cli 的 note +detail 也是这样推出来的）。
+ */
+export function verbatimTokenFromNote(note: { verbatim_doc_token?: string; artifacts?: { artifact_type?: number; doc_token?: string }[] } | undefined): string | null {
+  const direct = note?.verbatim_doc_token;
+  if (direct && DOC_TOKEN_PATTERN.test(direct)) return direct;
+  const fromArtifacts = note?.artifacts?.find((a) => a.artifact_type === 2)?.doc_token;
+  return fromArtifacts && DOC_TOKEN_PATTERN.test(fromArtifacts) ? fromArtifacts : null;
+}
+
 export async function verbatimDocToken(userToken: string, noteId: string): Promise<string> {
   if (!NOTE_ID_PATTERN.test(noteId)) throw new FeishuError("FEISHU_NOT_FOUND", 400, "纪要标识不正确");
-  const data = await openApi<{ note?: { verbatim_doc_token?: string } }>(userToken, "GET", `/open-apis/vc/v1/notes/${noteId}`);
-  const token = data.note?.verbatim_doc_token;
-  if (!token || !DOC_TOKEN_PATTERN.test(token)) throw new FeishuError("FEISHU_NOT_READY", 409, "飞书还在整理这段录音的文字记录，稍后再试");
+  const data = await openApi<{ note?: { verbatim_doc_token?: string; artifacts?: { artifact_type?: number; doc_token?: string }[] } }>(userToken, "GET", `/open-apis/vc/v1/notes/${noteId}`);
+  const token = verbatimTokenFromNote(data.note);
+  if (!token) throw new FeishuError("FEISHU_NOT_READY", 409, "飞书还在整理这段录音的文字记录，稍后再试");
   return token;
 }
 
