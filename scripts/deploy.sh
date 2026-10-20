@@ -122,7 +122,7 @@ deploy_model3d() {
     printf '    [dry-run] 比较 requirements 校验和并按需 pip install\n'
   elif [ ! -f "$stamp" ] || [ "$(cat "$stamp")" != "$want" ]; then
     say "依赖有变化，pip install"
-    "$MODEL3D_DIR/.venv/bin/pip" install -q -r "$MODEL3D_DIR/requirements.txt"
+    "$MODEL3D_DIR/.venv/bin/python" -m pip install -q -r "$MODEL3D_DIR/requirements.txt"
     echo "$want" > "$stamp"
   else
     say "依赖未变，跳过 pip install"
