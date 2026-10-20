@@ -21,6 +21,22 @@
 
 影石 X6 的接入方式不是直连相机，而是手机中继：用户在 Insta360 App 中把 360 照片导出到手机相册，再在遇见集的设备页或新建遇见页导入。路线轨迹、旅程拼贴和分享闭环已具备基础页面，后续重点是设备兼容与真实用户验证。
 
+## 部署（以 GitHub main 为准）
+
+服务器上一条命令完成同步、构建和重启：
+
+```bash
+cd /var/www/yujianji
+./scripts/deploy.sh all      # 主站 + 3D 服务
+./scripts/deploy.sh web      # 只主站（npm ci 按 lock 校验和触发 → build → 重启 → 校验 commit）
+./scripts/deploy.sh model3d  # 只 3D 服务（rsync 到 /var/www/yujianji-3d → 按需 pip install → 重启 → /health）
+```
+
+- 工作区不干净或不在 main 时脚本直接拒绝执行，不会部署半成品。
+- `--dry-run` 只打印步骤；`--no-pull` 用当前 checkout 的版本部署（救急）。
+- 3D 服务的运行目录保留 `.venv` / `.env` / `data` / `output`，`rsync --delete` 只清代码。
+- 依赖校验和存在 `/var/lib/yujianji-deploy`，不在仓库也不在运行目录。
+
 ## 技术栈
 
 - **应用框架**：Next.js 16（App Router）+ React 19 + TypeScript；
