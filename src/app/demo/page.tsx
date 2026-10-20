@@ -1,6 +1,6 @@
 "use client";
 
-// 路演扫码入口：/demo。先由根布局的同意弹层征得同意，同意后自动载入示例手帐，直接进旅途。
+// 路演扫码入口：/demo。先由根布局的同意弹层征得同意，同意后自动载入示例手帐，落到地球页（首页）。
 // 已经载入过（或已是最新版示例）就不重复写；自己的记录一条不动。
 // 想落到别的页面：/demo?to=/universe
 import { useLiveQuery } from "dexie-react-hooks";
@@ -21,8 +21,8 @@ export default function DemoEntryPage() {
 
 function DemoEntry() {
   const router = useRouter();
-  const to = useSearchParams().get("to") ?? "/journeys";
-  const target = ALLOWED.has(to) ? to : "/journeys";
+  const to = useSearchParams().get("to") ?? "/";
+  const target = ALLOWED.has(to) ? to : "/";
   // 同意弹层写的是 db.meta，这里订阅它：用户点完「开始使用」就接着往下走
   const consent = useLiveQuery(() => readConsent(), [], undefined);
   const [error, setError] = useState("");
