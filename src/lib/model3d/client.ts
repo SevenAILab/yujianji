@@ -67,11 +67,15 @@ export async function syncModelJobs(): Promise<number> {
 // 提交失败（没开通、额度用完、断网）后，自动提交先歇 10 分钟，别每 20 秒撞一次
 let autoPausedUntil = 0;
 
-/** 给还没模型的藏品提交建模。auto=true 只挑最近 48 小时拍的；每轮最多 limit 件 */
+/** 给还没模型的藏品提交建模。auto=true 只挑最近 48 小时「存进来」的；每轮最多 limit 件 */
 export async function submitMissing(options: { auto: boolean; limit: number }): Promise<number> {
   if (LOCAL_ONLY || (options.auto && Date.now() < autoPausedUntil)) return 0;
-  const since = new Date(Date.now() - AUTO_WINDOW_MS).toISOString();
-  const items = options.auto ? await db.items.where("date").above(since).toArray() : await db.items.toArray();
+  // 用 createdAt（存进来的时间）而不是 date（拍摄时间）：相册里的旧照片导入后也该自动建模
+  const since = Date.now() - AUTO_WINDOW_MS;
+  const all = await db.items.toArray();
+  const items = options.auto
+    ? all.filter((item) => Date.parse(item.createdAt) >= since)
+    : all;
   const taken = new Set((await db.models3d.toCollection().primaryKeys()).map(String));
   const candidates = items.filter((item) => modelable(item) && !taken.has(item.id)).slice(0, options.limit);
   let submitted = 0;
