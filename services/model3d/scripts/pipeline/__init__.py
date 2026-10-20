@@ -1,0 +1,1 @@
+"""Offline Encounter asset pipeline."""
