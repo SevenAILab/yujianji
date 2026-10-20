@@ -1,2 +1,5 @@
 -r requirements.txt
 pytest>=8,<10
+# tests/test_pipeline.py 导出 3MF/STL 时 trimesh 需要这两个可选依赖
+networkx>=3,<4
+lxml>=5,<7
