@@ -476,7 +476,7 @@
 .hardwareCard button:disabled { opacity: .5; cursor: not-allowed; }
 .hardwareCard button:focus-visible { outline: 2px solid #27897e; outline-offset: 3px; }
 .statusButton { margin-top: 14px; border: 0; background: transparent; color: #176c67; text-decoration: underline; font-size: 12px; }
-.hardwareError { color: #a63f2e; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.hardwareError { margin: 12px 0 0; padding: 11px 14px; background: var(--ui-coral, #ef655f); color: var(--ui-ink, #1b1715); clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
 .healthMetrics { display: grid; gap: 10px; }
 .healthMetrics > div { display: grid; gap: 6px; padding: 12px; border-radius: 14px; background: #e1eee8; }
 .healthMetrics span { font-size: 12px; }
@@ -490,3 +490,129 @@
 .panoramaCount small { display: block; margin-top: 4px; color: #607d79; font-size: 10px; }
 .storageHelp { padding-bottom: 16px; }
 .storageHelp a { color: #216f65; font-size: 12px; }
+
+/* 设备页与首页共用同一套「纸面 + 靛蓝 + 45° 斜切」系统。 */
+.deviceShell { background: var(--ui-paper, #eee8da); }
+.devicePage { padding-top: 42px; }
+.deviceHeader h1,
+.deviceSummary h2,
+.oscHeader h2,
+.hardwareHeader h2 { color: var(--ui-indigo, #454471); }
+.deviceHeader p,
+.deviceSummary small,
+.deviceSummary p,
+.deviceSummary .connectedStatus,
+.hardwareNote,
+.hardwareHeader + p,
+.healthMetrics small { color: rgba(69, 68, 113, .72); }
+.deviceEyebrow { color: var(--ui-coral, #ef655f); }
+
+.deviceCard,
+.deviceSettings,
+.oscPanel,
+.hardwareCard {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--ui-cream, #f8f1dd) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px));
+}
+
+.cameraIllustration,
+.devicePhoto {
+  border-radius: 0;
+  background: var(--ui-moss, #8b9c7e);
+  color: var(--ui-cream, #f8f1dd);
+  box-shadow: none;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+}
+.cameraIllustration::before,
+.cameraIllustration::after,
+.cameraIllustration > span { display: none; }
+
+.deviceStats > span,
+.panoramaCount,
+.healthMetrics > div {
+  border-radius: 0;
+  background: var(--ui-paper, #eee8da);
+  color: var(--ui-indigo, #454471);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+.deviceStats strong,
+.deviceStats small,
+.panoramaCount,
+.panoramaCount strong,
+.panoramaCount small,
+.liveHeartRate { color: var(--ui-indigo, #454471); }
+
+.connectDevice {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  justify-items: start;
+  align-items: center;
+  align-content: center;
+  column-gap: 11px;
+  min-height: 78px;
+  padding: 13px 24px;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--ui-indigo, #454471) !important;
+  color: var(--ui-cream, #f8f1dd) !important;
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+}
+.connectDevice > span {
+  grid-row: 1 / 3;
+  width: 34px;
+  height: 34px;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ui-cream, #f8f1dd);
+}
+.connectDevice strong { font-family: var(--serif); font-size: 15px; }
+.connectDevice small { color: rgba(248, 241, 221, .74); font-size: 10px; }
+
+.deviceSettings {
+  padding: 0;
+  background: transparent !important;
+  clip-path: none;
+}
+.settingsRow {
+  grid-template-columns: 36px 1fr auto;
+  min-height: 72px;
+  padding: 12px 18px;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--ui-cream, #f8f1dd) !important;
+  color: var(--ui-indigo, #454471) !important;
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+}
+.settingsIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 0;
+  background: var(--ui-paper, #eee8da);
+  color: var(--ui-indigo, #454471);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+.settingsRow small,
+.settingsRow > svg { color: rgba(69, 68, 113, .72); }
+
+.hardwareCard { color: var(--ui-ink, #1b1715); }
+.hardwareHeader > svg { color: var(--ui-indigo, #454471); }
+.hardwareButton {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--ui-cream, #f8f1dd) !important;
+  color: var(--ui-indigo, #454471) !important;
+  box-shadow: none !important;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+.connectButton,
+.hardwareButton:hover:not(:disabled) {
+  background: var(--ui-indigo, #454471) !important;
+  color: var(--ui-cream, #f8f1dd) !important;
+}
+.hardwareCard button:focus-visible { outline-color: var(--ui-indigo, #454471); }
+.storageHelp a { color: var(--ui-indigo, #454471); }

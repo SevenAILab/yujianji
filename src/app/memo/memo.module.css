@@ -161,19 +161,21 @@
 
 .notice {
   padding: 12px 14px;
-  border-radius: 14px;
-  background: var(--mint);
-  color: var(--teal-dark);
+  border-radius: 0;
+  background: var(--ui-cream, #f8f1dd);
+  color: var(--ui-indigo, #454471);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
   font-size: 13px;
   line-height: 1.6;
 }
 
 .warning {
   padding: 12px 14px;
-  border: 1px solid rgba(185, 111, 47, 0.3);
-  border-radius: 14px;
-  background: #fbf3ea;
-  color: #7a4a1f;
+  border: 0;
+  border-radius: 0;
+  background: var(--ui-coral, #ef655f);
+  color: var(--ui-ink, #1b1715);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
   font-size: 13px;
   line-height: 1.6;
 }
@@ -456,29 +458,38 @@
 
 .toast {
   position: fixed;
-  right: 16px;
-  bottom: calc(96px + env(safe-area-inset-bottom));
-  left: 16px;
+  right: auto;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  left: 0;
   z-index: 60;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  width: min(calc(100% - 32px), 480px);
-  margin: 0 auto;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: var(--ink);
-  color: #fff;
+  width: min(calc(100% - 34px), 480px);
+  min-height: 48px;
+  margin: 0;
+  padding: 11px 24px;
+  border-radius: 0;
+  background: var(--ui-indigo, #454471);
+  color: var(--ui-cream, #f8f1dd);
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px));
   font-size: 13px;
-  box-shadow: 0 12px 30px rgba(24, 59, 67, 0.3);
+  font-weight: 800;
+  box-shadow: none;
+  animation: notice-in 360ms cubic-bezier(.2, .8, .2, 1) both;
 }
 
 .toast button {
   border: 0;
   background: transparent;
-  color: #9fe0d6;
+  color: var(--ui-cream, #f8f1dd);
   font-weight: 800;
+}
+
+@keyframes notice-in {
+  from { transform: translateX(-110%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
 
 /* 逐字稿 / 过程 */
@@ -663,6 +674,17 @@
   border-radius: 4px;
   aspect-ratio: 4 / 5;
   object-fit: cover;
+}
+
+.diaryPhotoLink {
+  display: block;
+  color: inherit;
+  cursor: zoom-in;
+}
+
+.diaryPhotoLink:focus-visible {
+  outline: 2px solid var(--ui-indigo, #454471);
+  outline-offset: 4px;
 }
 
 .diaryText {

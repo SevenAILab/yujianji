@@ -241,7 +241,6 @@ export default function ItemPage() {
         <div className="hero-photo">
           <img src={currentItem.photo} alt={currentItem.name} />
         </div>
-
         <div className="detail-title">
           <div>
             <h1>{currentItem.name}</h1>

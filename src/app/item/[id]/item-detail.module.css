@@ -46,10 +46,22 @@
 .itemShell :global(.hero-photo) {
   margin-top: 15px;
   overflow: hidden;
-  border: 6px solid rgba(255, 255, 255, .78);
-  border-radius: 27px;
-  background: #dbe9e4;
-  box-shadow: 0 18px 38px rgba(39, 83, 77, .13);
+  box-sizing: border-box;
+  aspect-ratio: auto;
+  padding: 10px 10px 38px;
+  border: 0;
+  border-radius: 4px;
+  background: #fffef9;
+  box-shadow: none;
+}
+
+.itemShell :global(.hero-photo img) {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  border-radius: 0;
+  object-fit: cover;
 }
 
 .itemShell :global(.detail-title) {
@@ -184,8 +196,14 @@
 }
 
 .itemShell :global(.status-note) {
-  border-radius: 14px;
-  background: #e9f1ec;
+  border-radius: 0;
+  background: var(--ui-cream, #f8f1dd);
+  color: var(--ui-indigo, #454471);
+}
+
+.itemShell :global(.status-note.warning) {
+  background: var(--ui-coral, #ef655f);
+  color: var(--ui-ink, #1b1715);
 }
 
 .itemShell :global(.secondary-action) {
@@ -242,6 +260,6 @@
 
 @media (max-width: 430px) {
   .itemPage { padding: 22px 18px 28px; }
-  .itemShell :global(.hero-photo) { border-width: 4px; border-radius: 22px; }
+  .itemShell :global(.hero-photo) { padding: 7px 7px 29px; border-radius: 3px; }
   .itemShell :global(.detail-title h1) { font-size: 27px; }
 }

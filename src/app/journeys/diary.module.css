@@ -84,12 +84,15 @@
 .linkButton {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 3px;
   margin-left: auto;
-  padding: 0;
+  min-height: 36px;
+  padding: 0 18px;
   border: 0;
-  background: transparent;
-  color: var(--teal);
+  background: var(--ui-indigo, #454471);
+  color: var(--ui-cream, #f8f1dd);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
   font: inherit;
   font-size: 13px;
   font-weight: 600;

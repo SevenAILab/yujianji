@@ -1,15 +1,15 @@
 .wrap {
   position: fixed;
   top: calc(env(safe-area-inset-top, 0px) + 10px);
-  left: 50%;
+  left: 0;
   z-index: 70;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 6px;
-  width: max-content;
-  max-width: calc(100% - 32px);
-  transform: translateX(-50%);
+  width: min(calc(100% - 34px), 480px);
+  max-width: none;
+  transform: none;
   pointer-events: none;
 }
 
@@ -17,13 +17,15 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  max-width: 100%;
-  padding: 9px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  border-radius: 999px;
-  background: rgba(31, 84, 85, 0.95);
-  box-shadow: 0 8px 24px rgba(18, 40, 42, 0.18);
-  color: #fff;
+  width: 100%;
+  min-height: 48px;
+  max-width: none;
+  padding: 11px 42px 11px 24px;
+  border: 0;
+  border-radius: 0;
+  background: #454471;
+  color: #f8f1dd;
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px));
   font: inherit;
   font-size: 13px;
   font-weight: 600;
@@ -33,6 +35,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   pointer-events: auto;
+  animation: notice-in 360ms cubic-bezier(.2, .8, .2, 1) both;
 }
 
 button.pill {
@@ -40,16 +43,19 @@ button.pill {
 }
 
 .recording {
-  background: rgba(176, 48, 40, 0.95);
+  background: #ef655f;
+  color: #1b1715;
   font-variant-numeric: tabular-nums;
 }
 
 .done {
-  background: rgba(31, 84, 85, 0.95);
+  background: #8b9c7e;
+  color: #1b1715;
 }
 
 .error {
-  background: rgba(120, 72, 20, 0.95);
+  background: #ef655f;
+  color: #1b1715;
   white-space: normal;
 }
 
@@ -71,16 +77,20 @@ button.pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 8px 6px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 6px 18px rgba(18, 40, 42, 0.12);
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 18px 8px 24px;
+  border-radius: 0;
+  background: #f8f1dd;
+  color: #454471;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  box-shadow: none;
   font-size: 12px;
   pointer-events: auto;
 }
 
 .hint a {
-  color: var(--accent, #2f6f6a);
+  color: #454471;
   font-weight: 600;
   text-decoration: none;
 }
@@ -88,8 +98,13 @@ button.pill {
 .hint button {
   border: 0;
   background: transparent;
-  color: var(--muted, #6b7c7c);
+  color: #454471;
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
+}
+
+@keyframes notice-in {
+  from { transform: translateX(-110%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
