@@ -19,6 +19,8 @@ WEB_UNIT=${WEB_UNIT:-yujianji.service}
 MODEL3D_UNIT=${MODEL3D_UNIT:-yujianji-3d.service}
 HEALTH_WEB=${HEALTH_WEB:-http://127.0.0.1:3001/api/health}
 HEALTH_MODEL3D=${HEALTH_MODEL3D:-http://127.0.0.1:8000/health}
+# 部署状态放仓库和运行目录之外，避免被 --delete 清掉或被 git 当成脏文件
+STATE_DIR=${STATE_DIR:-/var/lib/yujianji-deploy}
 BRANCH=${BRANCH:-main}
 
 target=${1:-all}
@@ -38,6 +40,7 @@ run() {
   if [ "$dry_run" = 1 ]; then printf '    [dry-run] %s\n' "$*"; else "$@"; fi
 }
 
+mkdir -p "$STATE_DIR"
 cd "$REPO"
 
 # 1. 前置检查：工作区必须干净，分支必须是 main
@@ -80,7 +83,7 @@ wait_health() {
 deploy_web() {
   say "部署主站到 $WEB_DIR"
   cd "$WEB_DIR"
-  local stamp="$WEB_DIR/.npm-lock.sha256"
+  local stamp="$STATE_DIR/web-package-lock.sha256"
   local want
   want=$(sha256sum package-lock.json | cut -d' ' -f1)
   if [ "$dry_run" = 1 ]; then
@@ -115,7 +118,7 @@ deploy_model3d() {
     --exclude 'data/' --exclude 'output/' --exclude '.pytest_cache/' \
     "$REPO/services/model3d/" "$MODEL3D_DIR/"
 
-  local stamp="$MODEL3D_DIR/.requirements.sha256"
+  local stamp="$STATE_DIR/model3d-requirements.sha256"
   local want
   want=$(sha256sum "$REPO/services/model3d/requirements.txt" | cut -d' ' -f1)
   if [ "$dry_run" = 1 ]; then
