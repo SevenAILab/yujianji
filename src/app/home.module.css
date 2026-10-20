@@ -58,14 +58,14 @@
   margin: 13px 0 0;
   color: rgba(69, 68, 113, .7);
   font-family: Arial, sans-serif !important;
-  font-size: 10px !important;
+  font-size: 11px !important;
   font-weight: 800;
   letter-spacing: .11em;
 }
 
 .tagline {
   max-width: 370px;
-  margin: 22px 0 0;
+  margin: 14px 0 0;
   color: var(--indigo);
   font-family: var(--serif);
   font-size: 17px !important;
@@ -96,13 +96,26 @@
   white-space: nowrap;
 }
 
+.globeArea {
+  position: relative;
+  z-index: 1;
+}
+
+.globeInstruction {
+  margin: 0 25px 4px;
+  color: rgba(69, 68, 113, .5);
+  font-size: 10px !important;
+  font-weight: 800;
+  letter-spacing: .13em;
+}
+
 .globeStage {
   --cut: 34px;
   position: relative;
-  z-index: 1;
   margin: 0 25px;
   padding: 10px 14px 14px;
-  background: #f7f4eb;
+  /* 地球是透明线稿，窗口底色与首页同为一张复古纸面。 */
+  background: var(--paper);
   clip-path: polygon(0 0, calc(58% - var(--cut)) 0, 58% var(--cut), calc(100% - var(--cut)) var(--cut), 100% calc(var(--cut) * 2), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut)));
 }
 
@@ -114,7 +127,7 @@
 }
 
 .globeStage canvas { filter: hue-rotate(52deg) saturate(1.18) brightness(.86); }
-.globeStage :global([class*="globeHint"]) { top: 17px; left: 25px; z-index: 2; color: rgba(248, 241, 221, .7); font-size: 10px !important; font-weight: 800; letter-spacing: .13em; }
+.globeStage :global([class*="globeHint"]) { display: none; }
 
 .dashboard { padding: 16px 23px 24px; background: var(--paper); }
 
@@ -201,6 +214,7 @@
 .insight :global(.insight-line)::before { display: inline-block; width: 6px; height: 6px; margin: 0 8px 2px 3px; border-radius: 50%; background: var(--coral); content: ""; }
 
 .homeShell :global(.bottom-nav) {
+  position: fixed !important;
   right: 0;
   bottom: 0;
   left: 0;
@@ -221,12 +235,12 @@
   .homePage { display: grid; height: 100%; min-height: 0; grid-template-rows: auto minmax(0, 1fr) auto; }
   .heroHeader { gap: 14px; padding: calc(26px + env(safe-area-inset-top)) 20px 16px; }
   .wordmark { font-size: 35px !important; }
-  .subtitle { margin-top: 9px; }
-  .tagline { margin-top: 16px; font-size: 14px !important; }
+  .tagline { margin-top: 12px; font-size: 14px !important; }
   .universeEntry { min-width: 106px; height: 40px; padding-inline: 10px; font-size: 11px !important; }
   .homeShell { height: auto; min-height: 100svh; overflow-x: hidden; overflow-y: auto; }
   .homePage { display: block; height: auto; min-height: calc(100svh - 78px - env(safe-area-inset-bottom)); }
   /* 地球窗口由屏幕宽度决定，不能被可用视口高度的 grid 行压缩。 */
+  .globeInstruction { margin: 0 20px 4px; font-size: 10px !important; }
   .globeStage { height: min(calc(100vw - 40px), 505px); min-height: 0; margin: 0 20px; padding: 5px 8px 9px; flex-shrink: 0; }
   .globeStage > div { height: 100% !important; min-height: 0; }
   .dashboard { padding: 12px 16px 20px; }

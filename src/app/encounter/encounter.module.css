@@ -127,9 +127,14 @@
 }
 
 .encounterShell :global(.status-note) {
-  border-radius: 13px;
-  background: #e8f1ec;
-  color: #39716d;
+  border-radius: 0;
+  background: var(--ui-cream, #f8f1dd);
+  color: var(--ui-indigo, #454471);
+}
+
+.encounterShell :global(.status-note.warning) {
+  background: var(--ui-coral, #ef655f);
+  color: var(--ui-ink, #1b1715);
 }
 
 .encounterShell :global(.primary-action) {
@@ -143,9 +148,10 @@
 }
 
 .encounterShell :global(.error-box) {
-  border-color: rgba(218, 141, 112, .34);
-  border-radius: 18px;
-  background: #f8eae3;
+  border: 0;
+  border-radius: 0;
+  background: var(--ui-coral, #ef655f);
+  color: var(--ui-ink, #1b1715);
 }
 
 .encounterShell :global(.privacy-note) {
