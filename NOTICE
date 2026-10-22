@@ -1,0 +1,11 @@
+遇见集 (yujianji)
+Copyright 2026 Seven AI Lab (黄晓 / Seven) and 遇见集 contributors, including 彭佳娴.
+
+This project's source code is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Third-party content that is NOT covered by the Apache License 2.0:
+- Demo photos in public/demo/ and public/seed/ keep their original licenses
+  (CC0, CC BY, CC BY-SA, Unsplash License, or the owner's permission).
+  Sources, authors and licenses are listed in public/demo/CREDITS.md and README.md.
+- Demo 3D models in public/assets/models/demo/ were generated from those photos with Tripo;
+  they are provided for demonstration only.
